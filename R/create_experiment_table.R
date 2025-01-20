@@ -1,7 +1,16 @@
-create_experiment_table <- function(data_location_for_experiment,
-                                       experiment_definition_filename) {
+#' This function takes the experimental design and creates a table of all the simulations that will be run.
+#'
+#' @param experiment_folder Folder where the experiment data will be saved
+#' @param experiment_design_filename Name of the experiment definition file
+#'
+#' @return Returns the number of cases in the experiment. Also saves to RDS the experiment design, for later use.
+#' @export
+#'
+#' @examples NULL
+create_experiment_table <- function(experiment_folder,
+                                    experiment_design_filename) {
 
-  expt_def <- jsonlite::fromJSON(paste0(data_location_for_experiment, experiment_definition_filename))
+  expt_def <- jsonlite::fromJSON(paste0(experiment_folder, experiment_design_filename))
 
 
 
@@ -51,7 +60,7 @@ create_experiment_table <- function(data_location_for_experiment,
                                            trait_selection_method = .$trait_selection_method))
   expt <- cbind(expt, community_object)
 
-  saveRDS(expt, paste0(data_location_for_experiment, "experiment_table.RDS"))
+  saveRDS(expt, paste0(experiment_folder, "experiment_table.RDS"))
 
   return(paste("Number of simulations in experiment is", nrow(expt)))
 

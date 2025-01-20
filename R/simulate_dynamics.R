@@ -1,18 +1,28 @@
-simulate_dynamics <- function(data_location_for_experiment,
-                              expt_definition_filename) {
+#' Simulate the dynamics of all the cases in an experiment
+#' Unfortunately at the moment has features of temperature series hard coded in
+#'
+#' @param experiment_folder The folder where all information about the experiment is stored
+#' @param experiment_design_filename The filename of the experiment design file
+#'
+#' @return Returns nothing. Saves to SQLite databases the temperature time series and the community dynamics.
+#' @export
+#'
+#' @examples NULL
+simulate_dynamics <- function(experiment_folder,
+                              experiment_design_filename) {
 
   ## setup the databases for saving the temperature time series and the community dynamics
   ## set up data base to save results into
   #library(RSQLite)
   #library(DBI)
-  file.remove(paste0(data_location_for_experiment, "dynamics.db"))
-  file.remove(paste0(data_location_for_experiment, "temperatures.db"))
-  conn_dynamics <- dbConnect(RSQLite::SQLite(), paste0(data_location_for_experiment, "dynamics.db"))
-  conn_temperatures <- dbConnect(RSQLite::SQLite(), paste0(data_location_for_experiment, "temperatures.db"))
+  file.remove(paste0(experiment_folder, "dynamics.db"))
+  file.remove(paste0(experiment_folder, "temperatures.db"))
+  conn_dynamics <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "dynamics.db"))
+  conn_temperatures <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "temperatures.db"))
 
-  expt <- readRDS(paste0(data_location_for_experiment, "experiment_table.rds"))
+  expt <- readRDS(paste0(experiment_folder, "experiment_table.rds"))
 
-  expt_def <- jsonlite::fromJSON(paste0(data_location_for_experiment, experiment_definition_filename))
+  expt_def <- jsonlite::fromJSON(paste0(experiment_folder, experiment_design_filename))
 
 
   i <- 1

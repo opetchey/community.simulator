@@ -9,8 +9,16 @@ simulator_lv(input_com_params, TcelSeries, initial_abundances)
 \arguments{
 \item{input_com_params}{Community object, containing all species and community parameters}
 
-\item{initial_abundances}{}
+\item{TcelSeries}{Time series of temperature values}
+
+\item{initial_abundances}{Initial abundances of each species}
+}
+\value{
+Time series of population abundances for each species
 }
 \description{
 Simulate the population dynamics of a community of species using the Lotka-Volterra competition model with temperature-dependent vital rates.
+}
+\examples{
+NULL
 }

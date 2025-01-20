@@ -1,13 +1,13 @@
 #' Simulate the population dynamics of a community of species using the Lotka-Volterra competition model with temperature-dependent vital rates.
 #'
 #' @param input_com_params Community object, containing all species and community parameters
-#' @param TcelSeries
-#' @param initial_abundances
+#' @param TcelSeries Time series of temperature values
+#' @param initial_abundances Initial abundances of each species
 #'
-#' @return
+#' @return Time series of population abundances for each species
 #' @export
 #'
-#' @examples
+#' @examples NULL
 simulator_lv<-function(input_com_params,
                        TcelSeries,
                        initial_abundances){
