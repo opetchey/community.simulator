@@ -1,0 +1,85 @@
+---
+title: "test"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{test}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(community.simulator)
+```
+
+
+```{r}
+rm(list = ls())
+```
+
+```{r}
+usethis::use_package("dplyr")
+```
+
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(here)
+library(kableExtra)
+library(patchwork)
+library(primer)
+library(DBI)
+library(RSQLite)
+library(dplyr)
+library(dirmult)
+#library(community.simulator)
+```
+
+
+
+```{r}
+## Use this to load the package with any changes made to functions
+devtools::load_all()
+```
+
+
+
+```{r}
+## make a path to the desktop for saving data
+data_location <- "~/Desktop"
+experiment_name <- "test"
+data_location_for_experiment <- paste0(data_location, "/", experiment_name, "/")
+if(!dir.exists(data_location_for_experiment))
+  dir.create(data_location_for_experiment)
+rm(data_location)
+```
+
+**Now put the experiment definition csv in the experiment folder.**
+
+```{r}
+experiment_definition_filename <- "experiment_definition.csv"
+create_experiment_table(data_location_for_experiment, experiment_definition_filename)
+```
+
+```{r}
+seed.to.use <- 1234569 ## set.seed(as.numeric(Sys.time()))
+```
+
+
+```{r}
+#experiment_table <- readRDS(paste0(data_location_for_experiment, "experiment_table.rds"))
+```
+
+```{r}
+simulate_dynamics(data_location_for_experiment,
+                              experiment_definition_filename)
+```
+
+
