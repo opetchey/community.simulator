@@ -12,17 +12,7 @@ simulate_dynamics <- function(data_location_for_experiment,
 
   expt <- readRDS(paste0(data_location_for_experiment, "experiment_table.rds"))
 
-
-  expt_def <- read.csv(paste0(data_location_for_experiment, expt_definition_filename))
-
-  lookup_object_value <- function(expt_def, this_object) {
-    #check if object can be parsed as numeric
-    result <- suppressWarnings(as.numeric(expt_def$Value[expt_def$Object == this_object]))
-    if(is.na(result))
-      result <- as.character(expt_def$Value[expt_def$Object == this_object])
-    result
-  }
-
+  expt_def <- jsonlite::fromJSON(paste0(data_location_for_experiment, experiment_definition_filename))
 
 
   i <- 1
@@ -37,19 +27,19 @@ simulate_dynamics <- function(data_location_for_experiment,
     if(expt$temperature_series_control[i] == "all_different")
       set.seed(seed.to.use + abs(parse_number(as.character(expt$rep_names[i]))))
 
-    temperature_series <- tibble(phase = c(rep("burn_in", lookup_object_value(expt_def, "burn_in_duration")),
-                                           rep("expt", lookup_object_value(expt_def, "experiment_duration")+1)),
-                                 time = 0:(lookup_object_value(expt_def, "burn_in_duration") +
-                                             lookup_object_value(expt_def, "experiment_duration")),
+    temperature_series <- tibble(phase = c(rep("burn_in", expt_def$burn_in_duration),
+                                           rep("expt", expt_def$experiment_duration + 1)),
+                                 time = 0:(expt_def$burn_in_duration +
+                                             expt_def$experiment_duration),
                                  temperature = c(
                                    ## first the burn in phase, with temperature constant at the mean
-                                   rep(lookup_object_value(expt_def, "temperature_mean"),
-                                       lookup_object_value(expt_def, "burn_in_duration")),
+                                   rep(expt_def$temperature_mean,
+                                       expt_def$burn_in_duration),
                                    ## then the experiment phase, with temperature fluctuating
                                    scale(
-                                     one_over_f(gamma = 0.8, N = lookup_object_value(expt_def, "experiment_duration")+1)
+                                     one_over_f(gamma = 0.8, N = expt_def$experiment_duration+1)
                                    ) *
-                                     lookup_object_value(expt_def, "temperature_sd") + lookup_object_value(expt_def, "temperature_mean")),
+                                     expt_def$temperature_sd + expt_def$temperature_mean),
                                  case_id = expt$case_id[i])
     Tcel_control<-temperature_series$temperature
     Tcel_controlm<-matrix(Tcel_control,nrow=1)
@@ -75,7 +65,7 @@ simulate_dynamics <- function(data_location_for_experiment,
              time = temperature_series$time) |>
       pivot_longer(names_to = "Species_ID", values_to = "Abundance",
                    cols = starts_with("Spp")) |>
-      filter(time > lookup_object_value(expt_def, "burn_in_duration"))
+      filter(time > expt_def$burn_in_duration)
 
 
    # ggplot(spts, aes(x = time, y = Abundance, color = Species_ID)) +
@@ -83,7 +73,7 @@ simulate_dynamics <- function(data_location_for_experiment,
    #   labs(title = paste("Case ID:", expt$case_id[i]))
 
     temperature_series_expt_only <- temperature_series |>
-      filter(time > lookup_object_value(expt_def, "burn_in_duration"))
+      filter(time > expt_def$burn_in_duration)
 
     if(i == 1) {
       dbWriteTable(conn_dynamics, "dynamics", spts, overwrite = TRUE)
@@ -93,9 +83,8 @@ simulate_dynamics <- function(data_location_for_experiment,
       dbWriteTable(conn_dynamics, "dynamics", spts, append = TRUE)
       dbWriteTable(conn_temperatures, "temperatures", temperature_series_expt_only, append = TRUE)
     }
-  }
 
 
-
+    }
 
 }

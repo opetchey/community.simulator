@@ -24,7 +24,8 @@ rm(list = ls())
 ```
 
 ```{r}
-usethis::use_package("dplyr")
+## Use the next line to add a package to the DESCRIPTION file
+#usethis::use_package("dplyr")
 ```
 
 
@@ -53,7 +54,7 @@ devtools::load_all()
 
 ```{r}
 ## make a path to the desktop for saving data
-data_location <- "~/Desktop"
+data_location <- "/Users/owenpetchey/Desktop"
 experiment_name <- "test"
 data_location_for_experiment <- paste0(data_location, "/", experiment_name, "/")
 if(!dir.exists(data_location_for_experiment))
@@ -61,23 +62,15 @@ if(!dir.exists(data_location_for_experiment))
 rm(data_location)
 ```
 
-**Now put the experiment definition csv in the experiment folder.**
+**Now put the experiment definition json in the experiment folder. You can get a template of this file from the inst/ folder of the package.**
 
 ```{r}
-experiment_definition_filename <- "experiment_definition.csv"
+experiment_definition_filename <- "experiment_definition_template_v0.2.json"
 create_experiment_table(data_location_for_experiment, experiment_definition_filename)
 ```
 
 ```{r}
 seed.to.use <- 1234569 ## set.seed(as.numeric(Sys.time()))
-```
-
-
-```{r}
-#experiment_table <- readRDS(paste0(data_location_for_experiment, "experiment_table.rds"))
-```
-
-```{r}
 simulate_dynamics(data_location_for_experiment,
                               experiment_definition_filename)
 ```

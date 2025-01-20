@@ -1,46 +1,39 @@
 create_experiment_table <- function(data_location_for_experiment,
-                                       expt_definition_filename) {
+                                       experiment_definition_filename) {
 
-  expt_def <- read.csv(paste0(data_location_for_experiment, expt_definition_filename))
-
-  lookup_object_value <- function(expt_def, this_object) {
-    #check if object can be parsed as numeric
-    result <- suppressWarnings(as.numeric(expt_def$Value[expt_def$Object == this_object]))
-    if(is.na(result))
-      result <- as.character(expt_def$Value[expt_def$Object == this_object])
-    result
-  }
+  expt_def <- jsonlite::fromJSON(paste0(data_location_for_experiment, experiment_definition_filename))
 
 
-  rep_names <- paste0("rep-", 1:lookup_object_value(expt_def, "number_of_replicates"))
 
-  expt <- expand.grid(b_opt_mean = seq(lookup_object_value(expt_def, "b_opt_mean_treatment_min"),
-                                       lookup_object_value(expt_def, "b_opt_mean_treatment_max"),
-                                       length = lookup_object_value(expt_def, "b_opt_mean_treatment_length")),
-                      b_opt_range = seq(lookup_object_value(expt_def, "b_opt_range_treatment_min"),
-                                        lookup_object_value(expt_def, "b_opt_range_treatment_max"),
-                                        length = lookup_object_value(expt_def, "b_opt_range_treatment_length")),
-                      alpha_ij_mean = lookup_object_value(expt_def, "alpha_ij_mean_treatment"),
-                      alpha_ij_sd = seq(lookup_object_value(expt_def, "alpha_ij_sd_treatment_min"),
-                                        lookup_object_value(expt_def, "alpha_ij_sd_treatment_max"),
-                                        length = lookup_object_value(expt_def, "alpha_ij_sd_treatment_length")),
-                      richness = seq(lookup_object_value(expt_def, "number_of_species_min"),
-                                     lookup_object_value(expt_def, "number_of_species_max"),
-                                     length = lookup_object_value(expt_def, "number_of_species_length")),
+  rep_names <- paste0("rep-", 1:expt_def$number_of_replicates)
+
+  expt <- expand.grid(b_opt_mean = seq(expt_def$b_opt_mean_treatment_min,
+                                       expt_def$b_opt_mean_treatment_max,
+                                       length = expt_def$b_opt_mean_treatment_length),
+                      b_opt_range = seq(expt_def$b_opt_range_treatment_min,
+                                        expt_def$b_opt_range_treatment_max,
+                                        length = expt_def$b_opt_range_treatment_length),
+                      alpha_ij_mean = expt_def$alpha_ij_mean_treatment,
+                      alpha_ij_sd = seq(expt_def$alpha_ij_sd_treatment_min,
+                                        expt_def$alpha_ij_sd_treatment_max,
+                                        length = expt_def$alpha_ij_sd_treatment_length),
+                      richness = seq(expt_def$number_of_species_min,
+                                     expt_def$number_of_species_max,
+                                     length = expt_def$number_of_species_length),
                       rep_names = rep_names,
-                      trait_selection_method = lookup_object_value(expt_def, "trait_selection_method"),
-                      temperature_series_control = lookup_object_value(expt_def, "temperature_series_control"))
+                      trait_selection_method = expt_def$trait_selection_method,
+                      temperature_series_control = expt_def$temperature_series_control)
   expt <- expt %>%
     mutate(community_id = paste0("Comm-", 1:nrow(expt)),
            case_id = paste(community_id, rep_names, sep = "-"))
 
 
 
-  a_b <- lookup_object_value(expt_def, "a_b")
-  a_d<- lookup_object_value(expt_def, "a_d")
-  s <- lookup_object_value(expt_def, "sd_perf_curve")
-  z <- lookup_object_value(expt_def, "z")
-  alpha_jj <- lookup_object_value(expt_def, "alpha_jj")
+  a_b <- expt_def$a_b
+  a_d<- expt_def$a_d
+  s <- expt_def$sd_perf_curve
+  z <- expt_def$z
+  alpha_jj <- expt_def$alpha_jj
 
   community_object <- expt %>%
     rowwise(community_id) %>%
@@ -61,6 +54,7 @@ create_experiment_table <- function(data_location_for_experiment,
   saveRDS(expt, paste0(data_location_for_experiment, "experiment_table.RDS"))
 
   return(paste("Number of simulations in experiment is", nrow(expt)))
+
   }
 
 
