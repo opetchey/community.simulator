@@ -8,3 +8,4 @@
 .quarto
 .RDS
 .db
+inst/doc

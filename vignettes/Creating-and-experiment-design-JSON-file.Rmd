@@ -1,0 +1,78 @@
+---
+title: "Creating-and-experiment-design-JSON-file"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Creating-and-experiment-design-JSON-file}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(community.simulator)
+```
+
+# Introduction
+
+All entries are parsed and then must be R expressions that can be evaluated.
+
+## Single numbers
+
+"name": 0
+
+```{r}
+eval(parse(text = 0))
+```
+
+## Multiple numbers and functions
+
+"name": "c(0, 1, 2)"
+
+```{r}
+eval(parse(text = "c(0, 1, 2)"))
+```
+
+"name": "0:10"
+
+```{r}
+eval(parse(text = "0:10"))
+```
+
+"name": "seq(0, 10, 2)"
+
+```{r}
+eval(parse(text = "seq(0, 10, 2)"))
+```
+
+
+
+## Single words
+
+Do not use: "name": "word"
+
+```{r}
+eval(parse(text = "word"))
+```
+
+It must be:
+
+"name": "\"word\""
+
+```{r}
+eval(parse(text = "\"word\""))
+```
+
+## Multiple words
+
+"name": "c(\"word1\", \"word2\")"
+
+```{r}
+eval(parse(text = "c(\"word1\", \"word2\")"))
+```
+
