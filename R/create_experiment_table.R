@@ -1,4 +1,4 @@
-#' This function takes the experimental design and creates a table of all the simulations that will be run.
+#' This function takes the experimental design from the specified JSON experiment design file and creates a table of all the simulations that will be run.
 #'
 #' @param experiment_folder Folder where the experiment data will be saved
 #' @param experiment_design_filename Name of the experiment definition file
@@ -10,39 +10,30 @@
 create_experiment_table <- function(experiment_folder,
                                     experiment_design_filename) {
 
-  expt_def <- jsonlite::fromJSON(paste0(experiment_folder, experiment_design_filename))
+  expt_def <- read_experiment_design_json(experiment_folder, experiment_design_filename)
 
 
+  rep_names <- paste0("rep-", 1:eval(expt_def$number_of_replicates))
 
-  rep_names <- paste0("rep-", 1:expt_def$number_of_replicates)
-
-  expt <- expand.grid(b_opt_mean = seq(expt_def$b_opt_mean_treatment_min,
-                                       expt_def$b_opt_mean_treatment_max,
-                                       length = expt_def$b_opt_mean_treatment_length),
-                      b_opt_range = seq(expt_def$b_opt_range_treatment_min,
-                                        expt_def$b_opt_range_treatment_max,
-                                        length = expt_def$b_opt_range_treatment_length),
-                      alpha_ij_mean = expt_def$alpha_ij_mean_treatment,
-                      alpha_ij_sd = seq(expt_def$alpha_ij_sd_treatment_min,
-                                        expt_def$alpha_ij_sd_treatment_max,
-                                        length = expt_def$alpha_ij_sd_treatment_length),
-                      richness = seq(expt_def$number_of_species_min,
-                                     expt_def$number_of_species_max,
-                                     length = expt_def$number_of_species_length),
+  expt <- expand.grid(b_opt_mean = eval(expt_def$b_opt_mean_treatment),
+                      b_opt_range = eval(expt_def$b_opt_range_treatment),
+                      alpha_ij_mean = eval(expt_def$alpha_ij_mean_treatment),
+                      alpha_ij_sd = eval(expt_def$alpha_ij_sd_treatment),
+                      richness = eval(expt_def$number_of_species),
                       rep_names = rep_names,
-                      trait_selection_method = expt_def$trait_selection_method,
-                      temperature_series_control = expt_def$temperature_series_control)
+                      trait_selection_method = eval(expt_def$trait_selection_method),
+                      temperature_series_control = eval(expt_def$temperature_series_control))
   expt <- expt %>%
     mutate(community_id = paste0("Comm-", 1:nrow(expt)),
            case_id = paste(community_id, rep_names, sep = "-"))
 
 
 
-  a_b <- expt_def$a_b
-  a_d<- expt_def$a_d
-  s <- expt_def$sd_perf_curve
-  z <- expt_def$z
-  alpha_jj <- expt_def$alpha_jj
+  a_b <- eval(expt_def$a_b)
+  a_d <- eval(expt_def$a_d)
+  s <- eval(expt_def$sd_perf_curve)
+  z <- eval(expt_def$z)
+  alpha_jj <- eval(expt_def$alpha_jj)
 
   community_object <- expt %>%
     rowwise(community_id) %>%

@@ -1,5 +1,6 @@
 [
   {
+    "number_of_species_treatment": "seq(10, 20, 2)",
     "temperature_mean": 20,
     "temperature_sd": 4,
     "temperature_series_control": "all_different",
