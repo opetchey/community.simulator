@@ -31,8 +31,8 @@ devtools::load_all()
 
 ## make a path to the desktop for saving data
 ## While developing and testing, it can be useful to use the inst folder of the package as the location for the experiment
-experiment_folder_location <- here("inst")
-experiment_name <- "test"
+experiment_folder_location <- here("inst", "test_experiments")
+experiment_name <- "test_experiment1"
 experiment_design_filename <- "experiment_definition_template_v0.3.json"
 
 ## create folder for experiment, if it does not already exist
@@ -58,7 +58,7 @@ get_community_measures(experiment_folder, experiment_design_filename)
 
 ## Make plots for one community
 expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))
-case_id_oi <- expt$case_id[4]
+case_id_oi <- expt$case_id[1]
 graphs <- make_plots_for_one_community(experiment_folder, case_id_oi)
 
 graphs$p_tempseries
