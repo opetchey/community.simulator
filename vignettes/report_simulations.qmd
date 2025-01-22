@@ -476,7 +476,6 @@ p1 + p2 + p3
 
 ```
 
-
 Evenly distributed traits and the same temperature series for every simulation:
 
 ```{r}
@@ -502,8 +501,6 @@ p3 <- these_comm_measures |>
 p1 + p2 + p3
 
 ```
-
-
 
 Evenly distributed traits and different temperature series for each replicate. E.g., when there are five replicates, there are five temperature times series.
 
