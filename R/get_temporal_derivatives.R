@@ -4,10 +4,10 @@
 #' @param experiment_design_filename The name of the experiment design file
 #' @param every_t The time interval at which to calculate the derivatives
 #'
-#' @return
+#' @return Nothing. Saves data to a file.
 #' @export
 #'
-#' @examples
+#' @examples NULL
 get_temporal_derivatives <- function(experiment_folder,
                                      experiment_design_filename,
                                      every_t = 10) {

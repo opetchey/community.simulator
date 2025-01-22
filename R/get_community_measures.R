@@ -1,12 +1,12 @@
 #' Get various community level measures, e.g., community stability, response diversity, position of optimal temperature, etc.
 #'
-#' @param experiment_folder
-#' @param experiment_design_filename
+#' @param experiment_folder The folder containing the experiment data
+#' @param experiment_design_filename The name of the experiment design file
 #'
-#' @return
+#' @return Nothing. Saves data to a file.
 #' @export
 #'
-#' @examples
+#' @examples NULL
 get_community_measures <- function(experiment_folder, experiment_design_filename) {
 
 

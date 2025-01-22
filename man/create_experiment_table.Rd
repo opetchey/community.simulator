@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_experiment_table.R
 \name{create_experiment_table}
 \alias{create_experiment_table}
-\title{This function takes the experimental design and creates a table of all the simulations that will be run.}
+\title{This function takes the experimental design from the specified JSON experiment design file and creates a table of all the simulations that will be run.}
 \usage{
 create_experiment_table(experiment_folder, experiment_design_filename)
 }
@@ -15,7 +15,7 @@ create_experiment_table(experiment_folder, experiment_design_filename)
 Returns the number of cases in the experiment. Also saves to RDS the experiment design, for later use.
 }
 \description{
-This function takes the experimental design and creates a table of all the simulations that will be run.
+This function takes the experimental design from the specified JSON experiment design file and creates a table of all the simulations that will be run.
 }
 \examples{
 NULL

@@ -9,3 +9,5 @@
 .RDS
 .db
 inst/doc
+/doc/
+/Meta/

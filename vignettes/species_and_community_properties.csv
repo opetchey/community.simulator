@@ -1,0 +1,7 @@
+﻿Property,Level,Notes
+a_b,Species,Intercept of intrinsic growth rate - temperature function of species i.
+"b_{opt,i}",Species,Temperature at which intrinsic growth rate is highest for species i.
+s_i,Species,Width of intrinsic growth rate - temperature function of species i.
+a_d,Species,Intercept of death rate - temperature function of species i.
+z_i,Species,Slope of death rate - temperature function of species i.
+"alpha_{i,j}",Interaction,Strength of interspecific effect of species j on species i.
