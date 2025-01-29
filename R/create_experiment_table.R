@@ -22,7 +22,8 @@ create_experiment_table <- function(experiment_folder,
                       richness = eval(expt_def$number_of_species),
                       rep_names = rep_names,
                       trait_selection_method = eval(expt_def$trait_selection_method),
-                      temperature_series_control = eval(expt_def$temperature_series_control))
+                      temperature_series_control = eval(expt_def$temperature_series_control),
+                      one_over_f_gamma = eval(expt_def$one_over_f_gamma))
   expt <- expt %>%
     mutate(community_id = paste0("Comm-", 1:nrow(expt)),
            case_id = paste(community_id, rep_names, sep = "-"))

@@ -16,6 +16,7 @@
     "a_d": 0,
     "sd_perf_curve": 10,
     "z": 0.05,
-    "alpha_jj": 1
+    "alpha_jj": 1,
+    "one_over_f_gamma": 0.8
   }
 ]

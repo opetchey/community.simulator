@@ -43,8 +43,11 @@ experiment_folder <- create_experiment_folder(experiment_folder_location, experi
 ## Create experiment table
 create_experiment_table(experiment_folder, experiment_design_filename)
 
-## Simulate dynamics
+## Create environments
 seed.to.use <- 1234569 ## set.seed(as.numeric(Sys.time()))
+create_environments(experiment_folder, experiment_design_filename)
+
+## Simulate dynamics
 simulate_dynamics(experiment_folder, experiment_design_filename)
 
 ## Get temporal derivatives
@@ -58,7 +61,7 @@ get_community_measures(experiment_folder, experiment_design_filename)
 
 ## Make plots for one community
 expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))
-case_id_oi <- expt$case_id[1]
+case_id_oi <- expt$case_id[2]
 graphs <- make_plots_for_one_community(experiment_folder, case_id_oi)
 
 graphs$p_tempseries
@@ -69,17 +72,25 @@ graphs$p_igrderivtemp
 graphs$p_comm_div_temp_mean
 graphs$p_dynamics
 
+graphs$p_igrtemp / graphs$p_tempseries / graphs$p_dynamics
+
+
 ## Make a graph of stability versus sum of derivatives
 community_measures <- readRDS(paste0(experiment_folder, "community_measures.RDS"))
-expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))
-community_measures <- full_join(community_measures, expt, by = "case_id")
+#community_measures <- full_join(community_measures, expt, by = "case_id")
 ggplot(community_measures, aes(x = sum_rel_b_opt,
                                y = CV_totab,
                                col = as_factor(b_opt_mean),
                                shape = as_factor(richness))) +
   geom_point()
-ggplot(community_measures, aes(x = sum_deriv,
+ggplot(community_measures, aes(x = sum_temp_deriv,
                                y = CV_totab,
                                col = as_factor(b_opt_mean),
                                shape = as_factor(richness))) +
   geom_point()
+ggplot(community_measures, aes(x = sum_temp_deriv,
+                               y = sum_rel_b_opt,
+                               col = as_factor(b_opt_mean),
+                               shape = as_factor(richness))) +
+  geom_point()
+

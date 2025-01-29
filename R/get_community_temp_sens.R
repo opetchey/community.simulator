@@ -1,0 +1,43 @@
+#' Get the sensitivity of total biomass to temperature variation. Currently measured as the slope of a linear regression of total biomass on temperature.
+#'
+#' @param dynamics Connection to database containing dynamics data
+#' @param temperatures Connection to database containing temperature data
+#' @param expt Dataset containing experiment information
+#' @param rollsumr_window The window size for the rolling sum of temperature. Default is 50
+#'
+#' @return A dataset containing the sensitivity of total biomass to temperature variation
+#' @export
+#'
+#' @examples NULL
+get_community_temp_sens <- function(dynamics,
+                                    temperatures,
+                                    rollsumr_window = 50) {
+
+  ## calculate temperature sensitivity of total biomass
+  ## get rolling sum of temperatures
+  temperatures <- temperatures |>
+    collect()
+  temperatures <- temperatures |>
+    group_by(case_id) |>
+    mutate(temperature_rollsum = zoo::rollsumr(temperature, rollsumr_window, fill = NA))
+
+  ## calculate total biomass
+  temp1 <- dynamics |>
+    group_by(case_id, time) %>%
+    summarise(tot_ab = sum(Abundance, na.rm = T)) |>
+    collect()
+
+  ## calculate the temperature sensitivity of total biomass
+  ## merge the temperature and biomass time series
+  dd <- full_join(temp1, temperatures, by = c("case_id" = "case_id", "time" = "time")) |>
+    select(case_id, time, temperature, temperature_rollsum, tot_ab)
+  temp_sens <- dd |>
+    nest(data = c(time, temperature, temperature_rollsum, tot_ab)) |>
+    mutate(model = map(data, ~ lm(tot_ab ~ temperature, data = .))) |>
+    mutate(tidy_model = map(model, tidy)) %>%
+    unnest(tidy_model) |>
+    filter(term == "temperature")
+  temp_sens_to_merge_rs <- temp_sens %>%
+    select(case_id, comm_temperature_sensitivity = estimate)
+  return(temp_sens_to_merge_rs)
+}
