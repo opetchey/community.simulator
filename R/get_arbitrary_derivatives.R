@@ -1,3 +1,12 @@
+#' Get derivatives at arbitrary temperatures
+#'
+#' @param experiment_folder The folder where the experiment is stored
+#' @param experiment_design_filename The file with the experiment design
+#'
+#' @return Data base with the derivatives at arbitrary temperatures
+#' @export
+#'
+#' @examples NULL
 get_arbitrary_derivatives <- function(experiment_folder,
                                      experiment_design_filename) {
 

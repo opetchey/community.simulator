@@ -3,6 +3,7 @@
 export(create_environments)
 export(create_experiment_folder)
 export(create_experiment_table)
+export(get_arbitrary_derivatives)
 export(get_community_CV)
 export(get_community_measures)
 export(get_community_response_diversity)
