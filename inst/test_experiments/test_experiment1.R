@@ -44,7 +44,6 @@ experiment_folder <- create_experiment_folder(experiment_folder_location, experi
 create_experiment_table(experiment_folder, experiment_design_filename)
 
 ## Create environments
-seed.to.use <- 1234569 ## set.seed(as.numeric(Sys.time()))
 create_environments(experiment_folder, experiment_design_filename)
 
 ## Simulate dynamics
@@ -61,8 +60,10 @@ get_community_measures(experiment_folder, experiment_design_filename)
 
 ## Make plots for one community
 expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))
-case_id_oi <- expt$case_id[2]
+case_id_oi <- expt$case_id[6]
 graphs <- make_plots_for_one_community(experiment_folder, case_id_oi)
+graphs$p_igrtemp / graphs$p_tempseries / graphs$p_dynamics
+
 
 graphs$p_tempseries
 graphs$p_temphist

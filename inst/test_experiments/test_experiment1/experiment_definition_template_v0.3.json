@@ -1,5 +1,6 @@
 [
   {
+    "random_seed": 1234,
     "number_of_species_treatment": "seq(10, 20, length = 2)",
     "b_opt_mean_treatment": "seq(15, 25, length = 3)",
     "b_opt_range_treatment": "seq(10, 10, 1)",
@@ -7,7 +8,7 @@
     "alpha_ij_sd_treatment": 0,
     "temperature_mean": 20,
     "temperature_sd": 4,
-    "temperature_series_control": "c(\"all_same\")",
+    "temperature_series_control": "c(\"same_per_replicate\")",
     "number_of_replicates": 1,
     "burn_in_duration": 1000,
     "experiment_duration": 1000,

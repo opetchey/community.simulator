@@ -1,7 +1,6 @@
 #' Create temperature times series. Currently three options for how times series vary among cases.
-#' 1) `all_same`: all cases have the same environmental time series. No point in having more than one replicate per community.
-#' 2) `same_per_replicate` replicates of the same number share the same environmental time series. E.g., `case1_rep1` and `case2_rep1` share the same time series.
-#' 3) `all_different` all environmental time series are different
+#' 1) `same_per_replicate` replicates of the same number share the same environmental time series. E.g., `case1_rep1` and `case2_rep1` share the same time series.
+#' 2) `all_different` all environmental time series are different
 #'
 #' @param experiment_folder The folder where all information about the experiment is stored
 #' @param experiment_design_filename The filename of the experiment design file
@@ -21,6 +20,7 @@ create_environments <- function(experiment_folder,
 
   expt_def <- jsonlite::fromJSON(paste0(experiment_folder, experiment_design_filename))
 
+  expt_def$random_seed
 
   i <- 1
   for(i in 1:nrow(expt)){
@@ -29,12 +29,10 @@ create_environments <- function(experiment_folder,
 
 
     ## keep the next line to have a different seed for each replicate
-    if(expt$temperature_series_control[i] == "all_same")
-      set.seed(seed.to.use)
     if(expt$temperature_series_control[i] == "same_per_replicate")
-      set.seed(seed.to.use + abs(parse_number(as.character(expt$rep_names[i]))))
+      set.seed(expt_def$random_seed + abs(parse_number(as.character(expt$rep_names[i]))))
     if(expt$temperature_series_control[i] == "all_different")
-      set.seed(seed.to.use + i)
+      set.seed(expt_def$random_seed + i)
 
 
     temperature_series <- tibble(phase = c(rep("burn_in", expt_def$burn_in_duration),

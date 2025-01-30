@@ -4,7 +4,6 @@
 \alias{create_environments}
 \title{Create temperature times series. Currently three options for how times series vary among cases.
 \enumerate{
-\item \code{all_same}: all cases have the same environmental time series. No point in having more than one replicate per community.
 \item \code{same_per_replicate} replicates of the same number share the same environmental time series. E.g., \code{case1_rep1} and \code{case2_rep1} share the same time series.
 \item \code{all_different} all environmental time series are different
 }}
@@ -22,7 +21,6 @@ Returns nothing. Saves to SQLite databases the temperature time series.
 \description{
 Create temperature times series. Currently three options for how times series vary among cases.
 \enumerate{
-\item \code{all_same}: all cases have the same environmental time series. No point in having more than one replicate per community.
 \item \code{same_per_replicate} replicates of the same number share the same environmental time series. E.g., \code{case1_rep1} and \code{case2_rep1} share the same time series.
 \item \code{all_different} all environmental time series are different
 }

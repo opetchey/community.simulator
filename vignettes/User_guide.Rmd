@@ -96,9 +96,9 @@ The features of the experiment are given in a json file.
 
 
 
-# Creating environmental variability
+## Creating environmental variability
 
-Currently created by 1 over f process with *gamma* (slope of frequency-power relationship) given in the json file.
+Currently created by 1 over f process with *gamma* (slope of frequency-power relationship) given in the json file. The 1 over f process is created with the `one_over_f` function from the (`primer` package)[https://search.r-project.org/CRAN/refmans/primer/html/00Index.html]. 
 
 Also given in the json file are:
 
@@ -108,9 +108,8 @@ Also given in the json file are:
 
 Currently three options for how environmental time series vary among cases.
 
-1) `all_same`: all cases have the same environmental time series. No point in having more than one replicate per community.
-2) `same_per_replicate` replicates of the same number share the same environmental time series. E.g., `case1_rep1` and `case2_rep1` share the same time series.
-3) `all_different` all environmental time series are different
+1) `same_per_replicate` replicates of the same number share the same environmental time series. E.g., `case1_rep1` and `case2_rep1` share the same time series.
+2) `all_different` all environmental time series are different
 
 
 
@@ -139,7 +138,7 @@ file.copy(from = folder_to_copy, to = folder_to_copy_to, recursive = TRUE)
 
 In the `test_experiments` folder you will find a file `test_experiment1.r` which goes through the process of designing, running, and analysing an experiment.
 
-## 1 Design an experiment
+# JSON file specification
 
 The design of an experiment is given in a JSON file.
 
