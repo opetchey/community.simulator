@@ -12,7 +12,7 @@ get_community_sum_rel_b_opt <- function(temperatures, expt) {
   ## sum of relative position of temperature optima
   ## relative to mean environmental temperature each simulation
   mean_temps <- temperatures |>
-    group_by(case_id) %>%
+    group_by(env_series_id) %>%
     summarise(mean_temperature = mean(temperature)) |>
     collect()
   expt_long <- unnest_longer(expt, col = c(community_object)) |>

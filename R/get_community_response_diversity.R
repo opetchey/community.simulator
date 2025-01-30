@@ -14,6 +14,7 @@ get_community_response_diversity <- function(temp_derivs) {
               sum_deriv = sum(derivative),
               max_igr = max(igr)) |>
     collect()
+
   summary_derivs <- temp2 |>
     group_by(case_id) |>
     summarise(mean_abs_deriv = mean(abs(mean_deriv)),

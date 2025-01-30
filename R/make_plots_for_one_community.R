@@ -28,10 +28,13 @@ make_plots_for_one_community <- function(experiment_folder,
   ## for testing
   # i <- 1
   # case_id_oi <- expt$case_id[i]
+  env_series_oi <- expt |>
+    filter(case_id == case_id_oi) |>
+    pull(env_series_id)
 
   ## temperature time series
   temperatures_oi <- temperatures |>
-    filter(case_id == case_id_oi) |>
+    filter(env_series_id == env_series_oi) |>
     collect()
   p_tempseries <- temperatures_oi |>
     ggplot(aes(x = time, y = temperature)) +

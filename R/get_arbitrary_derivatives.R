@@ -21,35 +21,20 @@ get_arbitrary_derivatives <- function(experiment_folder,
   conn_derivs <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "arbitrary_derivs.db"))
 
 
-  ## Get a sequences of temperatures, using the min and max of the first
-  ## case_id and a buffer of 5 above and below
-  ## and length of 200
-  i = 1
-  #print(i)
-  case_id_oi <- expt$case_id[i]
-  temp1 <- temperatures |>
-    filter(case_id == case_id_oi) |>
-    collect() |>
-    summarise(min = min(temperature),
-              max = max(temperature))
-  buffer <- 5
-  temperatures_oi <- tibble(temperature = seq(temp1$min-buffer,
-                                              temp1$max+buffer,
-                                              length = 200))
-
-
-
   ## For each case
+  i <- 1
   for(i in 1:length(expt$case_id)) {
 
     print(i)
-    # case_id_oi <- expt$case_id[i]
-    # temperatures_oi <- temperatures |>
-    #   filter(case_id == case_id_oi) |>
-    #   collect() |>
-    #   filter((time %% 10) == 0)
-    #
-    #
+
+    ## Get a sequences of temperatures, using mean and standard deviation
+    ## from the expt table
+    min_temperature <- expt$temperature_mean[i] - 2.5 * expt$temperature_sd[i]
+    max_temperature <- expt$temperature_mean[i] + 2.5 * expt$temperature_sd[i]
+
+    temperatures_oi <- tibble(temperature = seq(min_temperature,
+                                                max_temperature,
+                                                length = 100))
 
     ## Get the parameters for each species in the community
     comm_pars_i <- expt$community_object[i][[1]]

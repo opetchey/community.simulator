@@ -7,7 +7,8 @@
 #' @export
 #'
 #' @examples NULL
-get_community_measures <- function(experiment_folder, experiment_design_filename) {
+get_community_measures <- function(experiment_folder,
+                                   experiment_design_filename) {
 
 
   ## Read in experiment information
@@ -37,7 +38,8 @@ get_community_measures <- function(experiment_folder, experiment_design_filename
   comm_cv <- get_community_CV(dynamics)
   comm_temp_sens <- get_community_temp_sens(dynamics,
                                             temperatures,
-                                            rollsumr_window = 50)
+                                            rollsumr_window = 50,
+                                            expt)
   comm_resp_div <- get_community_response_diversity(temp_derivs)
   comm_sum_rel_b_opt <- get_community_sum_rel_b_opt(temperatures, expt)
   comm_sum_derivs <- get_community_sum_derivatives(arb_derivs, temp_derivs)

@@ -11,25 +11,33 @@
 #' @examples NULL
 get_community_temp_sens <- function(dynamics,
                                     temperatures,
-                                    rollsumr_window = 50) {
+                                    rollsumr_window = 50,
+                                    expt) {
+
+  sub_expt <- expt |>
+    select(case_id, env_series_id, community_id)
 
   ## calculate temperature sensitivity of total biomass
   ## get rolling sum of temperatures
   temperatures <- temperatures |>
     collect()
+
   temperatures <- temperatures |>
-    group_by(case_id) |>
+    group_by(env_series_id) |>
     mutate(temperature_rollsum = zoo::rollsumr(temperature, rollsumr_window, fill = NA))
 
   ## calculate total biomass
-  temp1 <- dynamics |>
+  temp0 <- dynamics |>
     group_by(case_id, time) %>%
     summarise(tot_ab = sum(Abundance, na.rm = T)) |>
     collect()
 
+  temp1 <- temp0 |>
+    full_join(sub_expt, by = c("case_id" = "case_id"))
+
   ## calculate the temperature sensitivity of total biomass
   ## merge the temperature and biomass time series
-  dd <- full_join(temp1, temperatures, by = c("case_id" = "case_id", "time" = "time")) |>
+  dd <- full_join(temp1, temperatures, by = c("env_series_id" = "env_series_id", "time" = "time")) |>
     select(case_id, time, temperature, temperature_rollsum, tot_ab)
   temp_sens <- dd |>
     nest(data = c(time, temperature, temperature_rollsum, tot_ab)) |>

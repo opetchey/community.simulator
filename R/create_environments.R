@@ -20,20 +20,16 @@ create_environments <- function(experiment_folder,
 
   expt_def <- jsonlite::fromJSON(paste0(experiment_folder, experiment_design_filename))
 
-  expt_def$random_seed
+  #expt_def$random_seed
+
+  env_series <- unique(expt$env_series_id)
+
 
   i <- 1
-  for(i in 1:nrow(expt)){
 
-    print(i)
+  for(i in 1:length(env_series)) {
 
-
-    ## keep the next line to have a different seed for each replicate
-    if(expt$temperature_series_control[i] == "same_per_replicate")
-      set.seed(expt_def$random_seed + abs(parse_number(as.character(expt$rep_names[i]))))
-    if(expt$temperature_series_control[i] == "all_different")
-      set.seed(expt_def$random_seed + i)
-
+    set.seed(expt_def$random_seed + i)
 
     temperature_series <- tibble(phase = c(rep("burn_in", expt_def$burn_in_duration),
                                            rep("expt", expt_def$experiment_duration + 1)),
@@ -51,38 +47,7 @@ create_environments <- function(experiment_folder,
                                                 N = expt_def$experiment_duration+1)) *
                                      expt_def$temperature_sd + expt_def$temperature_mean),
 
-                                 case_id = expt$case_id[i])
-
-    # Tcel_control<-temperature_series$temperature
-    # Tcel_controlm<-matrix(Tcel_control,nrow=1)
-    #
-    #
-    #
-    #
-    # S <- expt[i,]$community_object[[1]]$S
-    #
-    # initial_abundances <- (rdirichlet(1, rep(1, S))*1000)[1,]
-    #
-    #
-    #
-    # spts <- simulator_lv(input_com_params = expt$community_object[[i]],
-    #                      TcelSeries = Tcel_controlm,
-    #                      initial_abundances = initial_abundances)
-    #
-    #
-    #
-    # spts <- spts |>
-    #   as_tibble() |>
-    #   mutate(case_id = expt$case_id[i],
-    #          time = temperature_series$time) |>
-    #   pivot_longer(names_to = "Species_ID", values_to = "Abundance",
-    #                cols = starts_with("Spp")) |>
-    #   filter(time > expt_def$burn_in_duration)
-    #
-
-    # ggplot(spts, aes(x = time, y = Abundance, color = Species_ID)) +
-    #    geom_line() +
-    #   labs(title = paste("Case ID:", expt$case_id[i]))
+                                 env_series_id = paste0("env_series-", i))
 
     temperature_series_expt_only <- temperature_series |>
       filter(time > expt_def$burn_in_duration)
@@ -95,7 +60,10 @@ create_environments <- function(experiment_folder,
     }
 
 
+
   }
+
+
 
   dbDisconnect(conn_temperatures)
 

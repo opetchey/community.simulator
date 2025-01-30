@@ -30,16 +30,19 @@ simulate_dynamics <- function(experiment_folder,
 
     print(i)
 
-    case_id_oi <- expt$case_id[i]
+    env_series_oi <- expt$env_series_id[i]
 
     temperatures_oi <- temperatures |>
-      filter(case_id == case_id_oi) |>
+      filter(env_series_id == env_series_oi) |>
       collect()
+
     burn_in_temps <- tibble(phase = rep("burn_in", expt_def$burn_in_duration),
                             time = 1:expt_def$burn_in_duration,
                             temperature = rep(expt_def$temperature_mean,
                                 expt_def$burn_in_duration),
-                            case_id = rep(case_id_oi, expt_def$burn_in_duration))
+                            env_series_id = rep(env_series_oi, expt_def$burn_in_duration)
+                            #case_id = rep(case_id_oi, expt_def$burn_in_duration)
+                            )
     temperature_series <- bind_rows(burn_in_temps, temperatures_oi)
 
 

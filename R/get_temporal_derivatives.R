@@ -30,10 +30,10 @@ get_temporal_derivatives <- function(experiment_folder,
     ## Housekeeping
     print(i)
     case_id_oi <- expt$case_id[i]
+    env_series_oi <- expt$env_series_id[i]
 
-    ## Get the temperatures for this case
     temperatures_oi <- temperatures |>
-      filter(case_id == case_id_oi) |>
+      filter(env_series_id == env_series_oi) |>
       collect() |>
       filter((time %% every_t) == 0)
 
