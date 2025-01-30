@@ -86,6 +86,32 @@ species_and_community_properties |>
   kableExtra::kable_styling()
 ```
 
+# Designing and experiment
+
+An experiment consists of a number of "cases". Each case consists of a combination of community composition and environmental variability. The community composition is defined by the species present and their properties. The environmental variability is a time series of environmental conditions that the community is exposed to. When a single community has multiple replicates, then each replicate has the same community composition but different environmental variability.
+
+The features of the experiment are given in a json file.
+
+
+
+# Creating environmental variability
+
+Currently created by 1 over f process with *gamma* (slope of frequency-power relationship) given in the json file.
+
+Also given in the json file are:
+
+* The mean of the environmental time series.
+* The standard deviation of the environmental time series.
+* How the environmental time series vary among cases.
+
+Currently three options for how environmental time series vary among cases.
+
+1) `all_same`: all cases have the same environmental time series. No point in having more than one replicate per community.
+2) `same_per_replicate` replicates of the same number share the same environmental time series. E.g., `case1_rep1` and `case2_rep1` share the same time series.
+3) `all_different` all environmental time series are different
+
+
+
 # Typical experiment workflow
 
 The typical workflow is as follows:

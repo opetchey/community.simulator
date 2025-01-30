@@ -28,6 +28,8 @@ simulate_dynamics <- function(experiment_folder,
   i <- 1
   for(i in 1:nrow(expt)){
 
+    print(i)
+
     case_id_oi <- expt$case_id[i]
 
     temperatures_oi <- temperatures |>

@@ -20,15 +20,43 @@ get_community_sum_derivatives <- function(arb_derivs, temp_derivs) {
   #  full_join(rel_b_opt)
 
   ## get sum derivative of each species
-  sum_derivs_arb <- arb_derivs |>
-    group_by(case_id) |>
+  temp1 <- arb_derivs |>
+    group_by(case_id, temperature) |>
     summarise(sum_arb_deriv = sum(derivative)) |>
     collect()
-  sum_derivs_temp <- temp_derivs |>
+
+  ggplot(temp1, aes(x = sum_arb_deriv)) +
+    geom_histogram() +
+    facet_wrap(~case_id)
+  ggplot(temp1, aes(x = temperature, y = sum_arb_deriv)) +
+    geom_point() +
+    facet_wrap(~case_id)
+
+  sum2_derivs_arb <- temp1 |>
     group_by(case_id) |>
+    summarise(sum2_arb_deriv = sum(sum_arb_deriv))
+
+  ### Actual / temporal
+  temp1 <- temp_derivs |>
+    group_by(case_id, temperature) |>
     summarise(sum_temp_deriv = sum(derivative)) |>
     collect()
-  sum_derivs <- full_join(sum_derivs_arb, sum_derivs_temp)
+
+  ggplot(temp1, aes(x = sum_temp_deriv)) +
+    geom_histogram() +
+    facet_wrap(~case_id)
+  ggplot(temp1, aes(x = temperature, y = sum_temp_deriv)) +
+    geom_point() +
+    facet_wrap(~case_id)
+
+  sum2_derivs_temp <- temp1 |>
+    group_by(case_id) |>
+    summarise(sum2_temp_deriv = sum(sum_temp_deriv))
+
+
+
+
+  sum_derivs <- full_join(sum2_derivs_arb, sum2_derivs_temp)
   return(sum_derivs)
 
 }
