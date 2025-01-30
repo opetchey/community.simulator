@@ -83,12 +83,12 @@ ggplot(community_measures, aes(x = sum_rel_b_opt,
                                col = as_factor(b_opt_mean),
                                shape = as_factor(richness))) +
   geom_point()
-ggplot(community_measures, aes(x = sum_temp_deriv,
+ggplot(community_measures, aes(x = sum2_temp_deriv,
                                y = CV_totab,
                                col = as_factor(b_opt_mean),
                                shape = as_factor(richness))) +
   geom_point()
-ggplot(community_measures, aes(x = sum_temp_deriv,
+ggplot(community_measures, aes(x = sum2_temp_deriv,
                                y = sum_rel_b_opt,
                                col = as_factor(b_opt_mean),
                                shape = as_factor(richness))) +

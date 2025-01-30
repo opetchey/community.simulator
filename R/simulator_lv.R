@@ -68,9 +68,16 @@ simulator_lv<-function(input_com_params,
 
     TimeSeries[,t+1]<- Ntnext
 
+    ## immigration of 0.1 per time step
+    ## WARNING: immigration rate is hard coded
+    TimeSeries[,t+1] <- TimeSeries[,t+1] + 0.1
+
+    ## this was an previously used method for avoiding
+    ## very low abundances
     if(any(TimeSeries[,t+1] <= 1e-4)==T) {
       TimeSeries[which(TimeSeries[,t+1] <= 1e-4),t+1] <- 1
     }
+
     t <- t + 1
   }
 

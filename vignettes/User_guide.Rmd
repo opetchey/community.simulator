@@ -71,7 +71,9 @@ Substituting Eqs. (\ref{eq.B}) - (\ref{eq.d0}) in Eq. (\ref{eq.r}), we get the f
 ```
 where, $\alpha_{ii} = 1$, $r_{m,i} = (b_{0,i} - d_{0,i})$ is the intrinsic (maximum) rate of increase and $K_{i} = r_{m,i}/(\beta+\delta)$ is the carrying capacity for the $i^{th}$ species, respectively.
 
-If abundance drops very low then it is reset to 1. May need to change this, or at least present a good ecological justification.
+At each time step there is a small amount of immigration into the system. This is implemented by adding 0.1 to all species' biomass at each time step. Done in the `simulator_lv` function.
+
+
 
 ## Model parameters
 
