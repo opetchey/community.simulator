@@ -16,6 +16,8 @@ create_experiment_table <- function(experiment_folder,
 
   expt <- expand.grid(b_opt_mean = eval(expt_def$b_opt_mean_treatment),
                       b_opt_range = eval(expt_def$b_opt_range_treatment),
+                      a_b_mean = eval(expt_def$a_b_mean_treatment),
+                      a_b_range = eval(expt_def$a_b_range_treatment),
                       alpha_ij_mean = eval(expt_def$alpha_ij_mean_treatment),
                       alpha_ij_sd = eval(expt_def$alpha_ij_sd_treatment),
                       richness = eval(expt_def$number_of_species),
@@ -38,7 +40,7 @@ create_experiment_table <- function(experiment_folder,
   expt <- expt |>
     mutate(case_id = paste0(community_id, "::", env_series_id))
 
-  a_b <- eval(expt_def$a_b)
+  #a_b <- eval(expt_def$a_b)
   a_d <- eval(expt_def$a_d)
   s <- eval(expt_def$sd_perf_curve)
   z <- eval(expt_def$z)
@@ -48,9 +50,11 @@ create_experiment_table <- function(experiment_folder,
     rowwise(case_id) %>%
     #group_by(b_opt_mean, b_opt_range, rep_names, community_id) %>%
     do(community_object = make_a_community(S = .$richness,
-                                           a_b = a_b,
+                                           #a_b = a_b,
                                            b_opt_mean = .$b_opt_mean,
                                            b_opt_range = .$b_opt_range,
+                                           a_b_mean = .$a_b_mean,
+                                           a_b_range = .$a_b_range,
                                            s = s,
                                            a_d = a_d,
                                            z = z,

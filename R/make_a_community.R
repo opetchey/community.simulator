@@ -4,6 +4,8 @@
 #' @param a_b Birth rate when temperature is equal to b_opt_i; same for all species.
 #' @param b_opt_mean Mean of the distribution from which b_opt_i values are drawn.
 #' @param b_opt_range Range of the distribution from which b_opt_i values are drawn.
+#' @param a_b_mean Mean of the distribution from which a_b values are drawn.
+#' @param a_b_range Range of the distribution from which a_b values are drawn.
 #' @param s Standard deviation of the Gaussian birth rate - temperature response curve; same for all species.
 #' @param a_d Death rate when temperature is equal to 0; same for all species.
 #' @param z Exponential rate of increase in death rate with temperature; same for all species.
@@ -17,9 +19,11 @@
 #'
 #' @examples NULL
 make_a_community <- function(S,
-                             a_b,
+                             #a_b,
                              b_opt_mean,
                              b_opt_range,
+                             a_b_mean,
+                             a_b_range,
                              s,
                              a_d,
                              z,
@@ -29,15 +33,22 @@ make_a_community <- function(S,
                              trait_selection_method){
 
   ## same a_b_i for all species
-  a_b_i <- rep(a_b, S)
+  #a_b_i <- rep(a_b, S)
 
   ## b_opt_i values according to trait_selection_method
-  if(trait_selection_method == "random1")
+  if(trait_selection_method == "random1") {
     b_opt_i <- runif(S, min= b_opt_mean - (0.5*b_opt_range),
                      max = b_opt_mean + (0.5*b_opt_range))
-  if(trait_selection_method == "deterministic")
+    a_b_i <- runif(S, min= a_b_mean - (0.5*a_b_range),
+                     max = a_b_mean + (0.5*a_b_range))
+  }
+  if(trait_selection_method == "deterministic") {
     b_opt_i <- seq(length.out = S, from = b_opt_mean - (0.5*b_opt_range),
                    to = b_opt_mean + (0.5*b_opt_range))
+    a_b_i <- seq(length.out = S, from = a_b_mean - (0.5*a_b_range),
+                   to = a_b_mean + (0.5*a_b_range))
+
+  }
 
   ## standard deviation of the Gaussian birth rate - temperature response curve
   ## same for all species

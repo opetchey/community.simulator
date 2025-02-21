@@ -25,7 +25,7 @@ simulate_dynamics <- function(experiment_folder,
   expt_def <- jsonlite::fromJSON(paste0(experiment_folder, experiment_design_filename))
 
 
-  i <- 1
+  i <- 7
   for(i in 1:nrow(expt)){
 
     print(i)

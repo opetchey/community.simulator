@@ -129,7 +129,7 @@ make_plots_for_one_community <- function(experiment_folder,
     filter(case_id == case_id_oi) |>
     collect()
   p_dynamics <- dynamics_oi |>
-    ggplot(aes(x = time, y = Abundance, col = Species_ID)) +
+    ggplot(aes(x = time, y = log10(Abundance), col = Species_ID)) +
     geom_line()
 
   graphs_list <- list(p_tempseries = p_tempseries,

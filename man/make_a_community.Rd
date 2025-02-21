@@ -6,9 +6,10 @@
 \usage{
 make_a_community(
   S,
-  a_b,
   b_opt_mean,
   b_opt_range,
+  a_b_mean,
+  a_b_range,
   s,
   a_d,
   z,
@@ -21,11 +22,13 @@ make_a_community(
 \arguments{
 \item{S}{Number of species in the community}
 
-\item{a_b}{Birth rate when temperature is equal to b_opt_i; same for all species.}
-
 \item{b_opt_mean}{Mean of the distribution from which b_opt_i values are drawn.}
 
 \item{b_opt_range}{Range of the distribution from which b_opt_i values are drawn.}
+
+\item{a_b_mean}{Mean of the distribution from which a_b values are drawn.}
+
+\item{a_b_range}{Range of the distribution from which a_b values are drawn.}
 
 \item{s}{Standard deviation of the Gaussian birth rate - temperature response curve; same for all species.}
 
@@ -40,6 +43,8 @@ make_a_community(
 \item{alpha_jj}{value of the diagonal of the community matrix, same for all jj}
 
 \item{trait_selection_method}{Either "random1" or "deterministic". If "random1", the b_opt_i values are drawn at random from a uniform distribution with mean b_opt_mean and range b_opt_range. If "deterministic", the b_opt_i values are equally spaced between b_opt_mean - 0.5\emph{b_opt_range and b_opt_mean + 0.5}b_opt_range.}
+
+\item{a_b}{Birth rate when temperature is equal to b_opt_i; same for all species.}
 }
 \value{
 Returns a list containing the community object.

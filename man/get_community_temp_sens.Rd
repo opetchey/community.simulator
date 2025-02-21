@@ -4,7 +4,7 @@
 \alias{get_community_temp_sens}
 \title{Get the sensitivity of total biomass to temperature variation. Currently measured as the slope of a linear regression of total biomass on temperature.}
 \usage{
-get_community_temp_sens(dynamics, temperatures, rollsumr_window = 50)
+get_community_temp_sens(dynamics, temperatures, rollsumr_window = 50, expt)
 }
 \arguments{
 \item{dynamics}{Connection to database containing dynamics data}

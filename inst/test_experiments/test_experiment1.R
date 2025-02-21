@@ -27,7 +27,7 @@ library(broom)
 #library(community.simulator)
 
 ## Use this to load the package with any changes made to functions
-devtools::load_all()
+#devtools::load_all()
 
 ## make a path to the desktop for saving data
 ## While developing and testing, it can be useful to use the inst folder of the package as the location for the experiment
@@ -60,7 +60,7 @@ get_community_measures(experiment_folder, experiment_design_filename)
 
 ## Make plots for one community
 expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))
-case_id_oi <- expt$case_id[12]
+case_id_oi <- expt$case_id[7]
 graphs <- make_plots_for_one_community(experiment_folder, case_id_oi)
 graphs$p_igrtemp / graphs$p_tempseries / graphs$p_dynamics
 
