@@ -13,14 +13,14 @@ get_temporal_derivatives <- function(experiment_folder,
                                      every_t = 10) {
 
   ## open connections and read in data
-  conn_temperatures <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "temperatures.db"))
-  temperatures <- tbl(conn_temperatures, "temperatures")
+  #conn_temperatures <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "temperatures.db"))
+  temperatures <- arrow::open_dataset(paste0(experiment_folder, "temperatures"))
   expt <- readRDS(paste0(experiment_folder, "experiment_table.rds"))
   expt_def <- jsonlite::fromJSON(paste0(experiment_folder, experiment_design_filename))
 
   ## set up data base to save results into
-  file.remove(paste0(experiment_folder, "temporal_derivs.db"))
-  conn_derivs <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "temporal_derivs.db"))
+  #file.remove(paste0(experiment_folder, "temporal_derivs.db"))
+  #conn_derivs <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "temporal_derivs.db"))
 
 
   ## Expand expt to make a species in row dataset
@@ -90,17 +90,25 @@ get_temporal_derivatives <- function(experiment_folder,
       select(case_id, species_id, temperature, igr, derivative)
 
 
+    arrow::write_dataset(species_pars4,
+                         path = paste0(experiment_folder, "temporal_derivatives"),
+                         format = "parquet",
+                         partitioning = "case_id",
+                         existing_data_behavior = "overwrite")
+
+
+
   ## Write to database
-    if(i == 1) {
-      dbWriteTable(conn_derivs, "derivs", species_pars4, overwrite = TRUE)
-    }
-    if(i > 1) {
-      dbWriteTable(conn_derivs, "derivs", species_pars4, append = TRUE)
-    }
+    # if(i == 1) {
+    #   dbWriteTable(conn_derivs, "derivs", species_pars4, overwrite = TRUE)
+    # }
+    # if(i > 1) {
+    #   dbWriteTable(conn_derivs, "derivs", species_pars4, append = TRUE)
+    # }
 
   }
 
-  dbDisconnect(conn_derivs)
-  dbDisconnect(conn_temperatures)
+  #dbDisconnect(conn_derivs)
+  #dbDisconnect(conn_temperatures)
 
 }

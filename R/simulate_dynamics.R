@@ -15,10 +15,12 @@ simulate_dynamics <- function(experiment_folder,
   ## set up data base to save results into
   #library(RSQLite)
   #library(DBI)
-  file.remove(paste0(experiment_folder, "dynamics.db"))
-  conn_dynamics <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "dynamics.db"))
-  conn_temperatures <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "temperatures.db"))
-  temperatures <- tbl(conn_temperatures, "temperatures")
+  #file.remove(paste0(experiment_folder, "dynamics.db"))
+  #conn_dynamics <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "dynamics.db"))
+  #conn_temperatures <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "temperatures.db"))
+  #temperatures <- tbl(conn_temperatures, "temperatures")
+
+  temperatures <- arrow::open_dataset(paste0(experiment_folder, "temperatures"))
 
   expt <- readRDS(paste0(experiment_folder, "experiment_table.rds"))
 
@@ -80,16 +82,23 @@ simulate_dynamics <- function(experiment_folder,
     #temperature_series_expt_only <- temperature_series |>
     #  filter(time > expt_def$burn_in_duration)
 
-    if(i == 1) {
-      dbWriteTable(conn_dynamics, "dynamics", spts, overwrite = TRUE)
-    }
-    if(i > 1) {
-      dbWriteTable(conn_dynamics, "dynamics", spts, append = TRUE)
-    }
+    arrow::write_dataset(spts,
+                         path = paste0(experiment_folder, "dynamics"),
+                         format = "parquet",
+                         partitioning = "case_id",
+                         existing_data_behavior = "overwrite")
+
+
+    # if(i == 1) {
+    #   dbWriteTable(conn_dynamics, "dynamics", spts, overwrite = TRUE)
+    # }
+    # if(i > 1) {
+    #   dbWriteTable(conn_dynamics, "dynamics", spts, append = TRUE)
+    # }
 
 
     }
 
-  dbDisconnect(conn_dynamics)
+  #dbDisconnect(conn_dynamics)
 
 }

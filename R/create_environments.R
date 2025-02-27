@@ -13,8 +13,9 @@ create_environments <- function(experiment_folder,
                                 experiment_design_filename) {
 
   ## setup the databases for saving the temperature time series
-  file.remove(paste0(experiment_folder, "temperatures.db"))
-  conn_temperatures <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "temperatures.db"))
+  #file.remove(paste0(experiment_folder, "temperatures.db"))
+  #conn_temperatures <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "temperatures.db"))
+
 
   expt <- readRDS(paste0(experiment_folder, "experiment_table.rds"))
 
@@ -52,12 +53,19 @@ create_environments <- function(experiment_folder,
     temperature_series_expt_only <- temperature_series |>
       filter(time > expt_def$burn_in_duration)
 
-    if(i == 1) {
-      dbWriteTable(conn_temperatures, "temperatures", temperature_series_expt_only, overwrite = TRUE)
-    }
-    if(i > 1) {
-      dbWriteTable(conn_temperatures, "temperatures", temperature_series_expt_only, append = TRUE)
-    }
+    arrow::write_dataset(temperature_series_expt_only,
+                         path = paste0(experiment_folder, "temperatures"),
+                         format = "parquet",
+                         partitioning = "env_series_id",
+                         existing_data_behavior = "overwrite")
+
+
+    # if(i == 1) {
+    #   dbWriteTable(conn_temperatures, "temperatures", temperature_series_expt_only, overwrite = TRUE)
+    # }
+    # if(i > 1) {
+    #   dbWriteTable(conn_temperatures, "temperatures", temperature_series_expt_only, append = TRUE)
+    # }
 
 
 
@@ -65,6 +73,6 @@ create_environments <- function(experiment_folder,
 
 
 
-  dbDisconnect(conn_temperatures)
+  #dbDisconnect(conn_temperatures)
 
 }
