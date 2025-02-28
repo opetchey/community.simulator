@@ -15,7 +15,6 @@ Suggests:
 VignetteBuilder:
     knitr
 Imports: 
-    arrow,
     DBI,
     dirmult,
     dplyr,

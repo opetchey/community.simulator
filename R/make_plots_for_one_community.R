@@ -12,10 +12,16 @@ make_plots_for_one_community <- function(experiment_folder,
 
   expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))
   comm_measures <- readRDS(paste0(experiment_folder, "community_measures.RDS"))
-  temperatures <- arrow::open_dataset(paste0(experiment_folder, "temperatures"))
-  dynamics <- arrow::open_dataset(paste0(experiment_folder, "dynamics"))
-  temporal_derivs <- arrow::open_dataset(paste0(experiment_folder, "temporal_derivatives"))
-  arbitrary_derivs <- arrow::open_dataset(paste0(experiment_folder, "arbitrary_derivatives"))
+  conn_temperatures <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "temperatures.db"))
+  temperatures <- tbl(conn_temperatures, "temperatures")
+  conn_dynamics <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "dynamics.db"))
+  dynamics <- tbl(conn_dynamics, "dynamics")
+  conn_temporal_derivs <- dbConnect(RSQLite::SQLite(),
+                                    paste0(experiment_folder, "temporal_derivs.db"))
+  temporal_derivs <- tbl(conn_temporal_derivs, "derivs")
+  conn_arbitrary_derivs <- dbConnect(RSQLite::SQLite(),
+                                     paste0(experiment_folder, "arbitrary_derivs.db"))
+  arbitrary_derivs <- tbl(conn_arbitrary_derivs, "derivs")
 
   comm_measures <- full_join(comm_measures, expt)
 

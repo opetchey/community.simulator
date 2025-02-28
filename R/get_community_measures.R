@@ -17,20 +17,20 @@ get_community_measures <- function(experiment_folder,
 
   ## open connections to databases
   ## temperatures
-  #conn_temperatures <- dbConnect(RSQLite::SQLite(),
-  #                               paste0(experiment_folder, "temperatures.db"))
-  temperatures <- arrow::open_dataset(paste0(experiment_folder, "temperatures"))
+  conn_temperatures <- dbConnect(RSQLite::SQLite(),
+                                 paste0(experiment_folder, "temperatures.db"))
+  temperatures <- tbl(conn_temperatures, "temperatures")
   ## dynamics
-  #conn_dynamics <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "dynamics.db"))
-  dynamics <- arrow::open_dataset(paste0(experiment_folder, "dynamics"))
+  conn_dynamics <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "dynamics.db"))
+  dynamics <- tbl(conn_dynamics, "dynamics")
   ## temporal derivatives
-  #conn_temp_derivs <- dbConnect(RSQLite::SQLite(),
-  #                              paste0(experiment_folder, "temporal_derivs.db"))
-  temp_derivs <- arrow::open_dataset(paste0(experiment_folder, "temporal_derivatives"))
+  conn_temp_derivs <- dbConnect(RSQLite::SQLite(),
+                                paste0(experiment_folder, "temporal_derivs.db"))
+  temp_derivs <- tbl(conn_temp_derivs, "derivs")
   ## arbitrary derivatives
-  #conn_arb_derivs <- dbConnect(RSQLite::SQLite(),
-  #                             paste0(experiment_folder, "arbitrary_derivs.db"))
-  arb_derivs <- arrow::open_dataset(paste0(experiment_folder, "arbitrary_derivatives"))
+  conn_arb_derivs <- dbConnect(RSQLite::SQLite(),
+                               paste0(experiment_folder, "arbitrary_derivs.db"))
+  arb_derivs <- tbl(conn_arb_derivs, "derivs")
 
 
 
