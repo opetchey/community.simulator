@@ -13,7 +13,7 @@ get_case_data <- function(case_ID,
 
 
   ## Read in experiment information
-  expt <- readRDS(paste0(experiment_folder, "experiment_table.rds"))
+  expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))
   expt_def <- jsonlite::fromJSON(paste0(experiment_folder, experiment_design_filename))
 
   ## open connections to databases

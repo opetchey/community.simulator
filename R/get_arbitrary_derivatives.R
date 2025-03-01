@@ -13,7 +13,7 @@ get_arbitrary_derivatives <- function(experiment_folder,
   ## open connections and read in data
   conn_temperatures <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "temperatures.db"))
   temperatures <- tbl(conn_temperatures, "temperatures")
-  expt <- readRDS(paste0(experiment_folder, "experiment_table.rds"))
+  expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))
   expt_def <- jsonlite::fromJSON(paste0(experiment_folder, experiment_design_filename))
 
   ## set up data base to save results into
