@@ -29,7 +29,7 @@ get_community_temp_sens <- function(dynamics,
   ## calculate total biomass
   temp0 <- dynamics |>
     group_by(case_id, time) %>%
-    summarise(tot_ab = sum(Abundance, na.rm = T)) |>
+    summarise(tot_ab = sum(Abundance, na.rm = F)) |>
     collect()
 
   temp1 <- temp0 |>
@@ -39,13 +39,31 @@ get_community_temp_sens <- function(dynamics,
   ## merge the temperature and biomass time series
   dd <- full_join(temp1, temperatures, by = c("env_series_id" = "env_series_id", "time" = "time")) |>
     select(case_id, time, temperature, temperature_rollsum, tot_ab)
-  temp_sens <- dd |>
+
+  ## make a dataset without any NA or Inf
+  ## cases with any Infinite values in tot_ab
+  cases_with_inf_or_NA <- dd |>
+    filter(is.infinite(tot_ab) | is.na(tot_ab)) |>
+    pull(case_id) |>
+    unique()
+  dd_OK <- dd |>
+    filter(!(case_id %in% cases_with_inf_or_NA))
+
+
+  temp_sens <- dd_OK |>
     nest(data = c(time, temperature, temperature_rollsum, tot_ab)) |>
     mutate(model = map(data, ~ lm(tot_ab ~ temperature, data = .))) |>
     mutate(tidy_model = map(model, tidy)) %>%
     unnest(tidy_model) |>
     filter(term == "temperature")
+
   temp_sens_to_merge_rs <- temp_sens %>%
     select(case_id, comm_temperature_sensitivity = estimate)
+
+  temp_sens_to_merge_rs <- bind_rows(temp_sens_to_merge_rs,
+                                     data.frame(case_id = cases_with_inf_or_NA,
+                                                comm_temperature_sensitivity = NA))
+
+
   return(temp_sens_to_merge_rs)
 }
