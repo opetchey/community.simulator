@@ -62,7 +62,7 @@ get_community_temp_sens <- function(dynamics,
 
   temp_sens_to_merge_rs <- bind_rows(temp_sens_to_merge_rs,
                                      data.frame(case_id = cases_with_inf_or_NA,
-                                                comm_temperature_sensitivity = NA))
+                                                comm_temperature_sensitivity = rep(NA, length(cases_with_inf_or_NA))))
 
 
   return(temp_sens_to_merge_rs)
