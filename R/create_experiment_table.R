@@ -23,23 +23,23 @@ create_experiment_table <- function(experiment_folder,
   }
 
 
-
+  set.seed(eval(expt_def$random_seed))
 
   expt <- expand.grid(a_b_mean = eval(expt_def$a_b_mean_treatment),
                       a_b_range = eval(expt_def$a_b_range_treatment),
                       a_b_distribution = eval(expt_def$a_b_distribution),
-                      a_b_realisation_seed = 1:eval(expt_def$a_b_number_of_realisations),
+                      a_b_realisation_seed = floor(runif(eval(expt_def$a_b_number_of_realisations))*1000000),
                       b_opt_mean = eval(expt_def$b_opt_mean_treatment),
                       b_opt_range = eval(expt_def$b_opt_range_treatment),
                       b_opt_distribution = eval(expt_def$b_opt_distribution),
-                      b_opt_realisation_seed = 1:eval(expt_def$b_opt_number_of_realisations),
+                      b_opt_realisation_seed = floor(runif(eval(expt_def$b_opt_number_of_realisations))*1000000),
                       alpha_ij_mean = eval(expt_def$alpha_ij_mean_treatment),
                       alpha_ij_sd = eval(expt_def$alpha_ij_sd_treatment),
-                      alpha_ij_realisation_seed = 1:eval(expt_def$alpha_ij_number_of_realisations),
+                      alpha_ij_realisation_seed = floor(runif(eval(expt_def$alpha_ij_number_of_realisations))*1000000),
                       temperature_mean = eval(expt_def$temperature_mean),
                       temperature_sd = eval(expt_def$temperature_sd),
                       one_over_f_gamma = eval(expt_def$one_over_f_gamma),
-                      temperature_realisation_seed = 1:eval(expt_def$temperature_number_of_realisations),
+                      temperature_realisation_seed = floor(runif(eval(expt_def$temperature_number_of_realisations))*1000000),
                       richness = eval(expt_def$number_of_species)) |>
     mutate(env_series_id = paste0("env_series_", temperature_mean, "_",
                                   temperature_sd, "_",
@@ -57,7 +57,21 @@ create_experiment_table <- function(experiment_folder,
                                  alpha_ij_sd, "_",
                                  alpha_ij_realisation_seed, "_",
                                  richness),
-           case_id = paste0("case_id_", row_number()))
+           case_id = paste0("case_id_", row_number())) |>
+    mutate(b_opt_unique = paste0(b_opt_mean, "_", b_opt_range, "_", richness),
+           b_opt_level = as.numeric(as.factor(b_opt_unique)),
+           b_opt_realisation_seed = b_opt_realisation_seed + b_opt_level,
+           a_b_unique = paste0(a_b_mean, "_", a_b_range, "_", richness),
+           a_b_level = as.numeric(as.factor(a_b_unique)),
+           a_b_realisation_seed = a_b_realisation_seed + a_b_level,
+           alpha_ij_unique = paste0(alpha_ij_mean, "_", alpha_ij_sd, "_", richness),
+           alpha_ij_level = as.numeric(as.factor(alpha_ij_unique)),
+           alpha_ij_realisation_seed = alpha_ij_realisation_seed + alpha_ij_level,
+           temperature_unique = paste0(temperature_mean, "_", temperature_sd, "_", one_over_f_gamma),
+           temperature_level = as.numeric(as.factor(temperature_unique)),
+           temperature_realisation_seed = temperature_realisation_seed + temperature_level,
+           rv = rnorm(length(case_id), 0, 1))
+
 
 
   #a_b <- eval(expt_def$a_b)

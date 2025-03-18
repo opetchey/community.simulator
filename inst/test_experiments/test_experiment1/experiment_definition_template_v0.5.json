@@ -5,18 +5,18 @@
     "number_of_species_treatment": "seq(10, 20, length = 2)",
 
     "a_b_mean_treatment": 0.3,
-    "a_b_range_treatment": "seq(0, 0, length = 1)",
+    "a_b_range_treatment": "seq(0, 1, length = 2)",
     "a_b_distribution": "c(\"regular\")",
-    "a_b_number_of_realisations": 1,
+    "a_b_number_of_realisations": 2,
 
     "b_opt_mean_treatment": "seq(15, 20, length = 2)",
-    "b_opt_range_treatment": "seq(15, 15, 1)",
+    "b_opt_range_treatment": "seq(15, 20, length = 2)",
     "b_opt_distribution": "c(\"regular\")",
-    "b_opt_number_of_realisations": 1,
+    "b_opt_number_of_realisations": 2,
 
     "alpha_ij_mean_treatment": 0,
-    "alpha_ij_sd_treatment": "seq(0, 0, length = 1)",
-    "alpha_ij_number_of_realisations": 1,
+    "alpha_ij_sd_treatment": "seq(0, 1, length = 2)",
+    "alpha_ij_number_of_realisations": 2,
 
     "temperature_mean": 20,
     "temperature_sd": 4,
