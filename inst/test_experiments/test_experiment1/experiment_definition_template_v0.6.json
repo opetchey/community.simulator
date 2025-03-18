@@ -6,22 +6,21 @@
 
     "a_b_mean_treatment": 0.3,
     "a_b_range_treatment": "seq(0, 1, length = 2)",
-    "a_b_distribution": "c(\"regular\")",
-    "a_b_number_of_realisations": 2,
+    "a_b_distribution": "c(\"random_uniform\")",
 
     "b_opt_mean_treatment": "seq(15, 20, length = 2)",
     "b_opt_range_treatment": "seq(15, 20, length = 2)",
-    "b_opt_distribution": "c(\"regular\")",
-    "b_opt_number_of_realisations": 2,
+    "b_opt_distribution": "c(\"random_uniform\")",
 
     "alpha_ij_mean_treatment": 0,
     "alpha_ij_sd_treatment": "seq(0, 1, length = 2)",
-    "alpha_ij_number_of_realisations": 2,
+
+    "number_of_community_replicates": 2,
 
     "temperature_mean": 20,
     "temperature_sd": 4,
     "one_over_f_gamma": 0.8,
-    "temperature_number_of_realisations": 2,
+    "number_of_environment_replicates": 2,
 
     "temperature_series_control": "c(\"same_per_replicate\")",
 

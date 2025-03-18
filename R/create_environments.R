@@ -19,7 +19,7 @@ create_environments <- function(experiment_folder,
   expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))
 
   environments <- expt |>
-    select(env_series_id, temperature_mean, temperature_sd, one_over_f_gamma, temperature_realisation_seed) |>
+    select(env_series_id, temperature_mean, temperature_sd, one_over_f_gamma, temperature_seed) |>
     distinct()
 
   expt_def <- jsonlite::fromJSON(paste0(experiment_folder, experiment_design_filename))
@@ -31,7 +31,7 @@ create_environments <- function(experiment_folder,
 
   for(i in 1:nrow(environments)) {
 
-    set.seed(environments$temperature_realisation_seed[i])
+    set.seed(environments$temperature_seed[i])
 
     temperature_series <- tibble(phase = c(rep("burn_in", expt_def$burn_in_duration),
                                            rep("expt", expt_def$experiment_duration + 1)),
