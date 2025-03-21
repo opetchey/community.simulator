@@ -27,7 +27,7 @@ library(broom)
 #library(community.simulator)
 
 ## Use this to load the package with any changes made to functions
-#devtools::load_all()
+devtools::load_all()
 
 ## make a path to the desktop for saving data
 ## While developing and testing, it can be useful to use the inst folder of the package as the location for the experiment

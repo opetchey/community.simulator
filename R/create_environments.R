@@ -49,7 +49,14 @@ create_environments <- function(experiment_folder,
                                                 N = expt_def$experiment_duration+1)) *
                                      expt_def$temperature_sd + expt_def$temperature_mean),
 
-                                 env_series_id = environments$env_series_id[i])
+                                 env_series_id = environments$env_series_id[i]) |>
+      mutate(temperature = ifelse(phase == "burn_in",
+                                  temperature[expt_def$burn_in_duration+1],
+                                  temperature))
+
+
+
+
 
     temperature_series_expt_only <- temperature_series |>
       filter(time > expt_def$burn_in_duration)
