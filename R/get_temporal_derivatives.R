@@ -69,6 +69,12 @@ get_temporal_derivatives <- function(experiment_folder,
                                      data = data))) %>%
       select(-data)
 
+    ## make a ggplot of one of the species igr temperature relationships
+    #species_pars2 |>
+    #  filter(species_id == "Spp-2") |>
+    #  ggplot(aes(x = temperatures, y = igr)) +
+    #  geom_point()
+
     ## Calculate the derivative of the gam of the growth rate - temperature relationship
     species_pars4 <- full_join(species_pars1, species_pars3) %>%
       group_by(case_id, species_id) %>%
@@ -88,6 +94,14 @@ get_temporal_derivatives <- function(experiment_folder,
                                           z_i,
                                           temperature)) %>%
       select(case_id, species_id, temperature, igr, derivative)
+
+
+    ## make a ggplot of one of the species igr temperature relationships
+    #species_pars4 |>
+    #  filter(species_id == "Spp-1") |>
+    #  ggplot(aes(x = temperature, y = igr)) +
+    #  geom_line(col= "red") +
+    #  geom_line(aes(y = derivative), col = "blue")
 
 
   ## Write to database

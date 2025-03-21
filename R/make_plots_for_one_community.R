@@ -23,6 +23,9 @@ make_plots_for_one_community <- function(experiment_folder,
                                      paste0(experiment_folder, "arbitrary_derivs.db"))
   arbitrary_derivs <- tbl(conn_arbitrary_derivs, "derivs")
 
+  conn_delta_igr <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "delta_igr.db"))
+  delta_igr <- tbl(conn_delta_igr, "delta_igr")
+
   comm_measures <- full_join(comm_measures, expt)
 
   ## for testing
@@ -132,13 +135,30 @@ make_plots_for_one_community <- function(experiment_folder,
     ggplot(aes(x = time, y = log10(Abundance), col = Species_ID)) +
     geom_line()
 
+  ## delta_igr time series
+  delta_igr_oi <- delta_igr |>
+    filter(case_id == case_id_oi) |>
+    collect()
+  p_delta_igr <- delta_igr_oi |>
+    ggplot(aes(x = time, y = delta_igr, col = species_id)) +
+    geom_line(linewidth = 0.1)
+
+
+  p_delta_igr_sp1 <- delta_igr_oi |>
+    filter(species_id == "Spp-1") |>
+    ggplot(aes(x = time, y = delta_igr, col = species_id)) +
+    geom_line(linewidth = 0.1)
+
+  #p_igrtemp / p_tempseries / p_delta_igr / p_dynamics
+
   graphs_list <- list(p_tempseries = p_tempseries,
                       p_temphist = p_temphist,
                       p_igrtemp = p_igrtemp,
                       p_igrhist = p_igrhist,
                       p_igrderivtemp = p_igrderivtemp,
                       p_comm_div_temp_mean = p_comm_div_temp_mean,
-                      p_dynamics = p_dynamics)
+                      p_dynamics = p_dynamics,
+                      p_delta_igr = p_delta_igr)
 
   return(graphs_list)
   #p_dynamics / p_tempseries / p_temphist
