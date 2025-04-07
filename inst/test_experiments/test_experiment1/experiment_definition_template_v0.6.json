@@ -5,15 +5,15 @@
     "number_of_species_treatment": "seq(10, 20, length = 2)",
 
     "a_b_mean_treatment": 0.3,
-    "a_b_range_treatment": "seq(0, 1, length = 2)",
+    "a_b_range_treatment": "seq(0, 0, length = 1)",
     "a_b_distribution": "c(\"random_uniform\")",
 
-    "b_opt_mean_treatment": "seq(15, 20, length = 2)",
-    "b_opt_range_treatment": "seq(15, 20, length = 2)",
+    "b_opt_mean_treatment": "seq(20, 20, length = 1)",
+    "b_opt_range_treatment": "seq(20, 20, length = 1)",
     "b_opt_distribution": "c(\"random_uniform\")",
 
     "alpha_ij_mean_treatment": 0,
-    "alpha_ij_sd_treatment": "seq(0, 1, length = 2)",
+    "alpha_ij_sd_treatment": "seq(0, 0, length = 1)",
 
     "number_of_community_replicates": 2,
 

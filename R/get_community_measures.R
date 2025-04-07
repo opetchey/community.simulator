@@ -32,7 +32,9 @@ get_community_measures <- function(experiment_folder,
                                paste0(experiment_folder, "arbitrary_derivs.db"))
   arb_derivs <- tbl(conn_arb_derivs, "derivs")
 
-
+  conn_delta_igr <- dbConnect(RSQLite::SQLite(),
+                               paste0(experiment_folder, "delta_igr.db"))
+  delta_igr <- tbl(conn_delta_igr, "delta_igr")
 
   ### Calculate various community level measure
   comm_cv <- get_community_CV(dynamics)
@@ -42,7 +44,7 @@ get_community_measures <- function(experiment_folder,
                                             expt)
   comm_resp_div <- get_community_response_diversity(temp_derivs)
   comm_sum_rel_b_opt <- get_community_sum_rel_b_opt(temperatures, expt)
-  comm_sum_derivs <- get_community_sum_derivatives(arb_derivs, temp_derivs)
+  comm_sum_derivs <- get_community_sum_derivatives(arb_derivs, temp_derivs, delta_igr)
 
   ## join all the community measures
   comm_measures <- expt |>

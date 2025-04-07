@@ -24,6 +24,7 @@ get_community_sum_rel_b_opt <- function(temperatures, expt) {
     mutate(relative_b_opt = community_object - mean_temperature)
   comm_sum_rel_b_opt <- rel_b_opt |>
     group_by(case_id) |>
-    summarise(sum_rel_b_opt = sum(relative_b_opt))
+    summarise(sum_rel_b_opt = sum(relative_b_opt),
+              min_rel_b_opt = min(abs(relative_b_opt)))
   return(comm_sum_rel_b_opt)
 }

@@ -2,12 +2,13 @@
 #'
 #' @param arb_derivs Connection to database containing arbitrary derivatives
 #' @param temp_derivs Connection to database containing temporal (actual) derivatives
+#' @param delta_igr Connection to database containing delta IGR
 #'
 #' @return A dataset containing the sum of the derivatives at arbitrary and actual temperatures
 #' @export
 #'
 #' @examples NULL
-get_community_sum_derivatives <- function(arb_derivs, temp_derivs) {
+get_community_sum_derivatives <- function(arb_derivs, temp_derivs, delta_igr) {
 
   ## get derivative of each species at mean temperature
   #spp_derivs_temp1 <- arb_derivs |>
@@ -53,10 +54,19 @@ get_community_sum_derivatives <- function(arb_derivs, temp_derivs) {
     group_by(case_id) |>
     summarise(sum2_temp_deriv = sum(sum_temp_deriv))
 
+  # delta_igr
+  temp1 <- delta_igr |>
+    group_by(case_id, time) |>
+    summarise(sum_delta_igr = sum(delta_igr)) |>
+    collect()
+  sum2_delta_igr <- temp1 |>
+    group_by(case_id) |>
+    summarise(sum2_arb_deriv = mean(abs(sum_delta_igr)))
 
 
 
-  sum_derivs <- full_join(sum2_derivs_arb, sum2_derivs_temp)
+  sum_derivs <- full_join(sum2_derivs_arb, sum2_derivs_temp) |>
+    full_join(sum2_delta_igr)
   return(sum_derivs)
 
 }

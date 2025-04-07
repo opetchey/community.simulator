@@ -86,7 +86,7 @@ get_delta_igr <- function(experiment_folder,
 
   }
 
-  dbDisconnect(conn_derivs)
+  dbDisconnect(conn_delta_igr)
   dbDisconnect(conn_temperatures)
 
 }
