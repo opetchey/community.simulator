@@ -25,34 +25,35 @@ get_community_sum_derivatives <- function(arb_derivs, temp_derivs, delta_igr) {
     group_by(case_id, temperature) |>
     summarise(sum_arb_deriv = sum(derivative)) |>
     collect()
-
-  ggplot(temp1, aes(x = sum_arb_deriv)) +
-    geom_histogram() +
-    facet_wrap(~case_id)
-  ggplot(temp1, aes(x = temperature, y = sum_arb_deriv)) +
-    geom_point() +
-    facet_wrap(~case_id)
-
   sum2_derivs_arb <- temp1 |>
     group_by(case_id) |>
-    summarise(sum2_arb_deriv = sum(sum_arb_deriv))
+    summarise(mean_arb_deriv = mean(abs(sum_arb_deriv)))
+
+  #ggplot(temp1, aes(x = sum_arb_deriv)) +
+  #  geom_histogram() +
+  #  facet_wrap(~case_id)
+  #ggplot(temp1, aes(x = temperature, y = sum_arb_deriv)) +
+  #  geom_point() +
+  #  facet_wrap(~case_id)
+
+
 
   ### Actual / temporal
   temp1 <- temp_derivs |>
     group_by(case_id, temperature) |>
     summarise(sum_temp_deriv = sum(derivative)) |>
     collect()
-
-  ggplot(temp1, aes(x = sum_temp_deriv)) +
-    geom_histogram() +
-    facet_wrap(~case_id)
-  ggplot(temp1, aes(x = temperature, y = sum_temp_deriv)) +
-    geom_point() +
-    facet_wrap(~case_id)
-
   sum2_derivs_temp <- temp1 |>
     group_by(case_id) |>
-    summarise(sum2_temp_deriv = sum(sum_temp_deriv))
+    summarise(mean_temp_deriv = mean(abs(sum_temp_deriv)))
+
+  #ggplot(temp1, aes(x = sum_temp_deriv)) +
+  #  geom_histogram() +
+  #  facet_wrap(~case_id)
+  #ggplot(temp1, aes(x = temperature, y = sum_temp_deriv)) +
+  #  geom_point() +
+  #  facet_wrap(~case_id)
+
 
   # delta_igr
   temp1 <- delta_igr |>
@@ -61,7 +62,7 @@ get_community_sum_derivatives <- function(arb_derivs, temp_derivs, delta_igr) {
     collect()
   sum2_delta_igr <- temp1 |>
     group_by(case_id) |>
-    summarise(sum2_arb_deriv = mean(abs(sum_delta_igr)))
+    summarise(mean_delta_igr = mean(abs(sum_delta_igr), na.rm = TRUE))
 
 
 

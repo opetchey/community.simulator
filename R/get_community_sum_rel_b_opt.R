@@ -26,5 +26,22 @@ get_community_sum_rel_b_opt <- function(temperatures, expt) {
     group_by(case_id) |>
     summarise(sum_rel_b_opt = sum(relative_b_opt),
               min_rel_b_opt = min(abs(relative_b_opt)))
-  return(comm_sum_rel_b_opt)
+
+
+  expt_long <- unnest_longer(expt, col = c(community_object)) |>
+    filter(community_object_id == "b_opt_i") |>
+    unnest(cols = c(community_object)) |>
+    group_by(case_id) |>
+    mutate(species_id = rep(paste0("Spp-", 1:length(case_id))))
+  real_b_opt <- expt_long |>
+    group_by(community_id, case_id) |>
+    summarise(real_mean_b_opt = mean(community_object),
+              real_sd_b_opt = sqrt( sum( (community_object-mean(community_object))^2 ) /
+                                      length(community_object)) )
+
+  result <- comm_sum_rel_b_opt |>
+    left_join(real_b_opt, by = "case_id")
+
+
+  return(result)
 }
