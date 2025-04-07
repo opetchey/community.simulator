@@ -4,12 +4,14 @@
 \alias{get_community_sum_derivatives}
 \title{Get the sum of the communities derivatives at arbitrary temperatures and at actual (temp = temporal) temperatures}
 \usage{
-get_community_sum_derivatives(arb_derivs, temp_derivs)
+get_community_sum_derivatives(arb_derivs, temp_derivs, delta_igr)
 }
 \arguments{
 \item{arb_derivs}{Connection to database containing arbitrary derivatives}
 
 \item{temp_derivs}{Connection to database containing temporal (actual) derivatives}
+
+\item{delta_igr}{Connection to database containing delta IGR}
 }
 \value{
 A dataset containing the sum of the derivatives at arbitrary and actual temperatures
