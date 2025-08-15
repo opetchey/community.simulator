@@ -28,6 +28,9 @@ make_a_community <- function(S,
                              b_opt_range,
                              b_opt_distribution,
 
+                             sd_perf_distribution,
+                             sd_perf_mean,
+                             sd_perf_range,
 
                              alpha_ij_mean,
                              alpha_ij_sd,
@@ -71,8 +74,13 @@ make_a_community <- function(S,
 
 
   ## standard deviation of the Gaussian birth rate - temperature response curve
-  ## same for all species
-  s_i <- rep(s, S)
+  ## not same for all species
+  if(sd_perf_distribution == "random_uniform") {
+    #set.seed(a_b_realisation_seed)
+    s_i <- runif(S, min= sd_perf_mean - (0.5*sd_perf_range),
+                 max = sd_perf_mean + (0.5*sd_perf_range))
+  }
+
 
   ## death rate when temperature is equal to 0
   ## same for all species

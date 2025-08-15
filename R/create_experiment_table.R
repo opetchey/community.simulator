@@ -33,6 +33,10 @@ create_experiment_table <- function(experiment_folder,
                       b_opt_range = eval(expt_def$b_opt_range_treatment),
                       b_opt_distribution = eval(expt_def$b_opt_distribution),
 
+                      sd_perf_distribution = eval(expt_def$sd_perf_distribution),
+                      sd_perf_mean=eval(expt_def$sd_perf_mean),
+                      sd_perf_range=eval(expt_def$sd_perf_range),
+
                       alpha_ij_mean = eval(expt_def$alpha_ij_mean_treatment),
                       alpha_ij_sd = eval(expt_def$alpha_ij_sd_treatment),
 
@@ -56,6 +60,10 @@ create_experiment_table <- function(experiment_folder,
                                  b_opt_mean, "_",
                                  b_opt_range, "_",
                                  b_opt_distribution, "_",
+
+                                 sd_perf_distribution, "_",
+                                 sd_perf_mean, "_",
+                                 sd_perf_range, "_",
 
                                  alpha_ij_mean, "_",
                                  alpha_ij_sd, "_",
@@ -99,6 +107,9 @@ create_experiment_table <- function(experiment_folder,
                                            b_opt_range = .$b_opt_range,
                                            b_opt_distribution = .$b_opt_distribution,
 
+                                           sd_perf_distribution = .$sd_perf_distribution,
+                                           sd_perf_mean = .$sd_perf_mean,
+                                           sd_perf_range = .$sd_perf_range,
 
                                            alpha_ij_mean = .$alpha_ij_mean,
                                            alpha_ij_sd = .$alpha_ij_sd,

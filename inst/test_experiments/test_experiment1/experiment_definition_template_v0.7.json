@@ -12,6 +12,10 @@
     "b_opt_range_treatment": "seq(20, 20, length = 1)",
     "b_opt_distribution": "c(\"random_uniform\")",
 
+    "sd_perf_distribution": "c(\"random_uniform\")",
+    "sd_perf_mean": "seq(10, 10, length = 1)",
+    "sd_perf_range": "c(0, 15)",
+
     "alpha_ij_mean_treatment": 0,
     "alpha_ij_sd_treatment": "seq(0, 0, length = 1)",
 
@@ -28,9 +32,13 @@
     "experiment_duration": 1000,
 
     "a_d": 0,
-    "sd_perf_curve": 10,
+
     "z": 0.05,
     "alpha_jj": 1
 
   }
 ]
+
+
+
+
