@@ -64,8 +64,16 @@ get_community_measures(experiment_folder, experiment_design_filename)
 
 ## Make plots for one community
 expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))
-case_id_oi <- expt$case_id[2]
+case_id_oi <- expt$case_id[16]
 
+conn_dynamics <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "dynamics.db"))
+dynamics <- tbl(conn_dynamics, "dynamics")
+dynamics_oi <- dynamics |>
+  filter(case_id == case_id_oi) |>
+  collect()
+p_dynamics <- dynamics_oi |>
+  ggplot(aes(x = time, y = log10(Abundance), col = Species_ID)) +
+  geom_line()
 
 
 
