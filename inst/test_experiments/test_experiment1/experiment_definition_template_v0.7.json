@@ -2,7 +2,7 @@
 [
   {
     "random_seed": 1234,
-    "number_of_species_treatment": "seq(10, 20, length = 2)",
+    "number_of_species_treatment": "seq(20, 20, length = 1)",
 
     "a_b_mean_treatment": 0.3,
     "a_b_range_treatment": "seq(0, 0, length = 1)",
@@ -14,17 +14,17 @@
 
     "sd_perf_distribution": "c(\"random_uniform\")",
     "sd_perf_mean": "seq(10, 10, length = 1)",
-    "sd_perf_range": "c(0, 15)",
+    "sd_perf_range": "c(0)",
 
     "alpha_ij_mean_treatment": 0,
-    "alpha_ij_sd_treatment": "seq(0, 0, length = 1)",
+    "alpha_ij_sd_treatment": "seq(0.5, 0.5, length = 1)",
 
-    "number_of_community_replicates": 2,
+    "number_of_community_replicates": 1,
 
     "temperature_mean": 20,
     "temperature_sd": 4,
     "one_over_f_gamma": 0.8,
-    "number_of_environment_replicates": 2,
+    "number_of_environment_replicates": 1,
 
     "temperature_series_control": "c(\"same_per_replicate\")",
 
