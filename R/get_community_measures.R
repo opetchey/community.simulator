@@ -36,21 +36,27 @@ get_community_measures <- function(experiment_folder,
   #                              paste0(experiment_folder, "delta_igr.db"))
   # delta_igr <- tbl(conn_delta_igr, "delta_igr")
 
+
   ### Calculate various community level measure
+
+  ## Community total biomass CV
   comm_cv <- get_community_CV(dynamics)
+
+  ## Community temperature sensitivity
   comm_temp_sens <- get_community_temp_sens(dynamics,
                                             temperatures,
                                             rollsumr_window = 50,
                                             expt)
   # comm_resp_div <- get_community_response_diversity(temp_derivs)
+
+  ## Get community sum of relative b_opt
   comm_sum_rel_b_opt <- get_community_sum_rel_b_opt(temperatures, expt)
   # comm_sum_derivs <- get_community_sum_derivatives(arb_derivs, temp_derivs, delta_igr)
 
-  # get synchrony
+  # get community synchrony
   comm_syn<-get_community_syn(dynamics)
 
   # get pop_stab
-
   comm_pop<-get_community_popstab(dynamics)
 
   ## join all the community measures
