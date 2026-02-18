@@ -40,7 +40,8 @@ make_a_community <- function(S,
                              s,
                              a_d,
                              z,
-                             alpha_jj){
+                             alpha_jj,
+                             alpha_ij_distribution){
 
   ## same a_b_i for all species
   #a_b_i <- rep(a_b, S)
@@ -91,9 +92,14 @@ make_a_community <- function(S,
 
   ## community matrix
   #set.seed(alpha_ij_realisation_seed)
-  temp <- rnorm(S*S,
-                mean = alpha_ij_mean,
-                sd = alpha_ij_sd)
+  if(alpha_ij_distribution == "random_normal") {
+    temp <- rnorm(S*S,
+                  mean = alpha_ij_mean,
+                  sd = alpha_ij_sd)
+  }
+  if(alpha_ij_distribution == "random_uniform") {
+    temp <- runif(S * S, min = alpha_ij_mean-(0.5*alpha_ij_sd),max=alpha_ij_mean+(0.5*alpha_ij_sd))
+  }
   alpha_ij <- matrix(temp, S, S)
   diag(alpha_ij) <- alpha_jj
 

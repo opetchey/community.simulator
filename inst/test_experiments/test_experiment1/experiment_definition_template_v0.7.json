@@ -2,7 +2,7 @@
 [
   {
     "random_seed": 1234,
-    "number_of_species_treatment": "seq(20, 20, length = 1)",
+    "number_of_species_treatment": "seq(2, 20, length = 10)",
 
     "a_b_mean_treatment": 0.3,
     "a_b_range_treatment": "seq(0, 0, length = 1)",
@@ -16,6 +16,7 @@
     "sd_perf_mean": "seq(10, 10, length = 1)",
     "sd_perf_range": "c(0)",
 
+    "alpha_ij_distribution": "c(\"random_uniform\")",
     "alpha_ij_mean_treatment": 0,
     "alpha_ij_sd_treatment": "seq(0.5, 0.5, length = 1)",
 

@@ -24,13 +24,13 @@ get_community_measures <- function(experiment_folder,
   conn_dynamics <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "dynamics.db"))
   dynamics <- tbl(conn_dynamics, "dynamics")
   ## temporal derivatives
-  conn_temp_derivs <- dbConnect(RSQLite::SQLite(),
-                                paste0(experiment_folder, "temporal_derivs.db"))
-  temp_derivs <- tbl(conn_temp_derivs, "derivs")
+  #conn_temp_derivs <- dbConnect(RSQLite::SQLite(),
+  #                              paste0(experiment_folder, "temporal_derivs.db"))
+  #temp_derivs <- tbl(conn_temp_derivs, "derivs")
   ## arbitrary derivatives
-  conn_arb_derivs <- dbConnect(RSQLite::SQLite(),
-                               paste0(experiment_folder, "arbitrary_derivs.db"))
-  arb_derivs <- tbl(conn_arb_derivs, "derivs")
+  #conn_arb_derivs <- dbConnect(RSQLite::SQLite(),
+  #                             paste0(experiment_folder, "arbitrary_derivs.db"))
+  #arb_derivs <- tbl(conn_arb_derivs, "derivs")
 
   # conn_delta_igr <- dbConnect(RSQLite::SQLite(),
   #                              paste0(experiment_folder, "delta_igr.db"))
@@ -59,6 +59,14 @@ get_community_measures <- function(experiment_folder,
   # get pop_stab
   comm_pop<-get_community_popstab(dynamics)
 
+  # get community CPC measures
+  comm_cpc <- get_community_CPC_measures(temperatures,
+                                   expt,
+                                   expt_def,
+                                   every_t = 1)
+
+
+
   ## join all the community measures
   comm_measures <- expt |>
     full_join(comm_cv) |>
@@ -67,7 +75,8 @@ get_community_measures <- function(experiment_folder,
     full_join(comm_sum_rel_b_opt) |>
     # full_join(comm_sum_derivs)|>
     full_join(comm_syn) |>
-    full_join(comm_pop)
+    full_join(comm_pop) |>
+    full_join(comm_cpc)
 
   saveRDS(comm_measures, paste0(experiment_folder, "community_measures.RDS"))
 

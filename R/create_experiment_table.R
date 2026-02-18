@@ -37,6 +37,7 @@ create_experiment_table <- function(experiment_folder,
                       sd_perf_mean=eval(expt_def$sd_perf_mean),
                       sd_perf_range=eval(expt_def$sd_perf_range),
 
+                      alpha_ij_distribution = eval(expt_def$alpha_ij_distribution),
                       alpha_ij_mean = eval(expt_def$alpha_ij_mean_treatment),
                       alpha_ij_sd = eval(expt_def$alpha_ij_sd_treatment),
 
@@ -65,6 +66,7 @@ create_experiment_table <- function(experiment_folder,
                                  sd_perf_mean, "_",
                                  sd_perf_range, "_",
 
+                                 alpha_ij_distribution, "_",
                                  alpha_ij_mean, "_",
                                  alpha_ij_sd, "_",
                                  community_replicate, "_",
@@ -119,7 +121,8 @@ create_experiment_table <- function(experiment_folder,
                                            s = s,
                                            a_d = a_d,
                                            z = z,
-                                           alpha_jj = alpha_jj
+                                           alpha_jj = alpha_jj,
+                                           alpha_ij_distribution = .$alpha_ij_distribution
     ))
 
   expt <- cbind(expt, community_object)

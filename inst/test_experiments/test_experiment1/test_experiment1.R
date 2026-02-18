@@ -50,17 +50,19 @@ create_environments(experiment_folder, experiment_design_filename)
 simulate_dynamics(experiment_folder, experiment_design_filename)
 
 ## Get temporal derivatives
-get_temporal_derivatives(experiment_folder, experiment_design_filename, every_t = 10)
+#get_temporal_derivatives(experiment_folder, experiment_design_filename, every_t = 10)
 
 ## Get arbitrary derivatives
-get_arbitrary_derivatives(experiment_folder, experiment_design_filename)
+#get_arbitrary_derivatives(experiment_folder, experiment_design_filename)
 
-## Get temporal derivatives
-get_delta_igr(experiment_folder, experiment_design_filename, every_t = 1)
+## Get delta IGR
+#get_delta_igr(experiment_folder, experiment_design_filename, every_t = 1)
 
 
 ## Get the community measures
 get_community_measures(experiment_folder, experiment_design_filename)
+
+
 
 ## Make plots for one community
 expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))

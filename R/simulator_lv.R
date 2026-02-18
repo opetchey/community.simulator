@@ -43,7 +43,10 @@ simulator_lv<-function(input_com_params,
     # temperature-dependent vital rates
     b0<- ab * exp(-(Tcel - bopt)^2/spread)
     d0<- ad * exp(z*Tcel)
-    rms<-b0-d0
+    rms<-b0-d0 + 1e-6 # Ensuring a lower boundary for birth rate to prevent NAs...
+    ## we investigated the effect of this constant and found that values of abundance
+    ## were strongly correlated between simulations with and without this constant, and
+    ## the cv of abundance across time was not affected by this constant
 
     K<-rms/(bet+delt)
     #print(K)
