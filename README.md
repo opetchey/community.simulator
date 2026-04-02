@@ -22,11 +22,48 @@ install.packages("remotes")
 remotes::install_github("opetchey/community.simulator")
 ```
 
+Install from GitHub and build the vignettes during installation:
+
+```r
+install.packages(c("remotes", "knitr", "rmarkdown"))
+remotes::install_github(
+  "opetchey/community.simulator",
+  build_vignettes = TRUE,
+  dependencies = TRUE,
+  upgrade = "never"
+)
+```
+
 Install from a local checkout:
 
 ```r
 install.packages("remotes")
 remotes::install_local(".")
+```
+
+Install from a local checkout and build the vignettes during installation:
+
+```r
+install.packages(c("remotes", "knitr", "rmarkdown"))
+remotes::install_local(
+  ".",
+  build_vignettes = TRUE,
+  dependencies = TRUE,
+  upgrade = "never"
+)
+```
+
+After installation, you can view the installed vignettes with:
+
+```r
+browseVignettes("community.simulator")
+```
+
+You can also open a specific vignette directly:
+
+```r
+vignette("getting_started", package = "community.simulator")
+vignette("User_guide", package = "community.simulator")
 ```
 
 If you are working interactively inside the repository during development:
