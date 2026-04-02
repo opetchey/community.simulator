@@ -29,7 +29,7 @@ get_community_temp_sens <- function(dynamics,
   ## calculate total biomass
   temp0 <- dynamics |>
     dplyr::group_by(case_id, time) |>
-    dplyr::summarise(tot_ab = sum(Abundance, na.rm = FALSE)) |>
+    dplyr::summarise(tot_ab = sum(Abundance, na.rm = TRUE)) |>
     dplyr::collect()
 
   temp1 <- temp0 |>

@@ -24,7 +24,7 @@ get_community_popstab <- function(dynamics) {
 
   temp1 <- dynamics |>
     dplyr::group_by(case_id, time) |>
-    dplyr::summarise(tot_ab = sum(Abundance, na.rm = FALSE)) |>
+    dplyr::summarise(tot_ab = sum(Abundance, na.rm = TRUE)) |>
     dplyr::collect()
 
 

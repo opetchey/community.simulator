@@ -25,9 +25,11 @@ get_community_measures <- function(experiment_folder,
   ## temperatures
   conn_temperatures <- DBI::dbConnect(RSQLite::SQLite(),
                                       paste0(experiment_folder, "temperatures.db"))
+  on.exit(DBI::dbDisconnect(conn_temperatures), add = TRUE)
   temperatures <- dplyr::tbl(conn_temperatures, "temperatures")
   ## dynamics
   conn_dynamics <- DBI::dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "dynamics.db"))
+  on.exit(DBI::dbDisconnect(conn_dynamics), add = TRUE)
   dynamics <- dplyr::tbl(conn_dynamics, "dynamics")
   ## temporal derivatives
   #conn_temp_derivs <- dbConnect(RSQLite::SQLite(),

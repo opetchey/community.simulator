@@ -11,7 +11,7 @@ get_community_CV <- function(dynamics) {
   ## Community biomass and community stability ----
   temp1 <- dynamics |>
     dplyr::group_by(case_id, time) |>
-    dplyr::summarise(tot_ab = sum(Abundance, na.rm = FALSE)) |>
+    dplyr::summarise(tot_ab = sum(Abundance, na.rm = TRUE)) |>
     dplyr::collect()
   comm_stab <- temp1 |>
     dplyr::group_by(case_id) |>
