@@ -49,6 +49,7 @@ The typical workflow is:
 The main user-facing functions are:
 
 - `run_experiment()`
+- `setup_example_experiment()`
 - `create_experiment_folder()`
 - `create_experiment_table()`
 - `create_environments()`
@@ -79,26 +80,11 @@ project_folder_location <- file.path("~/Desktop", "community_simulator_projects"
 experiment_name <- "test_experiment1"
 experiment_design_filename <- "experiment_definition_template_v0.7.json"
 
-experiment_folder <- create_experiment_folder(
+setup <- setup_example_experiment(
   experiment_folder_location = project_folder_location,
-  experiment_name = experiment_name
-)
-```
-
-Copy the bundled example JSON into that experiment folder:
-
-```r
-design_source <- system.file(
-  "test_experiments",
-  "test_experiment1",
-  experiment_design_filename,
-  package = "community.simulator"
-)
-
-file.copy(
-  from = design_source,
-  to = file.path(experiment_folder, experiment_design_filename),
-  overwrite = TRUE
+  experiment_name = experiment_name,
+  example_experiment_name = "test_experiment1",
+  experiment_design_filename = experiment_design_filename
 )
 ```
 

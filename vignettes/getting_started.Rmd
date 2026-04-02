@@ -37,28 +37,18 @@ library(community.simulator)
 ```{r}
 project_folder_location <- tempdir()
 experiment_name <- "getting_started_example"
-experiment_design_filename <- "getting_started_experiment.json"
+experiment_design_filename <- "experiment_definition_template_v0.7.json"
 
-experiment_folder <- create_experiment_folder(
+setup <- setup_example_experiment(
   experiment_folder_location = project_folder_location,
   experiment_name = experiment_name,
+  example_experiment_name = "test_experiment1",
+  experiment_design_filename = experiment_design_filename,
   verbose = FALSE
 )
 
-design_source <- system.file(
-  "extdata",
-  experiment_design_filename,
-  package = "community.simulator"
-)
-
-file.copy(
-  from = design_source,
-  to = file.path(experiment_folder, experiment_design_filename),
-  overwrite = TRUE
-)
-
 ## In a real project, this is the point where you would edit the JSON file
-## inside `experiment_folder` before running the workflow.
+## inside `setup$experiment_folder` before running the workflow.
 
 outputs <- suppressWarnings(
   suppressMessages(

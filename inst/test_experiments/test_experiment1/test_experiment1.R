@@ -12,28 +12,16 @@ project_folder_location <- file.path("~/Desktop", "community_simulator_projects"
 experiment_name <- "test_experiment1"
 experiment_design_filename <- "experiment_definition_template_v0.7.json"
 
-## Create a folder for this experiment
-experiment_folder <- create_experiment_folder(
+## Create a folder for this experiment and copy the bundled example JSON into it
+setup <- setup_example_experiment(
   experiment_folder_location = project_folder_location,
   experiment_name = experiment_name,
+  example_experiment_name = "test_experiment1",
+  experiment_design_filename = experiment_design_filename,
   verbose = TRUE
 )
 
-## Copy the bundled example JSON into the experiment folder
-design_source <- system.file(
-  "test_experiments",
-  "test_experiment1",
-  experiment_design_filename,
-  package = "community.simulator"
-)
-
-file.copy(
-  from = design_source,
-  to = file.path(experiment_folder, experiment_design_filename),
-  overwrite = TRUE
-)
-
-## Edit the JSON file in `experiment_folder` if you want to change the design.
+## Edit the JSON file in `setup$experiment_folder` if you want to change the design.
 ## Then run the main workflow.
 outputs <- run_experiment(
   experiment_folder_location = project_folder_location,
