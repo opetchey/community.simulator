@@ -19,7 +19,7 @@ Install from GitHub:
 
 ```r
 install.packages("remotes")
-remotes::install_github("owenpetchey/community.simulator")
+remotes::install_github("opetchey/community.simulator")
 ```
 
 Install from a local checkout:

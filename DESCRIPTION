@@ -10,6 +10,8 @@ Description: Tools to design simulation experiments, generate environmental
     community-level summary measures. The package was developed to study how
     temperature-dependent vital rates and response diversity influence the
     stability and functioning of ecological communities.
+URL: https://github.com/opetchey/community.simulator
+BugReports: https://github.com/opetchey/community.simulator/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
