@@ -22,7 +22,9 @@ new users.
 
 The example:
 
-- copies a bundled experiment-definition file to a temporary experiment folder
+- creates a project folder and an experiment subfolder
+- copies a bundled experiment-definition file into the experiment folder
+- highlights the point where a user would normally edit the JSON design
 - runs the standard workflow with `run_experiment()`
 - inspects the saved summary output
 
@@ -33,12 +35,12 @@ library(community.simulator)
 ## Run a Tiny Example
 
 ```{r}
-experiment_folder_location <- tempdir()
+project_folder_location <- tempdir()
 experiment_name <- "getting_started_example"
 experiment_design_filename <- "getting_started_experiment.json"
 
 experiment_folder <- create_experiment_folder(
-  experiment_folder_location = experiment_folder_location,
+  experiment_folder_location = project_folder_location,
   experiment_name = experiment_name,
   verbose = FALSE
 )
@@ -55,10 +57,13 @@ file.copy(
   overwrite = TRUE
 )
 
+## In a real project, this is the point where you would edit the JSON file
+## inside `experiment_folder` before running the workflow.
+
 outputs <- suppressWarnings(
   suppressMessages(
     run_experiment(
-      experiment_folder_location = experiment_folder_location,
+      experiment_folder_location = project_folder_location,
       experiment_name = experiment_name,
       experiment_design_filename = experiment_design_filename,
       overwrite = TRUE,
@@ -82,8 +87,9 @@ community_measures[, c("case_id", "richness", "temperature_mean", "CV_totab")]
 
 Once this small example works, the usual next steps are:
 
-- edit an experiment-definition file to change species, temperature, or
-  replicate settings
-- rerun the workflow in a new experiment folder
+- create a project folder that contains multiple experiment subfolders
+- copy an example JSON file into each experiment folder, then edit it to change
+  species, temperature, or replicate settings
+- rerun the workflow for a new experiment name
 - inspect `community_measures.RDS`, `dynamics.db`, and `temperatures.db`
 - use `make_plots_for_one_community()` for case-level plots

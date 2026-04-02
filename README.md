@@ -39,13 +39,12 @@ devtools::load_all()
 
 The typical workflow is:
 
-1. Create an experiment folder.
-2. Add an experiment-definition JSON file.
-3. Build the experiment table.
-4. Generate environmental time series.
-5. Simulate community dynamics.
-6. Calculate community-level summaries.
-7. Inspect plots and saved outputs.
+1. Set a project folder that can contain multiple experiment subfolders.
+2. Set an experiment name and create a folder for that experiment.
+3. Copy an example experiment-definition JSON file into the experiment folder.
+4. Edit the JSON file to define the experiment you want to run.
+5. Run the experiment workflow.
+6. Inspect plots and saved outputs.
 
 The main user-facing functions are:
 
@@ -63,44 +62,58 @@ A bundled example experiment is available under `inst/test_experiments`. The
 script `test_experiment1.R` shows the intended sequence of calls for setting up,
 running, and analysing an experiment.
 
-From an installed package, you can copy the example files to a working
-directory:
+One way to get started is to create a project folder on your Desktop that can
+contain multiple experiments:
 
 ```r
-folder_to_copy <- system.file("test_experiments", package = "community.simulator")
-dir.create("~/Desktop/test_experiments", recursive = TRUE, showWarnings = FALSE)
-file.copy(folder_to_copy, "~/Desktop/test_experiments", recursive = TRUE)
+project_folder_location <- file.path("~/Desktop", "community_simulator_projects")
+dir.create(project_folder_location, recursive = TRUE, showWarnings = FALSE)
 ```
 
-Then run the example workflow with the high-level wrapper:
+Then create a folder for a single experiment:
 
 ```r
 library(community.simulator)
 
-experiment_folder_location <- file.path("~/Desktop", "test_experiments")
+project_folder_location <- file.path("~/Desktop", "community_simulator_projects")
 experiment_name <- "test_experiment1"
 experiment_design_filename <- "experiment_definition_template_v0.7.json"
 
-outputs <- run_experiment(
-  experiment_folder_location,
-  experiment_name,
-  experiment_design_filename,
-  overwrite = FALSE
+experiment_folder <- create_experiment_folder(
+  experiment_folder_location = project_folder_location,
+  experiment_name = experiment_name
 )
 ```
 
-If you want to run the steps manually, the underlying workflow is:
+Copy the bundled example JSON into that experiment folder:
 
 ```r
-experiment_folder <- create_experiment_folder(
-  experiment_folder_location,
-  experiment_name
+design_source <- system.file(
+  "test_experiments",
+  "test_experiment1",
+  experiment_design_filename,
+  package = "community.simulator"
 )
 
-create_experiment_table(experiment_folder, experiment_design_filename)
-create_environments(experiment_folder, experiment_design_filename)
-simulate_dynamics(experiment_folder, experiment_design_filename)
-get_community_measures(experiment_folder, experiment_design_filename)
+file.copy(
+  from = design_source,
+  to = file.path(experiment_folder, experiment_design_filename),
+  overwrite = TRUE
+)
+```
+
+At this point, edit the JSON file in the experiment folder so it matches the
+experiment you want to run.
+
+Then run the experiment:
+
+```r
+outputs <- run_experiment(
+  experiment_folder_location = project_folder_location,
+  experiment_name = experiment_name,
+  experiment_design_filename = experiment_design_filename,
+  overwrite = FALSE
+)
 ```
 
 By default, workflow functions now stop if an output file already exists. To

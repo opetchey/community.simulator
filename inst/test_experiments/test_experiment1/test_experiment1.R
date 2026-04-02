@@ -1,115 +1,87 @@
+library(community.simulator)
 
-rm(list = ls())
-
-## Use the next line to add a package to the DESCRIPTION file
-#usethis::use_package("dplyr")
-
-library(tidyverse)
-library(readxl)
-library(here)
-library(kableExtra)
-library(patchwork)
-library(primer)
+## Optional packages used below for inspecting outputs and making example plots
 library(DBI)
-library(RSQLite)
 library(dplyr)
-library(dirmult)
-library(jsonlite)
-library(tidyverse)
-library(readxl)
-library(MESS)
-library(here)
+library(ggplot2)
 library(patchwork)
-library(DBI)
 library(RSQLite)
-library(broom)
 
-#library(community.simulator)
-
-## Use this to load the package with any changes made to functions
-devtools::load_all()
-
-## make a path to the desktop for saving data
-## While developing and testing, it can be useful to use the inst folder of the package as the location for the experiment
-experiment_folder_location <- here("inst", "test_experiments")
+## Set a project folder that can contain multiple experiments
+project_folder_location <- file.path("~/Desktop", "community_simulator_projects")
 experiment_name <- "test_experiment1"
 experiment_design_filename <- "experiment_definition_template_v0.7.json"
 
-## create folder for experiment, if it does not already exist
-experiment_folder <- create_experiment_folder(experiment_folder_location, experiment_name)
+## Create a folder for this experiment
+experiment_folder <- create_experiment_folder(
+  experiment_folder_location = project_folder_location,
+  experiment_name = experiment_name,
+  verbose = TRUE
+)
 
-## **Now put the experiment definition json in the experiment folder. You can get a template of this file from the inst/ folder of the package.**
+## Copy the bundled example JSON into the experiment folder
+design_source <- system.file(
+  "test_experiments",
+  "test_experiment1",
+  experiment_design_filename,
+  package = "community.simulator"
+)
 
-## Create experiment table
-create_experiment_table(experiment_folder, experiment_design_filename)
+file.copy(
+  from = design_source,
+  to = file.path(experiment_folder, experiment_design_filename),
+  overwrite = TRUE
+)
 
-## Create environments
-create_environments(experiment_folder, experiment_design_filename)
+## Edit the JSON file in `experiment_folder` if you want to change the design.
+## Then run the main workflow.
+outputs <- run_experiment(
+  experiment_folder_location = project_folder_location,
+  experiment_name = experiment_name,
+  experiment_design_filename = experiment_design_filename,
+  overwrite = FALSE,
+  verbose = TRUE
+)
 
-## Simulate dynamics
-simulate_dynamics(experiment_folder, experiment_design_filename)
+## Load the saved experiment table
+expt <- readRDS(outputs$experiment_table)
 
-## Get temporal derivatives
-#get_temporal_derivatives(experiment_folder, experiment_design_filename, every_t = 10)
+## Choose one case to inspect
+case_id_oi <- expt$case_id[1]
 
-## Get arbitrary derivatives
-#get_arbitrary_derivatives(experiment_folder, experiment_design_filename)
-
-## Get delta IGR
-#get_delta_igr(experiment_folder, experiment_design_filename, every_t = 1)
-
-
-## Get the community measures
-get_community_measures(experiment_folder, experiment_design_filename)
-
-
-
-## Make plots for one community
-expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))
-case_id_oi <- expt$case_id[16]
-
-conn_dynamics <- dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "dynamics.db"))
-dynamics <- tbl(conn_dynamics, "dynamics")
+## Read dynamics for the selected case
+conn_dynamics <- DBI::dbConnect(RSQLite::SQLite(), outputs$dynamics_db)
+dynamics <- dplyr::tbl(conn_dynamics, "dynamics")
 dynamics_oi <- dynamics |>
-  filter(case_id == case_id_oi) |>
-  collect()
+  dplyr::filter(case_id == case_id_oi) |>
+  dplyr::collect()
+
 p_dynamics <- dynamics_oi |>
-  ggplot(aes(x = time, y = log10(Abundance), col = Species_ID)) +
-  geom_line()
+  ggplot2::ggplot(ggplot2::aes(x = time, y = log10(Abundance), col = Species_ID)) +
+  ggplot2::geom_line()
 
+DBI::dbDisconnect(conn_dynamics)
 
+## Optional: make the package's case-level plots
+## These require the corresponding derivative files to exist.
+## For example, you may first run:
+## get_arbitrary_derivatives(outputs$experiment_folder, experiment_design_filename, overwrite = TRUE)
+## get_delta_igr(outputs$experiment_folder, experiment_design_filename, overwrite = TRUE)
 
-graphs <- make_plots_for_one_community(experiment_folder, case_id_oi)
-graphs$p_igrtemp / graphs$p_tempseries / graphs$p_delta_igr / graphs$p_dynamics
+## graphs <- make_plots_for_one_community(outputs$experiment_folder, case_id_oi)
+## graphs$p_igrtemp / graphs$p_tempseries / graphs$p_delta_igr / graphs$p_dynamics
 
+## Load the saved community summary output
+community_measures <- readRDS(outputs$community_measures)
 
-graphs$p_tempseries
-graphs$p_temphist
-graphs$p_igrtemp
-#graphs$p_igrhist
-graphs$p_igrderivtemp
-graphs$p_comm_div_temp_mean
-graphs$p_dynamics
-
-graphs$p_igrtemp / graphs$p_tempseries / graphs$p_dynamics
-
-
-## Make a graph of stability versus sum of derivatives
-community_measures <- readRDS(paste0(experiment_folder, "community_measures.RDS"))
-#community_measures <- full_join(community_measures, expt, by = "case_id")
-ggplot(community_measures, aes(x = sum_rel_b_opt,
-                               y = CV_totab,
-                               col = as_factor(b_opt_mean),
-                               shape = as_factor(richness))) +
-  geom_point()
-ggplot(community_measures, aes(x = sum2_temp_deriv,
-                               y = CV_totab,
-                               col = as_factor(b_opt_mean),
-                               shape = as_factor(richness))) +
-  geom_point()
-ggplot(community_measures, aes(x = sum2_temp_deriv,
-                               y = sum_rel_b_opt,
-                               col = as_factor(b_opt_mean),
-                               shape = as_factor(richness))) +
-  geom_point()
-
+## Example summary plot
+ggplot2::ggplot(
+  community_measures,
+  ggplot2::aes(
+    x = sum_rel_b_opt,
+    y = CV_totab,
+    col = factor(b_opt_mean),
+    shape = factor(richness)
+  )
+) +
+  ggplot2::geom_point()
