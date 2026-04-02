@@ -33,6 +33,17 @@ run_experiment <- function(experiment_folder_location,
     experiment_name = experiment_name,
     verbose = verbose
   )
+  design_path <- file.path(experiment_folder, experiment_design_filename)
+
+  if (!file.exists(design_path)) {
+    stop(
+      paste0(
+        "Experiment design file not found: ", design_path,
+        "\nCopy the JSON file into the experiment folder before calling run_experiment()."
+      ),
+      call. = FALSE
+    )
+  }
 
   if (verbose) {
     message("Creating experiment table")
@@ -76,10 +87,10 @@ run_experiment <- function(experiment_folder_location,
 
   outputs <- list(
     experiment_folder = experiment_folder,
-    experiment_table = paste0(experiment_folder, "experiment_table.RDS"),
-    temperatures_db = paste0(experiment_folder, "temperatures.db"),
-    dynamics_db = paste0(experiment_folder, "dynamics.db"),
-    community_measures = paste0(experiment_folder, "community_measures.RDS")
+    experiment_table = file.path(experiment_folder, "experiment_table.RDS"),
+    temperatures_db = file.path(experiment_folder, "temperatures.db"),
+    dynamics_db = file.path(experiment_folder, "dynamics.db"),
+    community_measures = file.path(experiment_folder, "community_measures.RDS")
   )
 
   if (verbose) {

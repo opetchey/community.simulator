@@ -9,7 +9,20 @@
 #' @examples NULL
 read_experiment_design_json <- function(experiment_folder, experiment_design_filename){
 
-  expt_def <- jsonlite::fromJSON(paste0(experiment_folder, experiment_design_filename))
+  experiment_folder <- path.expand(experiment_folder)
+  design_path <- file.path(experiment_folder, experiment_design_filename)
+
+  if (!file.exists(design_path)) {
+    stop(
+      paste0(
+        "Experiment design file not found: ", design_path,
+        "\nCheck that the file exists inside the experiment folder."
+      ),
+      call. = FALSE
+    )
+  }
+
+  expt_def <- jsonlite::fromJSON(design_path)
 
   for(i in 1:length(expt_def)) {
     expt_def[[i]] <- parse(text = expt_def[[i]])

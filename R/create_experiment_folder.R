@@ -13,7 +13,8 @@ create_experiment_folder <- function(experiment_folder_location,
                                      verbose = TRUE) {
 
   ## make a folder for the experiment
-  experiment_folder <- paste0(experiment_folder_location, "/", experiment_name, "/")
+  experiment_folder_location <- path.expand(experiment_folder_location)
+  experiment_folder <- file.path(experiment_folder_location, experiment_name, "")
 
   if (dir.exists(experiment_folder) && verbose) {
     message("Experiment folder already exists: ", experiment_folder)
