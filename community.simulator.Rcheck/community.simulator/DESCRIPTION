@@ -1,0 +1,27 @@
+Package: community.simulator
+Title: Simulate Temperature-Dependent Community Dynamics and
+        Experiments
+Version: 0.0.0.9000
+Authors@R: 
+    person("Owen L.", "Petchey", , "owen.petchey@uzh.ch", role = c("aut", "cre"))
+Author: Owen L. Petchey [aut, cre]
+Maintainer: Owen L. Petchey <owen.petchey@uzh.ch>
+Description: Tools to design simulation experiments, generate environmental
+    time series, simulate multispecies community dynamics, and calculate
+    community-level summary measures. The package was developed to study how
+    temperature-dependent vital rates and response diversity influence the
+    stability and functioning of ecological communities.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends: R (>= 4.1.0)
+Suggests: devtools, kableExtra, knitr, patchwork, readxl, rmarkdown,
+        testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Imports: DBI, broom, dirmult, dplyr, ggplot2, gratia, jsonlite, mgcv,
+        primer, purrr, RSQLite, tibble, tidyr, zoo
+Config/testthat/edition: 3
+NeedsCompilation: no
+Packaged: 2026-04-02 11:06:16 UTC; owenpetchey
+Built: R 4.4.1; ; 2026-04-02 11:06:21 UTC; unix

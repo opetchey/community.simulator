@@ -2,3 +2,8 @@
 ^\.Rproj\.user$
 ^doc$
 ^Meta$
+^\.git$
+^\.gitignore$
+^.*\.DS_Store$
+^\.\.Rcheck$
+^from before$

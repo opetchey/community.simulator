@@ -1,0 +1,439 @@
+* using log directory ‘/Users/owenpetchey/Library/CloudStorage/OneDrive-UniversitätZürichUZH/1. Research/R and github packages/community.simulator/..Rcheck’
+* using R version 4.4.1 (2024-06-14)
+* using platform: aarch64-apple-darwin20
+* R was compiled by
+    Apple clang version 14.0.0 (clang-1400.0.29.202)
+    GNU Fortran (GCC) 12.2.0
+* running under: macOS 26.3.1
+* using session charset: UTF-8
+* using option ‘--no-manual’
+* checking for file ‘./DESCRIPTION’ ... OK
+* this is package ‘community.simulator’ version ‘0.0.0.9000’
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .DS_Store
+  .gitignore
+  from before/1-simulations/reports/.DS_Store
+  inst/.DS_Store
+  inst/test_experiments/.DS_Store
+  inst/test_experiments/test_experiment1/.DS_Store
+  R/.DS_Store
+  vignettes/.DS_Store
+  vignettes/.gitignore
+  ..Rcheck
+  .git
+  .Rproj.user
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+* checking for portable file names ... WARNING
+Found the following files with non-portable file names:
+  from before/R/0-functions/make a community.R
+  from before/R/2-run/run experiment.r
+These are not fully portable file names.
+See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘community.simulator’ can be installed ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... NOTE
+Checking should be performed on sources prepared by ‘R CMD build’.
+Package listed in more than one of Depends, Imports, Suggests, Enhances:
+  ‘broom’
+A package should be listed in only one of these fields.
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... WARNING
+Found the following directory with the name of a check directory:
+  ./..Rcheck
+Most likely, these were included erroneously.
+* checking code files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking dependencies in R code ... NOTE
+Namespace in Imports field not imported from: ‘here’
+  All declared Imports should be used.
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+create_environments: no visible binding for global variable
+  ‘env_series_id’
+create_environments: no visible binding for global variable
+  ‘temperature_mean’
+create_environments: no visible binding for global variable
+  ‘temperature_sd’
+create_environments: no visible binding for global variable
+  ‘one_over_f_gamma’
+create_environments: no visible binding for global variable
+  ‘temperature_seed’
+create_environments: no visible binding for global variable ‘phase’
+create_environments: no visible binding for global variable
+  ‘temperature’
+create_environments: no visible binding for global variable ‘time’
+create_experiment_table: no visible binding for global variable
+  ‘temperature_mean’
+create_experiment_table: no visible binding for global variable
+  ‘temperature_sd’
+create_experiment_table: no visible binding for global variable
+  ‘one_over_f_gamma’
+create_experiment_table: no visible binding for global variable
+  ‘temperature_replicate’
+create_experiment_table: no visible binding for global variable
+  ‘a_b_mean’
+create_experiment_table: no visible binding for global variable
+  ‘a_b_range’
+create_experiment_table: no visible binding for global variable
+  ‘a_b_distribution’
+create_experiment_table: no visible binding for global variable
+  ‘b_opt_mean’
+create_experiment_table: no visible binding for global variable
+  ‘b_opt_range’
+create_experiment_table: no visible binding for global variable
+  ‘b_opt_distribution’
+create_experiment_table: no visible binding for global variable
+  ‘sd_perf_distribution’
+create_experiment_table: no visible binding for global variable
+  ‘sd_perf_mean’
+create_experiment_table: no visible binding for global variable
+  ‘sd_perf_range’
+create_experiment_table: no visible binding for global variable
+  ‘alpha_ij_distribution’
+create_experiment_table: no visible binding for global variable
+  ‘alpha_ij_mean’
+create_experiment_table: no visible binding for global variable
+  ‘alpha_ij_sd’
+create_experiment_table: no visible binding for global variable
+  ‘community_replicate’
+create_experiment_table: no visible binding for global variable
+  ‘richness’
+create_experiment_table: no visible binding for global variable
+  ‘community_id’
+create_experiment_table: no visible binding for global variable ‘.’
+create_experiment_table: no visible binding for global variable
+  ‘env_series_id’
+create_experiment_table: no visible binding for global variable
+  ‘case_id’
+get_arbitrary_derivatives: no visible binding for global variable
+  ‘a_b_i’
+get_arbitrary_derivatives: no visible binding for global variable
+  ‘b_opt_i’
+get_arbitrary_derivatives: no visible binding for global variable ‘s_i’
+get_arbitrary_derivatives: no visible binding for global variable
+  ‘a_d_i’
+get_arbitrary_derivatives: no visible binding for global variable ‘z_i’
+get_arbitrary_derivatives: no visible binding for global variable
+  ‘case_id’
+get_arbitrary_derivatives: no visible binding for global variable
+  ‘species_id’
+get_arbitrary_derivatives: no visible binding for global variable
+  ‘data’
+get_arbitrary_derivatives: no visible binding for global variable
+  ‘models’
+get_arbitrary_derivatives: no visible binding for global variable
+  ‘new_data’
+get_arbitrary_derivatives: no visible binding for global variable
+  ‘derivative’
+get_arbitrary_derivatives: no visible binding for global variable
+  ‘.derivative’
+get_arbitrary_derivatives: no visible binding for global variable
+  ‘temperature’
+get_arbitrary_derivatives: no visible binding for global variable ‘igr’
+get_community_CPC_measures: no visible binding for global variable
+  ‘env_series_id’
+get_community_CPC_measures: no visible binding for global variable
+  ‘time’
+get_community_CPC_measures : <anonymous>: no visible binding for global
+  variable ‘a_b_i’
+get_community_CPC_measures : <anonymous>: no visible binding for global
+  variable ‘b_opt_i’
+get_community_CPC_measures : <anonymous>: no visible binding for global
+  variable ‘s_i’
+get_community_CPC_measures : <anonymous>: no visible binding for global
+  variable ‘a_d_i’
+get_community_CPC_measures : <anonymous>: no visible binding for global
+  variable ‘z_i’
+get_community_CPC_measures: no visible binding for global variable
+  ‘case_id’
+get_community_CPC_measures: no visible binding for global variable
+  ‘temp’
+get_community_CPC_measures: no visible binding for global variable
+  ‘igr_info’
+get_community_CPC_measures: no visible binding for global variable
+  ‘igr_naive’
+get_community_CPC_measures: no visible global function definition for
+  ‘sd’
+get_community_CPC_measures: no visible binding for global variable
+  ‘community_igr_info’
+get_community_CPC_measures: no visible binding for global variable
+  ‘community_igr_naive’
+get_community_CPC_measures: no visible binding for global variable
+  ‘species_id’
+get_community_CPC_measures: no visible binding for global variable
+  ‘spec_sd_info’
+get_community_CPC_measures: no visible binding for global variable
+  ‘spec_sd_naive’
+get_community_CPC_measures: no visible binding for global variable
+  ‘tot_var_info’
+get_community_CPC_measures: no visible binding for global variable
+  ‘sum_sd_2_info’
+get_community_CPC_measures: no visible binding for global variable
+  ‘tot_var_naive’
+get_community_CPC_measures: no visible binding for global variable
+  ‘sum_sd_2_naive’
+get_community_CPC_measures: no visible binding for global variable
+  ‘sd_igr_info’
+get_community_CPC_measures: no visible binding for global variable
+  ‘mean_igr_info’
+get_community_CPC_measures: no visible binding for global variable
+  ‘sd_igr_naive’
+get_community_CPC_measures: no visible binding for global variable
+  ‘mean_igr_naive’
+get_community_CPC_measures: no visible binding for global variable
+  ‘tot_mean_info’
+get_community_CPC_measures: no visible binding for global variable
+  ‘spec_CV_info’
+get_community_CPC_measures: no visible binding for global variable
+  ‘tot_mean_naive’
+get_community_CPC_measures: no visible binding for global variable
+  ‘spec_CV_naive’
+get_community_CV: no visible binding for global variable ‘case_id’
+get_community_CV: no visible binding for global variable ‘time’
+get_community_CV: no visible binding for global variable ‘Abundance’
+get_community_CV: no visible binding for global variable ‘tot_ab’
+get_community_CV: no visible global function definition for ‘sd’
+get_community_CV: no visible binding for global variable ‘sd_totab’
+get_community_CV: no visible binding for global variable ‘mean_totab’
+get_community_popstab: no visible binding for global variable ‘case_id’
+get_community_popstab: no visible binding for global variable
+  ‘Species_ID’
+get_community_popstab: no visible global function definition for ‘sd’
+get_community_popstab: no visible binding for global variable
+  ‘Abundance’
+get_community_popstab: no visible binding for global variable ‘sd_pop’
+get_community_popstab: no visible binding for global variable
+  ‘mean_ab_pop’
+get_community_popstab: no visible binding for global variable ‘time’
+get_community_popstab: no visible binding for global variable ‘tot_ab’
+get_community_popstab: no visible binding for global variable
+  ‘mean_totab’
+get_community_popstab: no visible binding for global variable ‘rel_ab’
+get_community_popstab: no visible binding for global variable
+  ‘CV_ab_pop’
+get_community_response_diversity: no visible binding for global
+  variable ‘case_id’
+get_community_response_diversity: no visible binding for global
+  variable ‘temperature’
+get_community_response_diversity: no visible binding for global
+  variable ‘derivative’
+get_community_response_diversity: no visible binding for global
+  variable ‘igr’
+get_community_response_diversity: no visible binding for global
+  variable ‘mean_deriv’
+get_community_response_diversity: no visible binding for global
+  variable ‘max_igr’
+get_community_sum_derivatives: no visible binding for global variable
+  ‘case_id’
+get_community_sum_derivatives: no visible binding for global variable
+  ‘temperature’
+get_community_sum_derivatives: no visible binding for global variable
+  ‘derivative’
+get_community_sum_derivatives: no visible binding for global variable
+  ‘sum_arb_deriv’
+get_community_sum_derivatives: no visible binding for global variable
+  ‘sum_temp_deriv’
+get_community_sum_derivatives: no visible binding for global variable
+  ‘time’
+get_community_sum_derivatives: no visible binding for global variable
+  ‘sum_delta_igr’
+get_community_sum_rel_b_opt: no visible binding for global variable
+  ‘env_series_id’
+get_community_sum_rel_b_opt: no visible binding for global variable
+  ‘temperature’
+get_community_sum_rel_b_opt: no visible binding for global variable
+  ‘community_object’
+get_community_sum_rel_b_opt: no visible binding for global variable
+  ‘community_object_id’
+get_community_sum_rel_b_opt: no visible binding for global variable
+  ‘case_id’
+get_community_sum_rel_b_opt: no visible binding for global variable
+  ‘mean_temperature’
+get_community_sum_rel_b_opt: no visible binding for global variable
+  ‘relative_b_opt’
+get_community_sum_rel_b_opt: no visible binding for global variable
+  ‘community_id’
+get_community_syn: no visible binding for global variable ‘case_id’
+get_community_syn: no visible binding for global variable ‘Species_ID’
+get_community_syn: no visible global function definition for ‘sd’
+get_community_syn: no visible binding for global variable ‘Abundance’
+get_community_syn: no visible binding for global variable ‘sd_pop’
+get_community_syn: no visible binding for global variable ‘time’
+get_community_syn: no visible binding for global variable ‘tot_ab’
+get_community_syn: no visible binding for global variable ‘sd_totab’
+get_community_syn: no visible binding for global variable ‘sum_sd’
+get_community_temp_sens: no visible binding for global variable
+  ‘case_id’
+get_community_temp_sens: no visible binding for global variable
+  ‘env_series_id’
+get_community_temp_sens: no visible binding for global variable
+  ‘community_id’
+get_community_temp_sens: no visible binding for global variable
+  ‘temperature’
+get_community_temp_sens: no visible binding for global variable ‘time’
+get_community_temp_sens: no visible binding for global variable
+  ‘Abundance’
+get_community_temp_sens: no visible binding for global variable
+  ‘temperature_rollsum’
+get_community_temp_sens: no visible binding for global variable
+  ‘tot_ab’
+get_community_temp_sens: no visible binding for global variable ‘data’
+get_community_temp_sens: no visible binding for global variable ‘model’
+get_community_temp_sens: no visible binding for global variable
+  ‘tidy_model’
+get_community_temp_sens: no visible binding for global variable ‘term’
+get_community_temp_sens: no visible binding for global variable
+  ‘estimate’
+get_delta_igr: no visible binding for global variable ‘env_series_id’
+get_delta_igr: no visible binding for global variable ‘time’
+get_delta_igr: no visible binding for global variable ‘a_b_i’
+get_delta_igr: no visible binding for global variable ‘b_opt_i’
+get_delta_igr: no visible binding for global variable ‘s_i’
+get_delta_igr: no visible binding for global variable ‘a_d_i’
+get_delta_igr: no visible binding for global variable ‘z_i’
+get_delta_igr: no visible binding for global variable ‘case_id’
+get_delta_igr: no visible binding for global variable ‘species_id’
+get_delta_igr: no visible binding for global variable ‘igr’
+get_delta_igr: no visible binding for global variable ‘igr_lag’
+get_temporal_derivatives: no visible binding for global variable
+  ‘env_series_id’
+get_temporal_derivatives: no visible binding for global variable ‘time’
+get_temporal_derivatives: no visible binding for global variable
+  ‘a_b_i’
+get_temporal_derivatives: no visible binding for global variable
+  ‘b_opt_i’
+get_temporal_derivatives: no visible binding for global variable ‘s_i’
+get_temporal_derivatives: no visible binding for global variable
+  ‘a_d_i’
+get_temporal_derivatives: no visible binding for global variable ‘z_i’
+get_temporal_derivatives: no visible binding for global variable
+  ‘case_id’
+get_temporal_derivatives: no visible binding for global variable
+  ‘species_id’
+get_temporal_derivatives: no visible binding for global variable ‘data’
+get_temporal_derivatives: no visible binding for global variable
+  ‘models’
+get_temporal_derivatives: no visible binding for global variable
+  ‘new_data’
+get_temporal_derivatives: no visible binding for global variable
+  ‘derivative’
+get_temporal_derivatives: no visible binding for global variable
+  ‘.derivative’
+get_temporal_derivatives: no visible binding for global variable
+  ‘temperature’
+get_temporal_derivatives: no visible binding for global variable ‘igr’
+lm_with_inf_check: no visible global function definition for ‘lm’
+make_a_community: no visible global function definition for ‘runif’
+make_a_community: no visible global function definition for ‘rnorm’
+make_plots_for_one_community: no visible binding for global variable
+  ‘case_id’
+make_plots_for_one_community: no visible binding for global variable
+  ‘env_series_id’
+make_plots_for_one_community: no visible binding for global variable
+  ‘time’
+make_plots_for_one_community: no visible binding for global variable
+  ‘temperature’
+make_plots_for_one_community: no visible binding for global variable
+  ‘igr’
+make_plots_for_one_community: no visible binding for global variable
+  ‘species_id’
+make_plots_for_one_community: no visible binding for global variable
+  ‘derivative’
+make_plots_for_one_community: no visible binding for global variable
+  ‘mean_igrderiv’
+make_plots_for_one_community: no visible binding for global variable
+  ‘Abundance’
+make_plots_for_one_community: no visible binding for global variable
+  ‘Species_ID’
+simulate_dynamics: no visible binding for global variable
+  ‘env_series_id’
+simulate_dynamics: no visible binding for global variable ‘time’
+Undefined global functions or variables:
+  . .derivative a_b_distribution a_b_i a_b_mean a_b_range a_d_i
+  Abundance alpha_ij_distribution alpha_ij_mean alpha_ij_sd
+  b_opt_distribution b_opt_i b_opt_mean b_opt_range case_id
+  community_id community_igr_info community_igr_naive community_object
+  community_object_id community_replicate CV_ab_pop data derivative
+  env_series_id estimate igr igr_info igr_lag igr_naive lm max_igr
+  mean_ab_pop mean_deriv mean_igr_info mean_igr_naive mean_igrderiv
+  mean_temperature mean_totab model models new_data one_over_f_gamma
+  phase rel_ab relative_b_opt richness rnorm runif s_i sd sd_igr_info
+  sd_igr_naive sd_perf_distribution sd_perf_mean sd_perf_range sd_pop
+  sd_totab spec_CV_info spec_CV_naive spec_sd_info spec_sd_naive
+  species_id Species_ID sum_arb_deriv sum_delta_igr sum_sd
+  sum_sd_2_info sum_sd_2_naive sum_temp_deriv temp temperature
+  temperature_mean temperature_replicate temperature_rollsum
+  temperature_sd temperature_seed term tidy_model time tot_ab
+  tot_mean_info tot_mean_naive tot_var_info tot_var_naive z_i
+Consider adding
+  importFrom("stats", "lm", "rnorm", "runif", "sd", "time")
+  importFrom("utils", "data")
+to your NAMESPACE file.
+* checking Rd files ... NOTE
+checkRd: (-1) make_a_community.Rd:5: Lost braces; missing escapes or markup?
+     5 | \title{This function makes a community object, which contains all the parameters of the all speices in the community. At the moment only the temperature optima $b_{opt_i}$ can vary among the species. The other parameters are the same for all species.}
+       |                                                                                                                                                                    ^
+checkRd: (-1) make_a_community.Rd:59: Lost braces; missing escapes or markup?
+    59 | This function makes a community object, which contains all the parameters of the all speices in the community. At the moment only the temperature optima $b_{opt_i}$ can vary among the species. The other parameters are the same for all species.
+       |                                                                                                                                                             ^
+* checking Rd metadata ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... WARNING
+Documented arguments not in \usage in Rd file 'get_community_CV.Rd':
+  ‘expt’
+
+Documented arguments not in \usage in Rd file 'get_community_popstab.Rd':
+  ‘expt’
+
+Documented arguments not in \usage in Rd file 'get_community_syn.Rd':
+  ‘expt’
+
+Undocumented arguments in Rd file 'make_a_community.Rd'
+  ‘a_b_distribution’ ‘b_opt_distribution’ ‘sd_perf_distribution’
+  ‘sd_perf_mean’ ‘sd_perf_range’ ‘community_seed’
+  ‘alpha_ij_distribution’
+Documented arguments not in \usage in Rd file 'make_a_community.Rd':
+  ‘a_b’ ‘trait_selection_method’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking files in ‘vignettes’ ... WARNING
+Files in the 'vignettes' directory but no files in 'inst/doc':
+  ‘data_specification.xlsx’ ‘species_and_community_properties.csv’
+  ‘User_guide.Rmd’
+* checking examples ... OK
+* checking for unstated dependencies in vignettes ... OK
+* checking package vignettes ... WARNING
+Directory 'inst/doc' does not exist.
+Package vignette without corresponding single PDF/HTML:
+  ‘User_guide.Rmd’
+* checking re-building of vignette outputs ... OK
+* DONE
+Status: 5 WARNINGs, 5 NOTEs

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head><title>R: Simulate Temperature-Dependent Community Dynamics and
+Experiments</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+<h1> Simulate Temperature-Dependent Community Dynamics and
+Experiments
+<img class="toplogo" src="../../../doc/html/Rlogo.svg" alt="[R logo]" />
+</h1>
+<hr/>
+<div style="text-align: center;">
+<a href="../../../doc/html/packages.html"><img class="arrow" src="../../../doc/html/left.jpg" alt="[Up]" /></a>
+<a href="../../../doc/html/index.html"><img class="arrow" src="../../../doc/html/up.jpg" alt="[Top]" /></a>
+</div><h2>Documentation for package &lsquo;community.simulator&rsquo; version 0.0.0.9000</h2>
+
+<ul><li><a href="../DESCRIPTION">DESCRIPTION file</a>.</li>
+</ul>
+
+<h2>Help Pages</h2>
+
+
+<table style="width: 100%;">
+<tr><td style="width: 25%;"><a href="create_environments.html">create_environments</a></td>
+<td>Create temperature times series. Currently three options for how times series vary among cases.        1. 'same_per_replicate' replicates of the same number share the           same environmental time series. E.g., 'case1_rep1' and           'case2_rep1' share the same time series.        2. 'all_different' all environmental time series are different</td></tr>
+<tr><td style="width: 25%;"><a href="create_experiment_folder.html">create_experiment_folder</a></td>
+<td>Create folder for experiment</td></tr>
+<tr><td style="width: 25%;"><a href="create_experiment_table.html">create_experiment_table</a></td>
+<td>This function takes the experimental design from the specified JSON experiment design file and creates a table of all the simulations that will be run.</td></tr>
+<tr><td style="width: 25%;"><a href="get_arbitrary_derivatives.html">get_arbitrary_derivatives</a></td>
+<td>Get derivatives at arbitrary temperatures</td></tr>
+<tr><td style="width: 25%;"><a href="get_community_CPC_measures.html">get_community_CPC_measures</a></td>
+<td>Get measures of community performance curves</td></tr>
+<tr><td style="width: 25%;"><a href="get_community_CV.html">get_community_CV</a></td>
+<td>Get the stability of each case (community). Calculated CV of total biomass temporal variation. Also returns mean total biomass and standard deviation of total biomass</td></tr>
+<tr><td style="width: 25%;"><a href="get_community_measures.html">get_community_measures</a></td>
+<td>Get various community level measures, e.g., community stability, response diversity, position of optimal temperature, etc.</td></tr>
+<tr><td style="width: 25%;"><a href="get_community_popstab.html">get_community_popstab</a></td>
+<td>Get the stability of each case (community). Calculated CV of total biomass temporal variation. Also returns mean total biomass and standard deviation of total biomass</td></tr>
+<tr><td style="width: 25%;"><a href="get_community_response_diversity.html">get_community_response_diversity</a></td>
+<td>Get measures of community response diversity</td></tr>
+<tr><td style="width: 25%;"><a href="get_community_sum_derivatives.html">get_community_sum_derivatives</a></td>
+<td>Get the sum of the communities derivatives at arbitrary temperatures and at actual (temp = temporal) temperatures</td></tr>
+<tr><td style="width: 25%;"><a href="get_community_sum_rel_b_opt.html">get_community_sum_rel_b_opt</a></td>
+<td>Get the sum of the relative position of the temperature optimum of each species. Relative to the mean of the environmental temperatures experienced by the community.</td></tr>
+<tr><td style="width: 25%;"><a href="get_community_syn.html">get_community_syn</a></td>
+<td>Get the stability of each case (community). Calculated CV of total biomass temporal variation. Also returns mean total biomass and standard deviation of total biomass</td></tr>
+<tr><td style="width: 25%;"><a href="get_community_temp_sens.html">get_community_temp_sens</a></td>
+<td>Get the sensitivity of total biomass to temperature variation. Currently measured as the slope of a linear regression of total biomass on temperature.</td></tr>
+<tr><td style="width: 25%;"><a href="get_delta_igr.html">get_delta_igr</a></td>
+<td>Calculate the difference in growth rate from one time point to the next</td></tr>
+<tr><td style="width: 25%;"><a href="get_temporal_derivatives.html">get_temporal_derivatives</a></td>
+<td>Calculate the derivatives of the growth rate - temperature relationship at the temperatures in the temperature times series of each case in the experiment.</td></tr>
+<tr><td style="width: 25%;"><a href="intrinsic_growth_gaussian.html">intrinsic_growth_gaussian</a></td>
+<td>Calculate intrinsic growth rate from species parameters and a temperature, assuming a Gaussian birth rate - temperature response curve and an exponential death rate - temperature response curve.</td></tr>
+<tr><td style="width: 25%;"><a href="lm_with_inf_check.html">lm_with_inf_check</a></td>
+<td>Linear model with infinite value check</td></tr>
+<tr><td style="width: 25%;"><a href="make_a_community.html">make_a_community</a></td>
+<td>This function makes a community object, which contains all the parameters of the all speices in the community. At the moment only the temperature optima $b_opt_i$ can vary among the species. The other parameters are the same for all species.</td></tr>
+<tr><td style="width: 25%;"><a href="make_plots_for_one_community.html">make_plots_for_one_community</a></td>
+<td>Make graphs showing variance results from one case</td></tr>
+<tr><td style="width: 25%;"><a href="read_experiment_design_json.html">read_experiment_design_json</a></td>
+<td>Read in the JSON formatted text file that contains the experiment design. All values in the JSON file must be expressions that can be evaluated (using the 'eval' function) to get the values of the experiment design.</td></tr>
+<tr><td style="width: 25%;"><a href="simulate_dynamics.html">simulate_dynamics</a></td>
+<td>Simulate the dynamics of all the cases in an experiment Unfortunately at the moment has features of temperature series hard coded in</td></tr>
+<tr><td style="width: 25%;"><a href="simulator_lv.html">simulator_lv</a></td>
+<td>Simulate the population dynamics of a community of species using the Lotka-Volterra competition model with temperature-dependent vital rates.</td></tr>
+</table>
+</div></body></html>

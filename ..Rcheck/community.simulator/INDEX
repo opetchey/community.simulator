@@ -1,0 +1,86 @@
+create_environments     Create temperature times series. Currently
+                        three options for how times series vary among
+                        cases.  1. 'same_per_replicate' replicates of
+                        the same number share the same environmental
+                        time series. E.g., 'case1_rep1' and
+                        'case2_rep1' share the same time series.  2.
+                        'all_different' all environmental time series
+                        are different
+create_experiment_folder
+                        Create folder for experiment
+create_experiment_table
+                        This function takes the experimental design
+                        from the specified JSON experiment design file
+                        and creates a table of all the simulations that
+                        will be run.
+get_arbitrary_derivatives
+                        Get derivatives at arbitrary temperatures
+get_community_CPC_measures
+                        Get measures of community performance curves
+get_community_CV        Get the stability of each case (community).
+                        Calculated CV of total biomass temporal
+                        variation. Also returns mean total biomass and
+                        standard deviation of total biomass
+get_community_measures
+                        Get various community level measures, e.g.,
+                        community stability, response diversity,
+                        position of optimal temperature, etc.
+get_community_popstab   Get the stability of each case (community).
+                        Calculated CV of total biomass temporal
+                        variation. Also returns mean total biomass and
+                        standard deviation of total biomass
+get_community_response_diversity
+                        Get measures of community response diversity
+get_community_sum_derivatives
+                        Get the sum of the communities derivatives at
+                        arbitrary temperatures and at actual (temp =
+                        temporal) temperatures
+get_community_sum_rel_b_opt
+                        Get the sum of the relative position of the
+                        temperature optimum of each species. Relative
+                        to the mean of the environmental temperatures
+                        experienced by the community.
+get_community_syn       Get the stability of each case (community).
+                        Calculated CV of total biomass temporal
+                        variation. Also returns mean total biomass and
+                        standard deviation of total biomass
+get_community_temp_sens
+                        Get the sensitivity of total biomass to
+                        temperature variation. Currently measured as
+                        the slope of a linear regression of total
+                        biomass on temperature.
+get_delta_igr           Calculate the difference in growth rate from
+                        one time point to the next
+get_temporal_derivatives
+                        Calculate the derivatives of the growth rate -
+                        temperature relationship at the temperatures in
+                        the temperature times series of each case in
+                        the experiment.
+intrinsic_growth_gaussian
+                        Calculate intrinsic growth rate from species
+                        parameters and a temperature, assuming a
+                        Gaussian birth rate - temperature response
+                        curve and an exponential death rate -
+                        temperature response curve.
+lm_with_inf_check       Linear model with infinite value check
+make_a_community        This function makes a community object, which
+                        contains all the parameters of the all speices
+                        in the community. At the moment only the
+                        temperature optima $b_opt_i$ can vary among the
+                        species. The other parameters are the same for
+                        all species.
+make_plots_for_one_community
+                        Make graphs showing variance results from one
+                        case
+read_experiment_design_json
+                        Read in the JSON formatted text file that
+                        contains the experiment design. All values in
+                        the JSON file must be expressions that can be
+                        evaluated (using the 'eval' function) to get
+                        the values of the experiment design.
+simulate_dynamics       Simulate the dynamics of all the cases in an
+                        experiment Unfortunately at the moment has
+                        features of temperature series hard coded in
+simulator_lv            Simulate the population dynamics of a community
+                        of species using the Lotka-Volterra competition
+                        model with temperature-dependent vital rates.
