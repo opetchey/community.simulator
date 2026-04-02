@@ -21,6 +21,8 @@ library(community.simulator)
 
 # Introduction
 
+> Draft note: this user guide is still a work in progress. Some parts may change as the package interface and documentation continue to improve.
+
 This `community.simulator` package is a tool to simulate the dynamics of a community of species and to design and run experiments where features of species and the environment can be manipulated.
 
 It was originally created to allow investigation of how response diversity influences community stability.
@@ -88,11 +90,11 @@ species_and_community_properties |>
   kableExtra::kable_styling()
 ```
 
-# Designing and experiment
+# Designing an Experiment
 
 An experiment consists of a number of "cases". Each case consists of a combination of community composition and environmental variability. The community composition is defined by the species present and their properties. The environmental variability is a time series of environmental conditions that the community is exposed to. When a single community has multiple replicates, then each replicate has the same community composition but different environmental variability.
 
-The features of the experiment are given in a json file.
+The features of the experiment are given in a JSON file.
 
 
 
@@ -113,45 +115,96 @@ Currently three options for how environmental time series vary among cases.
 
 
 
-# Typical experiment workflow
+# Typical Experiment Workflow
 
 The typical workflow is as follows:
 
-1 Design an experiment.
-2 Make the folder where the experiment information will be stored.
-3 Run the experiment.
-4 Make some calculation on the results.
-5 Make some graphs of the results.
+1. Set a project folder that can contain multiple experiment subfolders.
+2. Set an experiment name and create a folder for that experiment.
+3. Copy an example experiment-definition JSON file into the experiment folder.
+4. Edit the JSON file to define the experiment you want to run.
+5. Run the experiment workflow.
+6. Inspect saved outputs and make plots.
 
-## An example experiment
+## Project Folder and Experiment Folder
 
-You can find an example of running this workflow in the `test_experiments` folder of the package. It could be useful to make a copy of this folder and its contents somewhere convienent, for example on your desktop, using the following code:
+One way to organise work is to create a project folder that contains multiple
+experiment subfolders:
 
 ```{r}
 #| eval = FALSE
-folder_to_copy <- system.file("test_experiments", package = "community.simulator")
-folder_to_copy_to <- file.path("~/Desktop", "test_experiments")
-dir.create(folder_to_copy_to)
-file.copy(from = folder_to_copy, to = folder_to_copy_to, recursive = TRUE)
-
+project_folder_location <- file.path("~/Desktop", "community_simulator_projects")
+dir.create(project_folder_location, recursive = TRUE, showWarnings = FALSE)
 ```
 
-In the `test_experiments` folder you will find a file `test_experiment1.r` which goes through the process of designing, running, and analysing an experiment.
+## Copy an Example JSON Design File
 
-# JSON file specification
+The package includes bundled example experiment-definition files. A convenient
+way to create an experiment folder and copy one of those JSON files into it is
+to use `setup_example_experiment()`:
+
+```{r}
+#| eval = FALSE
+project_folder_location <- file.path("~/Desktop", "community_simulator_projects")
+experiment_name <- "test_experiment1"
+experiment_design_filename <- "experiment_definition_template_v0.7.json"
+
+setup <- setup_example_experiment(
+  experiment_folder_location = project_folder_location,
+  experiment_name = experiment_name,
+  example_experiment_name = "test_experiment1",
+  experiment_design_filename = experiment_design_filename
+)
+```
+
+This creates the experiment folder and copies the example JSON into it. At that
+point, edit the JSON file in the experiment folder so it matches the experiment
+you want to run.
+
+The bundled script `inst/test_experiments/test_experiment1/test_experiment1.R`
+shows the intended setup and analysis sequence for this example experiment.
+
+## Run the Experiment
+
+Once the JSON file is in place and edited as needed, run the workflow with the
+high-level wrapper:
+
+```{r}
+#| eval = FALSE
+outputs <- run_experiment(
+  experiment_folder_location = project_folder_location,
+  experiment_name = experiment_name,
+  experiment_design_filename = experiment_design_filename,
+  overwrite = FALSE
+)
+```
+
+By default, workflow functions stop if an output file already exists. To
+replace existing outputs deliberately, re-run with `overwrite = TRUE`.
+
+The main outputs are saved inside the experiment folder and typically include:
+
+- `experiment_table.RDS`
+- `temperatures.db`
+- `dynamics.db`
+- `community_measures.RDS`
+
+# JSON File Specification
 
 The design of an experiment is given in a JSON file.
 
-An example of an experiment design file is in the `test_experiments` folder of the package. You can copy this file to your desktop (or another location if you change the value of `file_to_copy_to`):
+An example of an experiment design file is included in the package. If you want
+to copy it manually rather than using `setup_example_experiment()`, you can do
+so like this:
 
 ```{r}
 #| eval = FALSE
 path_to_example_experiment_design_file <- system.file(file.path("test_experiments",
                       "test_experiment1",
-                      "experiment_definition_template_v0.3.json"),
+                      "experiment_definition_template_v0.7.json"),
             package = "community.simulator")
-file_to_copy_to <- file.path("~/Desktop", "experiment_definition_template_v0.3.json")
-file.copy(from = path_to_example_experiment_design_file, to = folder_to_copy_to)
+file_to_copy_to <- file.path("~/Desktop", "experiment_definition_template_v0.7.json")
+file.copy(from = path_to_example_experiment_design_file, to = file_to_copy_to)
 
 ```
 
@@ -165,7 +218,7 @@ All values in that file are parsed and then must be R expressions that can be ev
 "name": 0
 
 ```{r}
-eval(parse(text = 0))
+eval(parse(text = "0"))
 ```
 
 **Multiple numbers and functions**
@@ -213,5 +266,3 @@ eval(parse(text = "\"word\""))
 ```{r}
 eval(parse(text = "c(\"word1\", \"word2\")"))
 ```
-
-
