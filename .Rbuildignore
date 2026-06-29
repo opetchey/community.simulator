@@ -7,3 +7,5 @@
 ^.*\.DS_Store$
 ^\.\.Rcheck$
 ^from before$
+^LICENSE\.md$
+^TODO\.md$

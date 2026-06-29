@@ -16,6 +16,8 @@ create_environments <- function(experiment_folder,
                                 overwrite = FALSE,
                                 verbose = TRUE) {
 
+  require_dbplyr()
+
   ## setup the databases for saving the temperature time series
   output_path <- paste0(experiment_folder, "temperatures.db")
   prepare_output_path(output_path, overwrite = overwrite, verbose = verbose, label = "temperatures database")

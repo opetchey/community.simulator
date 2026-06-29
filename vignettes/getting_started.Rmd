@@ -37,12 +37,12 @@ library(community.simulator)
 ```{r}
 project_folder_location <- tempdir()
 experiment_name <- "getting_started_example"
-experiment_design_filename <- "experiment_definition_template_v0.7.json"
+experiment_design_filename <- "experiment_definition.json"
 
 setup <- setup_example_experiment(
   experiment_folder_location = project_folder_location,
   experiment_name = experiment_name,
-  example_experiment_name = "test_experiment1",
+  example_experiment_name = "discrete_lv",
   experiment_design_filename = experiment_design_filename,
   verbose = FALSE
 )

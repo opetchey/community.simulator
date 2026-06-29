@@ -14,6 +14,7 @@ get_community_measures <- function(experiment_folder,
                                    overwrite = FALSE,
                                    verbose = TRUE) {
 
+  require_dbplyr()
 
   ## Read in experiment information
   expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))

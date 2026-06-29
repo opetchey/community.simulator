@@ -32,3 +32,17 @@ announce_output_written <- function(path, verbose = TRUE, label = "output") {
 
   invisible(path)
 }
+
+#' @keywords internal
+require_dbplyr <- function() {
+  if (!requireNamespace("dbplyr", quietly = TRUE)) {
+    stop(
+      "The package `dbplyr` is required for database-backed dplyr operations.",
+      call. = FALSE
+    )
+  }
+
+  dbplyr::sql("")
+
+  invisible(TRUE)
+}

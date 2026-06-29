@@ -1,0 +1,48 @@
+[
+  {
+    "random_seed": 456,
+    "dynamics_type": "\"continuous\"",
+    "number_of_species_treatment": "c(2)",
+
+    "a_b_mean_treatment": 0.3,
+    "a_b_range_treatment": "c(0)",
+    "a_b_distribution": "c(\"random_uniform\")",
+
+    "b_opt_mean_treatment": "c(20)",
+    "b_opt_range_treatment": "c(4)",
+    "b_opt_distribution": "c(\"random_uniform\")",
+
+    "sd_perf_distribution": "c(\"random_uniform\")",
+    "sd_perf_mean": "c(10)",
+    "sd_perf_range": "c(0)",
+
+    "alpha_ij_distribution": "c(\"random_uniform\")",
+    "alpha_ij_mean_treatment": 0,
+    "alpha_ij_sd_treatment": "c(0.2)",
+
+    "number_of_community_replicates": 1,
+
+    "temperature_mean": 20,
+    "temperature_sd": 1,
+    "one_over_f_gamma": 0.8,
+    "number_of_environment_replicates": 1,
+
+    "temperature_series_control": "c(\"same_per_replicate\")",
+
+    "burn_in_duration": 10,
+    "experiment_duration": 20,
+
+    "a_d": 0,
+    "z": 0.05,
+    "alpha_jj": 1,
+
+    "temperature_interpolation": "\"linear\"",
+    "immigration_rate": 0.1,
+    "immigration_mode": "\"continuous\"",
+    "ode_method": "\"lsoda\"",
+    "ode_rtol": 1e-6,
+    "ode_atol": 1e-8,
+    "ode_max_step": 1,
+    "blowup_threshold": 1e12
+  }
+]

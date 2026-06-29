@@ -7,7 +7,7 @@
 #'   be created.
 #' @param experiment_name Name of the experiment folder.
 #' @param example_experiment_name Name of the bundled example experiment to copy
-#'   from. Defaults to `"test_experiment1"`.
+#'   from. Defaults to `"discrete_lv"`.
 #' @param experiment_design_filename Name of the bundled JSON design file to
 #'   copy into the experiment folder.
 #' @param verbose Logical. If `TRUE`, print setup messages.
@@ -19,7 +19,7 @@
 #' @examples NULL
 setup_example_experiment <- function(experiment_folder_location,
                                      experiment_name,
-                                     example_experiment_name = "test_experiment1",
+                                     example_experiment_name = "discrete_lv",
                                      experiment_design_filename,
                                      verbose = TRUE) {
 

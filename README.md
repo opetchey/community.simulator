@@ -96,9 +96,12 @@ The main user-facing functions are:
 
 ## Example
 
-A bundled example experiment is available under `inst/test_experiments`. The
-script `test_experiment1.R` shows the intended sequence of calls for setting up,
-running, and analysing an experiment.
+Bundled example experiment designs are available under `inst/test_experiments`.
+The package currently ships one compact design for each supported model type:
+
+- `discrete_lv/experiment_definition.json`
+- `continuous_lv/experiment_definition.json`
+- `consumer_resource/experiment_definition.json`
 
 One way to get started is to create a project folder on your Desktop that can
 contain multiple experiments:
@@ -114,13 +117,13 @@ Then create a folder for a single experiment:
 library(community.simulator)
 
 project_folder_location <- file.path("~/Desktop", "community_simulator_projects")
-experiment_name <- "test_experiment1"
-experiment_design_filename <- "experiment_definition_template_v0.7.json"
+experiment_name <- "discrete_lv_example"
+experiment_design_filename <- "experiment_definition.json"
 
 setup <- setup_example_experiment(
   experiment_folder_location = project_folder_location,
   experiment_name = experiment_name,
-  example_experiment_name = "test_experiment1",
+  example_experiment_name = "discrete_lv",
   experiment_design_filename = experiment_design_filename
 )
 ```

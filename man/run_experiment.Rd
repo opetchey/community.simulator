@@ -9,7 +9,8 @@ run_experiment(
   experiment_name,
   experiment_design_filename,
   overwrite = FALSE,
-  verbose = TRUE
+  verbose = TRUE,
+  confirm_run = interactive()
 )
 }
 \arguments{
@@ -25,6 +26,10 @@ This file must already be present inside the experiment folder.}
 
 \item{verbose}{Logical. If \code{TRUE}, print progress messages during the
 workflow.}
+
+\item{confirm_run}{Logical. If \code{TRUE}, show a preflight summary and ask
+whether to continue before creating environments and simulating dynamics. Defaults to
+\code{interactive()}.}
 }
 \value{
 Invisibly returns a named list containing the experiment folder and
@@ -35,6 +40,12 @@ This is a convenience wrapper for the standard experiment workflow. It
 creates the experiment folder, builds the experiment table, generates
 environmental time series, simulates dynamics, and calculates community-level
 summary measures.
+}
+\details{
+The preflight summary estimates output rows, database sizes, and
+runtime from the experiment table and design settings. Confirmation happens
+before environment generation, dynamics simulation, and analysis. These
+estimates are intended as rough guidance before launching large experiments.
 }
 \examples{
 NULL

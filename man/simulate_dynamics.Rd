@@ -28,6 +28,16 @@ Returns nothing. Saves to SQLite databases the temperature time series and the c
 Simulate the dynamics of all the cases in an experiment
 Unfortunately at the moment has features of temperature series hard coded in
 }
+\details{
+Experiment JSON files can optionally include
+\code{parallel_simulations}, \code{parallel_workers}, and
+\code{initial_abundance_seed_base}. They can also include
+\code{dynamics_save_every}, an integer giving the interval between saved
+consumer/resource output time points. When \code{parallel_simulations}
+evaluates to \code{TRUE}, simulation cases are computed in parallel and SQLite
+tables are still written serially by the parent process. Parallel
+processing is intended for macOS/Linux.
+}
 \examples{
 NULL
 }

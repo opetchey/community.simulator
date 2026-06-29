@@ -1,0 +1,55 @@
+[
+  {
+    "random_seed": 789,
+    "dynamics_type": "\"consumer_resource_continuous\"",
+    "number_of_species_treatment": "c(2)",
+
+    "u_max_mean_treatment": "c(0.06)",
+    "u_max_range_treatment": "c(0)",
+    "u_max_distribution": "c(\"random_uniform\")",
+
+    "u_opt_mean_treatment": "c(20)",
+    "u_opt_range_treatment": "c(4)",
+    "u_opt_distribution": "c(\"random_uniform\")",
+
+    "sd_u_distribution": "c(\"random_uniform\")",
+    "sd_u_mean": "c(5)",
+    "sd_u_range": "c(0)",
+
+    "half_saturation_mean_treatment": "c(100)",
+    "half_saturation_range_treatment": "c(0)",
+    "half_saturation_distribution": "c(\"random_uniform\")",
+
+    "consumer_death_rate_treatment": "c(0.03)",
+    "resource_renewal_rate_treatment": "c(1)",
+    "resource_supply_treatment": "c(1000)",
+    "conversion_efficiency": "c(1)",
+
+    "resource_use_mode": "c(\"one_resource_all_consumers\")",
+    "active_resource": 1,
+
+    "number_of_community_replicates": 1,
+
+    "temperature_mean": 20,
+    "temperature_sd": 1,
+    "one_over_f_gamma": 0.8,
+    "number_of_environment_replicates": 1,
+
+    "temperature_series_control": "c(\"same_per_replicate\")",
+
+    "burn_in_duration": 10,
+    "experiment_duration": 20,
+
+    "consumer_immigration_rate": 0.01,
+    "initial_consumer_total_abundance": 30,
+    "resource_initial_value": 1000,
+
+    "temperature_interpolation": "\"linear\"",
+    "ode_method": "\"lsoda\"",
+    "ode_rtol": 1e-6,
+    "ode_atol": 1e-8,
+    "ode_max_step": 1,
+    "blowup_threshold": 1e12,
+    "negative_tolerance": 1e-8
+  }
+]

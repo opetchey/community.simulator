@@ -146,13 +146,13 @@ to use `setup_example_experiment()`:
 ```{r}
 #| eval = FALSE
 project_folder_location <- file.path("~/Desktop", "community_simulator_projects")
-experiment_name <- "test_experiment1"
-experiment_design_filename <- "experiment_definition_template_v0.7.json"
+experiment_name <- "discrete_lv_example"
+experiment_design_filename <- "experiment_definition.json"
 
 setup <- setup_example_experiment(
   experiment_folder_location = project_folder_location,
   experiment_name = experiment_name,
-  example_experiment_name = "test_experiment1",
+  example_experiment_name = "discrete_lv",
   experiment_design_filename = experiment_design_filename
 )
 ```
@@ -161,8 +161,12 @@ This creates the experiment folder and copies the example JSON into it. At that
 point, edit the JSON file in the experiment folder so it matches the experiment
 you want to run.
 
-The bundled script `inst/test_experiments/test_experiment1/test_experiment1.R`
-shows the intended setup and analysis sequence for this example experiment.
+The package includes three compact example designs, one for each supported
+model type:
+
+- `inst/test_experiments/discrete_lv/experiment_definition.json`
+- `inst/test_experiments/continuous_lv/experiment_definition.json`
+- `inst/test_experiments/consumer_resource/experiment_definition.json`
 
 ## Run the Experiment
 
@@ -200,10 +204,10 @@ so like this:
 ```{r}
 #| eval = FALSE
 path_to_example_experiment_design_file <- system.file(file.path("test_experiments",
-                      "test_experiment1",
-                      "experiment_definition_template_v0.7.json"),
+                      "discrete_lv",
+                      "experiment_definition.json"),
             package = "community.simulator")
-file_to_copy_to <- file.path("~/Desktop", "experiment_definition_template_v0.7.json")
+file_to_copy_to <- file.path("~/Desktop", "experiment_definition.json")
 file.copy(from = path_to_example_experiment_design_file, to = file_to_copy_to)
 
 ```

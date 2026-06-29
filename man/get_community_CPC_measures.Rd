@@ -4,7 +4,13 @@
 \alias{get_community_CPC_measures}
 \title{Get measures of community performance curves}
 \usage{
-get_community_CPC_measures(temperatures, expt, expt_def, every_t = 1)
+get_community_CPC_measures(
+  temperatures,
+  expt,
+  expt_def,
+  every_t = 1,
+  soft_viability_scale = 0.01
+)
 }
 \arguments{
 \item{temperatures}{\itemize{
@@ -22,6 +28,9 @@ get_community_CPC_measures(temperatures, expt, expt_def, every_t = 1)
 \item{every_t}{\itemize{
 \item how often to sample the temperature time series (e.g., every 1 time step, every 10 time steps, etc.)
 }}
+
+\item{soft_viability_scale}{Positive scale parameter for the soft viability
+transform \code{plogis(g_i(T) / soft_viability_scale)}.}
 }
 \value{
 A dataset containing measures of community performance curves, including CV of community performance, synchrony of performance curves, and average CV of species performance curves weighted by their mean contribution to community performance.

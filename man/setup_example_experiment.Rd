@@ -7,7 +7,7 @@
 setup_example_experiment(
   experiment_folder_location,
   experiment_name,
-  example_experiment_name = "test_experiment1",
+  example_experiment_name = "discrete_lv",
   experiment_design_filename,
   verbose = TRUE
 )
@@ -19,7 +19,7 @@ be created.}
 \item{experiment_name}{Name of the experiment folder.}
 
 \item{example_experiment_name}{Name of the bundled example experiment to copy
-from. Defaults to \code{"test_experiment1"}.}
+from. Defaults to \code{"discrete_lv"}.}
 
 \item{experiment_design_filename}{Name of the bundled JSON design file to
 copy into the experiment folder.}
