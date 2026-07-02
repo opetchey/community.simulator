@@ -78,14 +78,14 @@ get_community_measures <- function(experiment_folder,
 
   ## join all the community measures
   comm_measures <- expt |>
-    dplyr::full_join(comm_cv) |>
-    dplyr::full_join(comm_temp_sens) |>
+    dplyr::left_join(comm_cv) |>
+    dplyr::left_join(comm_temp_sens) |>
     # full_join(comm_resp_div) |>
-    dplyr::full_join(comm_sum_rel_b_opt) |>
+    dplyr::left_join(comm_sum_rel_b_opt) |>
     # full_join(comm_sum_derivs)|>
-    dplyr::full_join(comm_syn) |>
-    dplyr::full_join(comm_pop) |>
-    dplyr::full_join(comm_cpc)
+    dplyr::left_join(comm_syn) |>
+    dplyr::left_join(comm_pop) |>
+    dplyr::left_join(comm_cpc)
 
   saveRDS(comm_measures, output_path)
   announce_output_written(output_path, verbose = verbose, label = "community-measures file")

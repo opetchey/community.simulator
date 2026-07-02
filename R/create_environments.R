@@ -51,7 +51,7 @@ create_environments <- function(experiment_folder,
                                              expt_def$burn_in_duration),
                                          scale(
                                            primer::one_over_f(
-                                             gamma = expt$one_over_f_gamma[i],
+                                             gamma = environments$one_over_f_gamma[i],
                                              N = expt_def$experiment_duration + 1
                                            )
                                          ) * expt_def$temperature_sd + expt_def$temperature_mean
