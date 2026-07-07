@@ -5,6 +5,10 @@
 #' @param overwrite Logical. If `TRUE`, overwrite an existing community-measures file.
 #' @param verbose Logical. If `TRUE`, print messages about written outputs.
 #'
+#' @details If `simulation_summaries.RDS` is present, dynamic abundance
+#'   summaries are read from that compact file. Otherwise, the function falls
+#'   back to calculating those summaries from `dynamics.db`.
+#'
 #' @return Nothing. Saves data to a file.
 #' @export
 #'
@@ -28,19 +32,25 @@ get_community_measures <- function(experiment_folder,
                                       paste0(experiment_folder, "temperatures.db"))
   on.exit(DBI::dbDisconnect(conn_temperatures), add = TRUE)
   temperatures <- dplyr::tbl(conn_temperatures, "temperatures")
-  ## dynamics
+  summaries_path <- paste0(experiment_folder, "simulation_summaries.RDS")
   dynamics_path <- paste0(experiment_folder, "dynamics.db")
-  if (!file.exists(dynamics_path)) {
+  has_simulation_summaries <- file.exists(summaries_path)
+  has_dynamics <- file.exists(dynamics_path)
+
+  if (!has_simulation_summaries && !has_dynamics) {
     stop(
-      "Cannot calculate community measures because dynamics.db was not found. ",
-      "If the experiment used `save_dynamics = FALSE`, rerun with saved dynamics ",
-      "or use summary measures calculated during simulation.",
+      "Cannot calculate community measures because neither simulation_summaries.RDS ",
+      "nor dynamics.db was found.",
       call. = FALSE
     )
   }
-  conn_dynamics <- DBI::dbConnect(RSQLite::SQLite(), dynamics_path)
-  on.exit(DBI::dbDisconnect(conn_dynamics), add = TRUE)
-  dynamics <- dplyr::tbl(conn_dynamics, "dynamics")
+
+  dynamics <- NULL
+  if (!has_simulation_summaries) {
+    conn_dynamics <- DBI::dbConnect(RSQLite::SQLite(), dynamics_path)
+    on.exit(DBI::dbDisconnect(conn_dynamics), add = TRUE)
+    dynamics <- dplyr::tbl(conn_dynamics, "dynamics")
+  }
   ## temporal derivatives
   #conn_temp_derivs <- dbConnect(RSQLite::SQLite(),
   #                              paste0(experiment_folder, "temporal_derivs.db"))
@@ -57,25 +67,35 @@ get_community_measures <- function(experiment_folder,
 
   ### Calculate various community level measure
 
-  ## Community total biomass CV
-  comm_cv <- get_community_CV(dynamics)
+  if (has_simulation_summaries) {
+    comm_dynamic_measures <- readRDS(summaries_path) |>
+      tibble::as_tibble()
+  } else {
+    ## Community total biomass CV
+    comm_cv <- get_community_CV(dynamics)
 
-  ## Community temperature sensitivity
-  comm_temp_sens <- get_community_temp_sens(dynamics,
-                                            temperatures,
-                                            rollsumr_window = 50,
-                                            expt)
-  # comm_resp_div <- get_community_response_diversity(temp_derivs)
+    ## Community temperature sensitivity
+    comm_temp_sens <- get_community_temp_sens(dynamics,
+                                              temperatures,
+                                              rollsumr_window = 50,
+                                              expt)
+    # comm_resp_div <- get_community_response_diversity(temp_derivs)
+
+    # get community synchrony
+    comm_syn <- get_community_syn(dynamics)
+
+    # get pop_stab
+    comm_pop <- get_community_popstab(dynamics)
+
+    comm_dynamic_measures <- comm_cv |>
+      dplyr::left_join(comm_temp_sens) |>
+      dplyr::left_join(comm_syn) |>
+      dplyr::left_join(comm_pop)
+  }
 
   ## Get community sum of relative b_opt
   comm_sum_rel_b_opt <- get_community_sum_rel_b_opt(temperatures, expt)
   # comm_sum_derivs <- get_community_sum_derivatives(arb_derivs, temp_derivs, delta_igr)
-
-  # get community synchrony
-  comm_syn<-get_community_syn(dynamics)
-
-  # get pop_stab
-  comm_pop<-get_community_popstab(dynamics)
 
   # get community CPC measures
   comm_cpc <- get_community_CPC_measures(temperatures,
@@ -87,13 +107,10 @@ get_community_measures <- function(experiment_folder,
 
   ## join all the community measures
   comm_measures <- expt |>
-    dplyr::left_join(comm_cv) |>
-    dplyr::left_join(comm_temp_sens) |>
+    dplyr::left_join(comm_dynamic_measures) |>
     # full_join(comm_resp_div) |>
     dplyr::left_join(comm_sum_rel_b_opt) |>
     # full_join(comm_sum_derivs)|>
-    dplyr::left_join(comm_syn) |>
-    dplyr::left_join(comm_pop) |>
     dplyr::left_join(comm_cpc)
 
   saveRDS(comm_measures, output_path)

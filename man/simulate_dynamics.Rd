@@ -22,7 +22,9 @@ simulate_dynamics(
 \item{verbose}{Logical. If \code{TRUE}, print progress and output messages.}
 }
 \value{
-Returns nothing. Saves to SQLite databases the temperature time series and the community dynamics.
+Returns nothing. Always saves compact \code{simulation_summaries.RDS} and
+\code{population_summaries.RDS}; optionally saves SQLite dynamics/resources
+databases depending on output-control settings.
 }
 \description{
 Simulate the dynamics of all the cases in an experiment
@@ -35,7 +37,9 @@ Experiment JSON files can optionally include
 \code{save_dynamics}, \code{save_resources}, \code{dynamics_save_every}, and
 \code{resources_save_every}. The save interval values are integers giving the
 interval between saved output time points. \code{resources_save_every} defaults
-to \code{dynamics_save_every}. \code{save_resources} only applies to
+to \code{dynamics_save_every}. Compact case and population summaries are always
+written. \code{save_dynamics} and \code{save_resources} control only the
+diagnostic SQLite outputs. \code{save_resources} only applies to
 consumer-resource dynamics. When \code{parallel_simulations} evaluates to
 \code{TRUE}, simulation cases are computed in parallel and SQLite tables are
 still written serially by the parent process. Parallel processing is intended

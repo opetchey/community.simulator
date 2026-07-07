@@ -47,9 +47,9 @@ runtime from the experiment table and design settings, including output
 controls such as \code{save_dynamics}, \code{save_resources},
 \code{dynamics_save_every}, and \code{resources_save_every}. Confirmation
 happens before environment generation, dynamics simulation, and analysis. These
-estimates are intended as rough guidance before launching large experiments. If
-\code{save_dynamics = FALSE}, the workflow skips current community-measure
-calculation because those measures require \code{dynamics.db}.
+estimates are intended as rough guidance before launching large experiments.
+Compact simulation summaries are always written and are used to calculate
+\code{community_measures.RDS} even when \code{save_dynamics = FALSE}.
 }
 \examples{
 NULL

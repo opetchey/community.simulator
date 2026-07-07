@@ -216,8 +216,8 @@ confirm_experiment_run <- function(summary) {
 #'   `dynamics_save_every`, and `resources_save_every`. Confirmation happens
 #'   before environment generation, dynamics simulation, and analysis. These
 #'   estimates are intended as rough guidance before launching large
-#'   experiments. If `save_dynamics = FALSE`, the workflow skips current
-#'   community-measure calculation because those measures require `dynamics.db`.
+#'   experiments. Compact simulation summaries are always written and are used
+#'   to calculate `community_measures.RDS` even when `save_dynamics = FALSE`.
 #'
 #' @return Invisibly returns a named list containing the experiment folder and
 #'   the main output file paths.
@@ -301,28 +301,23 @@ run_experiment <- function(experiment_folder_location,
   if (verbose) {
     message("Calculating community measures")
   }
-  if (experiment_summary$save_dynamics) {
-    get_community_measures(
-      experiment_folder,
-      experiment_design_filename,
-      overwrite = overwrite,
-      verbose = verbose
-    )
-  } else if (verbose) {
-    message(
-      "Skipping community measures because save_dynamics is FALSE. ",
-      "Most current community measures require dynamics.db."
-    )
-  }
+  get_community_measures(
+    experiment_folder,
+    experiment_design_filename,
+    overwrite = overwrite,
+    verbose = verbose
+  )
 
   outputs <- list(
     experiment_folder = experiment_folder,
     experiment_table = file.path(experiment_folder, "experiment_table.RDS"),
-    temperatures_db = file.path(experiment_folder, "temperatures.db")
+    temperatures_db = file.path(experiment_folder, "temperatures.db"),
+    simulation_summaries = file.path(experiment_folder, "simulation_summaries.RDS"),
+    population_summaries = file.path(experiment_folder, "population_summaries.RDS"),
+    community_measures = file.path(experiment_folder, "community_measures.RDS")
   )
   if (experiment_summary$save_dynamics) {
     outputs$dynamics_db <- file.path(experiment_folder, "dynamics.db")
-    outputs$community_measures <- file.path(experiment_folder, "community_measures.RDS")
   }
   if (experiment_summary$save_resources) {
     outputs$resources_db <- file.path(experiment_folder, "resources.db")

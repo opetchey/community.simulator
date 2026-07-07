@@ -1,3 +1,89 @@
+summarise_case_dynamics <- function(case_id,
+                                    spts,
+                                    returned_times,
+                                    output_times,
+                                    temperature_series,
+                                    burn_in_duration,
+                                    extinction_threshold = 1e-8) {
+  consumer_data <- spts |>
+    tibble::as_tibble() |>
+    dplyr::mutate(time = returned_times) |>
+    dplyr::filter(
+      .data$time > burn_in_duration,
+      .data$time %in% output_times
+    )
+
+  species_columns <- grep("^Spp", names(consumer_data), value = TRUE)
+  abundance_matrix <- as.matrix(consumer_data[, species_columns, drop = FALSE])
+  total_abundance <- rowSums(abundance_matrix, na.rm = TRUE)
+  population_means <- colMeans(abundance_matrix, na.rm = TRUE)
+  population_sds <- apply(abundance_matrix, 2, stats::sd, na.rm = TRUE)
+  population_cvs <- population_sds / population_means
+  final_abundances <- abundance_matrix[nrow(abundance_matrix), ]
+  extinct_final <- final_abundances <= extinction_threshold
+  extinct_ever <- apply(abundance_matrix <= extinction_threshold, 2, any, na.rm = TRUE)
+
+  mean_totab <- mean(total_abundance, na.rm = TRUE)
+  sd_totab <- stats::sd(total_abundance, na.rm = TRUE)
+  sum_population_sds <- sum(population_sds, na.rm = TRUE)
+  relative_abundances <- population_means / mean_totab
+
+  temperature_data <- temperature_series |>
+    dplyr::filter(
+      .data$time > burn_in_duration,
+      .data$time %in% output_times
+    )
+  temp_sensitivity <- NA_real_
+  if (length(total_abundance) == nrow(temperature_data) &&
+      length(total_abundance) >= 2 &&
+      stats::var(temperature_data$temperature, na.rm = TRUE) > 0) {
+    temp_model <- try(
+      stats::lm(total_abundance ~ temperature, data = temperature_data),
+      silent = TRUE
+    )
+    if (!inherits(temp_model, "try-error")) {
+      temp_sensitivity <- unname(stats::coef(temp_model)[[2]])
+    }
+  }
+
+  case_summary <- tibble::tibble(
+    case_id = case_id,
+    mean_totab = mean_totab,
+    sd_totab = sd_totab,
+    CV_totab = sd_totab / mean_totab,
+    comm_temperature_sensitivity = temp_sensitivity,
+    sync_ab = sd_totab^2 / sum_population_sds^2,
+    pop_CV_ab = sum(relative_abundances * population_cvs, na.rm = TRUE),
+    final_totab = total_abundance[[length(total_abundance)]],
+    final_min_abundance = min(final_abundances, na.rm = TRUE),
+    final_mean_abundance = mean(final_abundances, na.rm = TRUE),
+    final_max_abundance = max(final_abundances, na.rm = TRUE),
+    final_richness_above_extinction_threshold = sum(!extinct_final, na.rm = TRUE),
+    n_extinct_final = sum(extinct_final, na.rm = TRUE),
+    any_extinct_final = any(extinct_final, na.rm = TRUE),
+    n_extinct_ever = sum(extinct_ever, na.rm = TRUE),
+    any_extinct_ever = any(extinct_ever, na.rm = TRUE),
+    min_abundance_ever = min(abundance_matrix, na.rm = TRUE),
+    extinction_threshold = extinction_threshold
+  )
+
+  population_summary <- tibble::tibble(
+    case_id = case_id,
+    Species_ID = species_columns,
+    mean_ab_pop = population_means,
+    sd_pop = population_sds,
+    CV_ab_pop = population_cvs,
+    final_abundance = final_abundances,
+    extinct_final = extinct_final,
+    extinct_ever = extinct_ever
+  )
+
+  list(
+    case_summary = case_summary,
+    population_summary = population_summary
+  )
+}
+
 simulate_one_dynamics_case <- function(i,
                                        expt,
                                        temperatures_data,
@@ -19,6 +105,7 @@ simulate_one_dynamics_case <- function(i,
                                        resources_save_every,
                                        save_dynamics,
                                        save_resources,
+                                       extinction_threshold,
                                        initial_abundance_seed_base) {
 
   env_series_oi <- expt$env_series_id[i]
@@ -106,6 +193,16 @@ simulate_one_dynamics_case <- function(i,
     returned_times <- solver_output_times
   }
 
+  online_summaries <- summarise_case_dynamics(
+    case_id = expt$case_id[i],
+    spts = spts,
+    returned_times = returned_times,
+    output_times = output_times,
+    temperature_series = temperature_series,
+    burn_in_duration = expt_def$burn_in_duration,
+    extinction_threshold = extinction_threshold
+  )
+
   if (save_dynamics) {
     spts <- spts |>
       tibble::as_tibble() |>
@@ -148,7 +245,9 @@ simulate_one_dynamics_case <- function(i,
 
   list(
     dynamics = spts,
-    resources = resources_ts
+    resources = resources_ts,
+    case_summary = online_summaries$case_summary,
+    population_summary = online_summaries$population_summary
   )
 }
 
@@ -166,13 +265,17 @@ simulate_one_dynamics_case <- function(i,
 #'   `save_dynamics`, `save_resources`, `dynamics_save_every`, and
 #'   `resources_save_every`. The save interval values are integers giving the
 #'   interval between saved output time points. `resources_save_every` defaults
-#'   to `dynamics_save_every`. `save_resources` only applies to
+#'   to `dynamics_save_every`. Compact case and population summaries are always
+#'   written. `save_dynamics` and `save_resources` control only the diagnostic
+#'   SQLite outputs. `save_resources` only applies to
 #'   consumer-resource dynamics. When `parallel_simulations` evaluates to
 #'   `TRUE`, simulation cases are computed in parallel and SQLite tables are
 #'   still written serially by the parent process. Parallel processing is
 #'   intended for macOS/Linux.
 #'
-#' @return Returns nothing. Saves to SQLite databases the temperature time series and the community dynamics.
+#' @return Returns nothing. Always saves compact `simulation_summaries.RDS` and
+#'   `population_summaries.RDS`; optionally saves SQLite dynamics/resources
+#'   databases depending on output-control settings.
 #' @export
 #'
 #' @examples NULL
@@ -232,6 +335,10 @@ simulate_dynamics <- function(experiment_folder,
   save_dynamics <- isTRUE(get_design_value("save_dynamics", TRUE))
   save_resources <- isTRUE(get_design_value("save_resources", TRUE)) &&
     dynamics_type == "consumer_resource_continuous"
+  extinction_threshold <- as.numeric(get_design_value("extinction_threshold", 1e-8))
+  if (is.na(extinction_threshold) || extinction_threshold < 0) {
+    stop("`extinction_threshold` must evaluate to a non-negative number.", call. = FALSE)
+  }
   simulation_progress <- isTRUE(get_design_value("simulation_progress", verbose))
   parallel_simulations <- isTRUE(get_design_value("parallel_simulations", FALSE))
   parallel_workers <- as.integer(get_design_value(
@@ -262,10 +369,16 @@ simulate_dynamics <- function(experiment_folder,
   if (!save_dynamics && !save_resources && verbose) {
     warning(
       "Both `save_dynamics` and `save_resources` are FALSE. ",
-      "Dynamics will be simulated but no dynamics/resources database will be written.",
+      "Dynamics will be simulated and compact summaries written, but no ",
+      "dynamics/resources database will be written.",
       call. = FALSE
     )
   }
+
+  summaries_path <- paste0(experiment_folder, "simulation_summaries.RDS")
+  population_summaries_path <- paste0(experiment_folder, "population_summaries.RDS")
+  prepare_output_path(summaries_path, overwrite = overwrite, verbose = verbose, label = "simulation summaries file")
+  prepare_output_path(population_summaries_path, overwrite = overwrite, verbose = verbose, label = "population summaries file")
 
   conn_dynamics <- NULL
   output_path <- paste0(experiment_folder, "dynamics.db")
@@ -305,6 +418,7 @@ simulate_dynamics <- function(experiment_folder,
       "resources_save_every",
       "save_dynamics",
       "save_resources",
+      "extinction_threshold",
       "simulation_progress",
       "initial_abundance_seed_base",
       "parallel_simulations",
@@ -328,6 +442,7 @@ simulate_dynamics <- function(experiment_folder,
       resources_save_every,
       save_dynamics,
       save_resources,
+      extinction_threshold,
       simulation_progress,
       initial_abundance_seed_metadata,
       parallel_simulations,
@@ -369,6 +484,7 @@ simulate_dynamics <- function(experiment_folder,
       resources_save_every = resources_save_every,
       save_dynamics = save_dynamics,
       save_resources = save_resources,
+      extinction_threshold = extinction_threshold,
       initial_abundance_seed_base = initial_abundance_seed_base
     )
   }
@@ -398,8 +514,13 @@ simulate_dynamics <- function(experiment_folder,
 
   dynamics_table_written <- FALSE
   resources_table_written <- FALSE
+  case_summaries <- vector("list", length(case_indices))
+  population_summaries <- vector("list", length(case_indices))
 
-  write_case_result <- function(case_result) {
+  write_case_result <- function(case_result, case_index) {
+    case_summaries[[case_index]] <<- case_result$case_summary
+    population_summaries[[case_index]] <<- case_result$population_summary
+
     if (!is.null(conn_dynamics) && !is.null(case_result$dynamics)) {
       DBI::dbWriteTable(
         conn_dynamics,
@@ -478,7 +599,7 @@ simulate_dynamics <- function(experiment_folder,
             call. = FALSE
           )
         }
-        write_case_result(case_result)
+        write_case_result(case_result, case_index)
         active_jobs[[active_name]] <- NULL
         update_progress()
       }
@@ -486,7 +607,7 @@ simulate_dynamics <- function(experiment_folder,
   } else {
     for (i in case_indices) {
       case_result <- simulate_case(i)
-      write_case_result(case_result)
+      write_case_result(case_result, i)
       update_progress()
     }
   }
@@ -506,5 +627,10 @@ simulate_dynamics <- function(experiment_folder,
     conn_dynamics <- NULL
     announce_output_written(output_path, verbose = verbose, label = "dynamics database")
   }
+
+  saveRDS(dplyr::bind_rows(case_summaries), summaries_path)
+  announce_output_written(summaries_path, verbose = verbose, label = "simulation summaries file")
+  saveRDS(dplyr::bind_rows(population_summaries), population_summaries_path)
+  announce_output_written(population_summaries_path, verbose = verbose, label = "population summaries file")
 
 }
