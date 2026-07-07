@@ -16,6 +16,9 @@ simulate_one_dynamics_case <- function(i,
                                        blowup_threshold,
                                        negative_tolerance,
                                        dynamics_save_every,
+                                       resources_save_every,
+                                       save_dynamics,
+                                       save_resources,
                                        initial_abundance_seed_base) {
 
   env_series_oi <- expt$env_series_id[i]
@@ -38,6 +41,11 @@ simulate_one_dynamics_case <- function(i,
     ((integration_times - 1L) %% dynamics_save_every) == 0L |
       integration_times == max(integration_times)
   ]
+  resource_output_times <- integration_times[
+    ((integration_times - 1L) %% resources_save_every) == 0L |
+      integration_times == max(integration_times)
+  ]
+  solver_output_times <- sort(unique(c(output_times, resource_output_times)))
 
   S <- expt[i, ]$community_object[[1]]$S
   if (!is.null(initial_abundance_seed_base)) {
@@ -83,7 +91,7 @@ simulate_one_dynamics_case <- function(i,
       initial_consumer_abundances = initial_abundances,
       initial_resource_values = initial_resources,
       times = integration_times,
-      output_times = output_times,
+      output_times = solver_output_times,
       temperature_interpolation = temperature_interpolation,
       consumer_immigration_rate = consumer_immigration_rate,
       ode_method = ode_method,
@@ -95,26 +103,30 @@ simulate_one_dynamics_case <- function(i,
     )
     spts <- cr_output$consumers
     resources_ts <- cr_output$resources
-    returned_times <- output_times
+    returned_times <- solver_output_times
   }
 
-  spts <- spts |>
-    tibble::as_tibble() |>
-    dplyr::mutate(
-      case_id = expt$case_id[i],
-      time = returned_times
-    ) |>
-    tidyr::pivot_longer(
-      names_to = "Species_ID",
-      values_to = "Abundance",
-      cols = dplyr::starts_with("Spp")
-    ) |>
-    dplyr::filter(
-      .data$time > expt_def$burn_in_duration,
-      .data$time %in% output_times
-    )
+  if (save_dynamics) {
+    spts <- spts |>
+      tibble::as_tibble() |>
+      dplyr::mutate(
+        case_id = expt$case_id[i],
+        time = returned_times
+      ) |>
+      tidyr::pivot_longer(
+        names_to = "Species_ID",
+        values_to = "Abundance",
+        cols = dplyr::starts_with("Spp")
+      ) |>
+      dplyr::filter(
+        .data$time > expt_def$burn_in_duration,
+        .data$time %in% output_times
+      )
+  } else {
+    spts <- NULL
+  }
 
-  if (!is.null(resources_ts)) {
+  if (save_resources && !is.null(resources_ts)) {
     resources_ts <- resources_ts |>
       tibble::as_tibble() |>
       dplyr::mutate(
@@ -128,8 +140,10 @@ simulate_one_dynamics_case <- function(i,
       ) |>
       dplyr::filter(
         .data$time > expt_def$burn_in_duration,
-        .data$time %in% output_times
+        .data$time %in% resource_output_times
       )
+  } else {
+    resources_ts <- NULL
   }
 
   list(
@@ -148,12 +162,15 @@ simulate_one_dynamics_case <- function(i,
 #'
 #' @details Experiment JSON files can optionally include
 #'   `parallel_simulations`, `parallel_workers`, and
-#'   `initial_abundance_seed_base`. They can also include
-#'   `dynamics_save_every`, an integer giving the interval between saved
-#'   consumer/resource output time points. When `parallel_simulations`
-#'   evaluates to `TRUE`, simulation cases are computed in parallel and SQLite
-#'   tables are still written serially by the parent process. Parallel
-#'   processing is intended for macOS/Linux.
+#'   `initial_abundance_seed_base`. They can also include output-control options:
+#'   `save_dynamics`, `save_resources`, `dynamics_save_every`, and
+#'   `resources_save_every`. The save interval values are integers giving the
+#'   interval between saved output time points. `resources_save_every` defaults
+#'   to `dynamics_save_every`. `save_resources` only applies to
+#'   consumer-resource dynamics. When `parallel_simulations` evaluates to
+#'   `TRUE`, simulation cases are computed in parallel and SQLite tables are
+#'   still written serially by the parent process. Parallel processing is
+#'   intended for macOS/Linux.
 #'
 #' @return Returns nothing. Saves to SQLite databases the temperature time series and the community dynamics.
 #' @export
@@ -166,12 +183,8 @@ simulate_dynamics <- function(experiment_folder,
 
   require_dbplyr()
 
-  ## setup the databases for saving the temperature time series and the community dynamics
-  ## set up data base to save results into
-  output_path <- paste0(experiment_folder, "dynamics.db")
-  prepare_output_path(output_path, overwrite = overwrite, verbose = verbose, label = "dynamics database")
-  conn_dynamics <- DBI::dbConnect(RSQLite::SQLite(), output_path)
   conn_temperatures <- DBI::dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "temperatures.db"))
+  on.exit(DBI::dbDisconnect(conn_temperatures), add = TRUE)
   temperatures <- dplyr::tbl(conn_temperatures, "temperatures")
   temperatures_data <- temperatures |>
     dplyr::collect()
@@ -212,6 +225,13 @@ simulate_dynamics <- function(experiment_folder,
   if (is.na(dynamics_save_every) || dynamics_save_every < 1) {
     stop("`dynamics_save_every` must evaluate to an integer >= 1.", call. = FALSE)
   }
+  resources_save_every <- as.integer(get_design_value("resources_save_every", dynamics_save_every))
+  if (is.na(resources_save_every) || resources_save_every < 1) {
+    stop("`resources_save_every` must evaluate to an integer >= 1.", call. = FALSE)
+  }
+  save_dynamics <- isTRUE(get_design_value("save_dynamics", TRUE))
+  save_resources <- isTRUE(get_design_value("save_resources", TRUE)) &&
+    dynamics_type == "consumer_resource_continuous"
   simulation_progress <- isTRUE(get_design_value("simulation_progress", verbose))
   parallel_simulations <- isTRUE(get_design_value("parallel_simulations", FALSE))
   parallel_workers <- as.integer(get_design_value(
@@ -239,11 +259,31 @@ simulate_dynamics <- function(experiment_folder,
     )
   }
 
+  if (!save_dynamics && !save_resources && verbose) {
+    warning(
+      "Both `save_dynamics` and `save_resources` are FALSE. ",
+      "Dynamics will be simulated but no dynamics/resources database will be written.",
+      call. = FALSE
+    )
+  }
+
+  conn_dynamics <- NULL
+  output_path <- paste0(experiment_folder, "dynamics.db")
+  if (save_dynamics) {
+    prepare_output_path(output_path, overwrite = overwrite, verbose = verbose, label = "dynamics database")
+    conn_dynamics <- DBI::dbConnect(RSQLite::SQLite(), output_path)
+  } else if (overwrite && file.exists(output_path)) {
+    prepare_output_path(output_path, overwrite = TRUE, verbose = verbose, label = "disabled dynamics database")
+  }
+
   conn_resources <- NULL
-  if (dynamics_type == "consumer_resource_continuous") {
+  resources_output_path <- paste0(experiment_folder, "resources.db")
+  if (save_resources) {
     resources_output_path <- paste0(experiment_folder, "resources.db")
     prepare_output_path(resources_output_path, overwrite = overwrite, verbose = verbose, label = "resources database")
     conn_resources <- DBI::dbConnect(RSQLite::SQLite(), resources_output_path)
+  } else if (overwrite && file.exists(resources_output_path)) {
+    prepare_output_path(resources_output_path, overwrite = TRUE, verbose = verbose, label = "disabled resources database")
   }
 
   dynamics_metadata <- tibble::tibble(
@@ -262,6 +302,9 @@ simulate_dynamics <- function(experiment_folder,
       "blowup_threshold",
       "negative_tolerance",
       "dynamics_save_every",
+      "resources_save_every",
+      "save_dynamics",
+      "save_resources",
       "simulation_progress",
       "initial_abundance_seed_base",
       "parallel_simulations",
@@ -282,13 +325,18 @@ simulate_dynamics <- function(experiment_folder,
       blowup_threshold,
       negative_tolerance,
       dynamics_save_every,
+      resources_save_every,
+      save_dynamics,
+      save_resources,
       simulation_progress,
       initial_abundance_seed_metadata,
       parallel_simulations,
       parallel_workers
     ))
   )
-  DBI::dbWriteTable(conn_dynamics, "dynamics_metadata", dynamics_metadata, overwrite = TRUE)
+  if (!is.null(conn_dynamics)) {
+    DBI::dbWriteTable(conn_dynamics, "dynamics_metadata", dynamics_metadata, overwrite = TRUE)
+  }
   if (!is.null(conn_resources)) {
     DBI::dbWriteTable(conn_resources, "resources_metadata", dynamics_metadata, overwrite = TRUE)
   }
@@ -318,6 +366,9 @@ simulate_dynamics <- function(experiment_folder,
       blowup_threshold = blowup_threshold,
       negative_tolerance = negative_tolerance,
       dynamics_save_every = dynamics_save_every,
+      resources_save_every = resources_save_every,
+      save_dynamics = save_dynamics,
+      save_resources = save_resources,
       initial_abundance_seed_base = initial_abundance_seed_base
     )
   }
@@ -349,14 +400,16 @@ simulate_dynamics <- function(experiment_folder,
   resources_table_written <- FALSE
 
   write_case_result <- function(case_result) {
-    DBI::dbWriteTable(
-      conn_dynamics,
-      "dynamics",
-      case_result$dynamics,
-      overwrite = !dynamics_table_written,
-      append = dynamics_table_written
-    )
-    dynamics_table_written <<- TRUE
+    if (!is.null(conn_dynamics) && !is.null(case_result$dynamics)) {
+      DBI::dbWriteTable(
+        conn_dynamics,
+        "dynamics",
+        case_result$dynamics,
+        overwrite = !dynamics_table_written,
+        append = dynamics_table_written
+      )
+      dynamics_table_written <<- TRUE
+    }
 
     if (!is.null(conn_resources) && !is.null(case_result$resources)) {
       DBI::dbWriteTable(
@@ -443,12 +496,15 @@ simulate_dynamics <- function(experiment_folder,
     progress_bar <- NULL
   }
 
-  DBI::dbDisconnect(conn_temperatures)
   if (!is.null(conn_resources)) {
     DBI::dbDisconnect(conn_resources)
+    conn_resources <- NULL
     announce_output_written(resources_output_path, verbose = verbose, label = "resources database")
   }
-  DBI::dbDisconnect(conn_dynamics)
-  announce_output_written(output_path, verbose = verbose, label = "dynamics database")
+  if (!is.null(conn_dynamics)) {
+    DBI::dbDisconnect(conn_dynamics)
+    conn_dynamics <- NULL
+    announce_output_written(output_path, verbose = verbose, label = "dynamics database")
+  }
 
 }

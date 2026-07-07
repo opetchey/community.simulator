@@ -43,9 +43,13 @@ summary measures.
 }
 \details{
 The preflight summary estimates output rows, database sizes, and
-runtime from the experiment table and design settings. Confirmation happens
-before environment generation, dynamics simulation, and analysis. These
-estimates are intended as rough guidance before launching large experiments.
+runtime from the experiment table and design settings, including output
+controls such as \code{save_dynamics}, \code{save_resources},
+\code{dynamics_save_every}, and \code{resources_save_every}. Confirmation
+happens before environment generation, dynamics simulation, and analysis. These
+estimates are intended as rough guidance before launching large experiments. If
+\code{save_dynamics = FALSE}, the workflow skips current community-measure
+calculation because those measures require \code{dynamics.db}.
 }
 \examples{
 NULL

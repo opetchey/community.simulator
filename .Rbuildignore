@@ -6,6 +6,7 @@
 ^\.gitignore$
 ^.*\.DS_Store$
 ^\.\.Rcheck$
+^.*\.Rcheck$
 ^from before$
 ^LICENSE\.md$
 ^TODO\.md$

@@ -48,6 +48,12 @@ estimate_experiment_outputs <- function(experiment_folder, experiment_design_fil
   if (is.na(dynamics_save_every) || dynamics_save_every < 1) {
     dynamics_save_every <- 1L
   }
+  resources_save_every <- as.integer(get_json_design_value(expt_def, "resources_save_every", dynamics_save_every))
+  if (is.na(resources_save_every) || resources_save_every < 1) {
+    resources_save_every <- dynamics_save_every
+  }
+  save_dynamics <- isTRUE(get_json_design_value(expt_def, "save_dynamics", TRUE))
+  save_resources <- isTRUE(get_json_design_value(expt_def, "save_resources", TRUE))
   dynamics_type <- get_json_design_value(expt_def, "dynamics_type", "discrete")
   parallel_simulations <- isTRUE(get_json_design_value(expt_def, "parallel_simulations", FALSE))
   parallel_workers <- as.integer(get_json_design_value(
@@ -76,9 +82,20 @@ estimate_experiment_outputs <- function(experiment_folder, experiment_design_fil
     x$R
   }, numeric(1))
 
-  dynamics_rows <- saved_time_points * sum(species_per_case)
-  resource_rows <- if (dynamics_type == "consumer_resource_continuous") {
-    saved_time_points * sum(resource_per_case)
+  resource_output_times <- seq_len(integration_steps)
+  resource_output_times <- resource_output_times[
+    ((resource_output_times - 1L) %% resources_save_every) == 0L |
+      resource_output_times == max(resource_output_times)
+  ]
+  saved_resource_time_points <- sum(resource_output_times > burn_in_duration)
+
+  dynamics_rows <- if (save_dynamics) {
+    saved_time_points * sum(species_per_case)
+  } else {
+    0
+  }
+  resource_rows <- if (save_resources && dynamics_type == "consumer_resource_continuous") {
+    saved_resource_time_points * sum(resource_per_case)
   } else {
     0
   }
@@ -112,7 +129,11 @@ estimate_experiment_outputs <- function(experiment_folder, experiment_design_fil
     dynamics_type = dynamics_type,
     integration_steps = integration_steps,
     saved_time_points = saved_time_points,
+    saved_resource_time_points = saved_resource_time_points,
     dynamics_save_every = dynamics_save_every,
+    resources_save_every = resources_save_every,
+    save_dynamics = save_dynamics,
+    save_resources = save_resources && dynamics_type == "consumer_resource_continuous",
     dynamics_rows = dynamics_rows,
     resource_rows = resource_rows,
     temperature_rows = temperature_rows,
@@ -134,14 +155,26 @@ confirm_experiment_run <- function(summary) {
   message("Dynamics type: ", summary$dynamics_type)
   message("Integration time points per case: ", summary$integration_steps)
   message("Saved dynamics/resource time points per case: ", summary$saved_time_points)
+  if (summary$save_resources) {
+    message("Saved resource time points per case: ", summary$saved_resource_time_points)
+  }
+  message("save_dynamics: ", summary$save_dynamics)
+  message("save_resources: ", summary$save_resources)
   message("dynamics_save_every: ", summary$dynamics_save_every)
-  message("Expected dynamics rows: ", format(summary$dynamics_rows, big.mark = ","))
-  if (summary$resource_rows > 0) {
+  if (summary$save_resources) {
+    message("resources_save_every: ", summary$resources_save_every)
+  }
+  if (summary$save_dynamics) {
+    message("Expected dynamics rows: ", format(summary$dynamics_rows, big.mark = ","))
+  }
+  if (summary$save_resources) {
     message("Expected resource rows: ", format(summary$resource_rows, big.mark = ","))
   }
   message("Expected temperature rows: ", format(summary$temperature_rows, big.mark = ","))
-  message("Estimated dynamics.db size: ", format_bytes(summary$estimated_dynamics_db_bytes))
-  if (summary$resource_rows > 0) {
+  if (summary$save_dynamics) {
+    message("Estimated dynamics.db size: ", format_bytes(summary$estimated_dynamics_db_bytes))
+  }
+  if (summary$save_resources) {
     message("Estimated resources.db size: ", format_bytes(summary$estimated_resources_db_bytes))
   }
   message("Estimated temperatures.db size: ", format_bytes(summary$estimated_temperatures_db_bytes))
@@ -178,9 +211,13 @@ confirm_experiment_run <- function(summary) {
 #'   `interactive()`.
 #'
 #' @details The preflight summary estimates output rows, database sizes, and
-#'   runtime from the experiment table and design settings. Confirmation happens
+#'   runtime from the experiment table and design settings, including output
+#'   controls such as `save_dynamics`, `save_resources`,
+#'   `dynamics_save_every`, and `resources_save_every`. Confirmation happens
 #'   before environment generation, dynamics simulation, and analysis. These
-#'   estimates are intended as rough guidance before launching large experiments.
+#'   estimates are intended as rough guidance before launching large
+#'   experiments. If `save_dynamics = FALSE`, the workflow skips current
+#'   community-measure calculation because those measures require `dynamics.db`.
 #'
 #' @return Invisibly returns a named list containing the experiment folder and
 #'   the main output file paths.
@@ -264,20 +301,32 @@ run_experiment <- function(experiment_folder_location,
   if (verbose) {
     message("Calculating community measures")
   }
-  get_community_measures(
-    experiment_folder,
-    experiment_design_filename,
-    overwrite = overwrite,
-    verbose = verbose
-  )
+  if (experiment_summary$save_dynamics) {
+    get_community_measures(
+      experiment_folder,
+      experiment_design_filename,
+      overwrite = overwrite,
+      verbose = verbose
+    )
+  } else if (verbose) {
+    message(
+      "Skipping community measures because save_dynamics is FALSE. ",
+      "Most current community measures require dynamics.db."
+    )
+  }
 
   outputs <- list(
     experiment_folder = experiment_folder,
     experiment_table = file.path(experiment_folder, "experiment_table.RDS"),
-    temperatures_db = file.path(experiment_folder, "temperatures.db"),
-    dynamics_db = file.path(experiment_folder, "dynamics.db"),
-    community_measures = file.path(experiment_folder, "community_measures.RDS")
+    temperatures_db = file.path(experiment_folder, "temperatures.db")
   )
+  if (experiment_summary$save_dynamics) {
+    outputs$dynamics_db <- file.path(experiment_folder, "dynamics.db")
+    outputs$community_measures <- file.path(experiment_folder, "community_measures.RDS")
+  }
+  if (experiment_summary$save_resources) {
+    outputs$resources_db <- file.path(experiment_folder, "resources.db")
+  }
 
   if (verbose) {
     message("Experiment workflow complete")

@@ -29,7 +29,16 @@ get_community_measures <- function(experiment_folder,
   on.exit(DBI::dbDisconnect(conn_temperatures), add = TRUE)
   temperatures <- dplyr::tbl(conn_temperatures, "temperatures")
   ## dynamics
-  conn_dynamics <- DBI::dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "dynamics.db"))
+  dynamics_path <- paste0(experiment_folder, "dynamics.db")
+  if (!file.exists(dynamics_path)) {
+    stop(
+      "Cannot calculate community measures because dynamics.db was not found. ",
+      "If the experiment used `save_dynamics = FALSE`, rerun with saved dynamics ",
+      "or use summary measures calculated during simulation.",
+      call. = FALSE
+    )
+  }
+  conn_dynamics <- DBI::dbConnect(RSQLite::SQLite(), dynamics_path)
   on.exit(DBI::dbDisconnect(conn_dynamics), add = TRUE)
   dynamics <- dplyr::tbl(conn_dynamics, "dynamics")
   ## temporal derivatives

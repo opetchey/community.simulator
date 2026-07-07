@@ -31,12 +31,15 @@ Unfortunately at the moment has features of temperature series hard coded in
 \details{
 Experiment JSON files can optionally include
 \code{parallel_simulations}, \code{parallel_workers}, and
-\code{initial_abundance_seed_base}. They can also include
-\code{dynamics_save_every}, an integer giving the interval between saved
-consumer/resource output time points. When \code{parallel_simulations}
-evaluates to \code{TRUE}, simulation cases are computed in parallel and SQLite
-tables are still written serially by the parent process. Parallel
-processing is intended for macOS/Linux.
+\code{initial_abundance_seed_base}. They can also include output-control options:
+\code{save_dynamics}, \code{save_resources}, \code{dynamics_save_every}, and
+\code{resources_save_every}. The save interval values are integers giving the
+interval between saved output time points. \code{resources_save_every} defaults
+to \code{dynamics_save_every}. \code{save_resources} only applies to
+consumer-resource dynamics. When \code{parallel_simulations} evaluates to
+\code{TRUE}, simulation cases are computed in parallel and SQLite tables are
+still written serially by the parent process. Parallel processing is intended
+for macOS/Linux.
 }
 \examples{
 NULL
