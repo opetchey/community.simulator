@@ -35,15 +35,18 @@ Experiment JSON files can optionally include
 \code{parallel_simulations}, \code{parallel_workers}, and
 \code{initial_abundance_seed_base}. They can also include output-control options:
 \code{save_dynamics}, \code{save_resources}, \code{dynamics_save_every}, and
-\code{resources_save_every}. The save interval values are integers giving the
-interval between saved output time points. \code{resources_save_every} defaults
-to \code{dynamics_save_every}. Compact case and population summaries are always
-written. \code{save_dynamics} and \code{save_resources} control only the
-diagnostic SQLite outputs. \code{save_resources} only applies to
+\code{resources_save_every}. They can also include \code{summary_checkpoint_every}
+and \code{runtime_update_every}. The save interval values are integers giving
+the interval between saved output time points. \code{resources_save_every}
+defaults to \code{dynamics_save_every}. Compact case and population summaries
+are checkpointed by the parent process every \code{summary_checkpoint_every}
+completed cases and written again at the end. \code{save_dynamics} and
+\code{save_resources} control only the diagnostic SQLite outputs.
+\code{save_resources} only applies to
 consumer-resource dynamics. When \code{parallel_simulations} evaluates to
 \code{TRUE}, simulation cases are computed in parallel and SQLite tables are
-still written serially by the parent process. Parallel processing is intended
-for macOS/Linux.
+still written serially by the parent process. Parallel processing is
+intended for macOS/Linux.
 }
 \examples{
 NULL

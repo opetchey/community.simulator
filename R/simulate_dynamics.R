@@ -84,6 +84,57 @@ summarise_case_dynamics <- function(case_id,
   )
 }
 
+format_simulation_duration <- function(seconds) {
+  seconds <- as.numeric(seconds)
+  if (!is.finite(seconds) || seconds < 0) {
+    return("unknown")
+  }
+  if (seconds < 60) {
+    return(paste0(round(seconds), " sec"))
+  }
+
+  total_minutes <- round(seconds / 60)
+  days <- total_minutes %/% (24 * 60)
+  hours <- (total_minutes %% (24 * 60)) %/% 60
+  minutes <- total_minutes %% 60
+
+  parts <- character()
+  if (days > 0) {
+    parts <- c(parts, paste0(days, " d"))
+  }
+  if (hours > 0 || days > 0) {
+    parts <- c(parts, paste0(hours, " h"))
+  }
+  if (minutes > 0 || length(parts) == 0) {
+    parts <- c(parts, paste0(minutes, " min"))
+  }
+  paste(parts, collapse = " ")
+}
+
+atomic_save_rds <- function(object, path) {
+  temp_path <- tempfile(
+    pattern = paste0(basename(path), "."),
+    tmpdir = dirname(path),
+    fileext = ".tmp"
+  )
+  on.exit({
+    if (file.exists(temp_path)) {
+      unlink(temp_path)
+    }
+  }, add = TRUE)
+
+  saveRDS(object, temp_path)
+  if (!file.rename(temp_path, path)) {
+    if (file.exists(path)) {
+      unlink(path)
+    }
+    if (!file.rename(temp_path, path)) {
+      stop("Failed to write checkpoint file: ", path, call. = FALSE)
+    }
+  }
+  invisible(path)
+}
+
 simulate_one_dynamics_case <- function(i,
                                        expt,
                                        temperatures_data,
@@ -263,11 +314,14 @@ simulate_one_dynamics_case <- function(i,
 #'   `parallel_simulations`, `parallel_workers`, and
 #'   `initial_abundance_seed_base`. They can also include output-control options:
 #'   `save_dynamics`, `save_resources`, `dynamics_save_every`, and
-#'   `resources_save_every`. The save interval values are integers giving the
-#'   interval between saved output time points. `resources_save_every` defaults
-#'   to `dynamics_save_every`. Compact case and population summaries are always
-#'   written. `save_dynamics` and `save_resources` control only the diagnostic
-#'   SQLite outputs. `save_resources` only applies to
+#'   `resources_save_every`. They can also include `summary_checkpoint_every`
+#'   and `runtime_update_every`. The save interval values are integers giving
+#'   the interval between saved output time points. `resources_save_every`
+#'   defaults to `dynamics_save_every`. Compact case and population summaries
+#'   are checkpointed by the parent process every `summary_checkpoint_every`
+#'   completed cases and written again at the end. `save_dynamics` and
+#'   `save_resources` control only the diagnostic SQLite outputs.
+#'   `save_resources` only applies to
 #'   consumer-resource dynamics. When `parallel_simulations` evaluates to
 #'   `TRUE`, simulation cases are computed in parallel and SQLite tables are
 #'   still written serially by the parent process. Parallel processing is
@@ -338,6 +392,17 @@ simulate_dynamics <- function(experiment_folder,
   extinction_threshold <- as.numeric(get_design_value("extinction_threshold", 1e-8))
   if (is.na(extinction_threshold) || extinction_threshold < 0) {
     stop("`extinction_threshold` must evaluate to a non-negative number.", call. = FALSE)
+  }
+  summary_checkpoint_every <- as.integer(get_design_value("summary_checkpoint_every", 1))
+  if (is.na(summary_checkpoint_every) || summary_checkpoint_every < 1) {
+    stop("`summary_checkpoint_every` must evaluate to an integer >= 1.", call. = FALSE)
+  }
+  runtime_update_every <- as.integer(get_design_value(
+    "runtime_update_every",
+    max(1L, floor(nrow(expt) / 100))
+  ))
+  if (is.na(runtime_update_every) || runtime_update_every < 1) {
+    stop("`runtime_update_every` must evaluate to an integer >= 1.", call. = FALSE)
   }
   simulation_progress <- isTRUE(get_design_value("simulation_progress", verbose))
   parallel_simulations <- isTRUE(get_design_value("parallel_simulations", FALSE))
@@ -419,6 +484,8 @@ simulate_dynamics <- function(experiment_folder,
       "save_dynamics",
       "save_resources",
       "extinction_threshold",
+      "summary_checkpoint_every",
+      "runtime_update_every",
       "simulation_progress",
       "initial_abundance_seed_base",
       "parallel_simulations",
@@ -443,6 +510,8 @@ simulate_dynamics <- function(experiment_folder,
       save_dynamics,
       save_resources,
       extinction_threshold,
+      summary_checkpoint_every,
+      runtime_update_every,
       simulation_progress,
       initial_abundance_seed_metadata,
       parallel_simulations,
@@ -491,6 +560,9 @@ simulate_dynamics <- function(experiment_folder,
 
   progress_bar <- NULL
   completed_cases <- 0L
+  simulation_start_time <- Sys.time()
+  last_summary_checkpoint_completed <- 0L
+  last_runtime_update_completed <- 0L
   if (simulation_progress) {
     progress_bar <- utils::txtProgressBar(
       min = 0,
@@ -542,6 +614,64 @@ simulate_dynamics <- function(experiment_folder,
       )
       resources_table_written <<- TRUE
     }
+  }
+
+  checkpoint_summary_outputs <- function(force = FALSE) {
+    if (completed_cases == 0L) {
+      return(invisible(FALSE))
+    }
+    if (!force &&
+        completed_cases - last_summary_checkpoint_completed < summary_checkpoint_every) {
+      return(invisible(FALSE))
+    }
+
+    atomic_save_rds(dplyr::bind_rows(case_summaries), summaries_path)
+    atomic_save_rds(dplyr::bind_rows(population_summaries), population_summaries_path)
+    last_summary_checkpoint_completed <<- completed_cases
+
+    invisible(TRUE)
+  }
+
+  report_runtime_estimate <- function(force = FALSE) {
+    if (!verbose || completed_cases == 0L) {
+      return(invisible(FALSE))
+    }
+    if (force && last_runtime_update_completed == completed_cases) {
+      return(invisible(FALSE))
+    }
+    if (!force &&
+        completed_cases - last_runtime_update_completed < runtime_update_every &&
+        completed_cases < length(case_indices)) {
+      return(invisible(FALSE))
+    }
+
+    elapsed_seconds <- as.numeric(difftime(Sys.time(), simulation_start_time, units = "secs"))
+    seconds_per_case <- elapsed_seconds / completed_cases
+    remaining_cases <- length(case_indices) - completed_cases
+    remaining_seconds <- seconds_per_case * remaining_cases
+
+    if (!is.null(progress_bar)) {
+      cat("\n")
+    }
+    message(
+      "Runtime: ",
+      completed_cases,
+      "/",
+      length(case_indices),
+      " cases complete; elapsed ",
+      format_simulation_duration(elapsed_seconds),
+      "; estimated remaining ",
+      format_simulation_duration(remaining_seconds)
+    )
+    last_runtime_update_completed <<- completed_cases
+    invisible(TRUE)
+  }
+
+  record_case_completion <- function(case_result, case_index) {
+    write_case_result(case_result, case_index)
+    update_progress()
+    checkpoint_summary_outputs()
+    report_runtime_estimate()
   }
 
   if (parallel_simulations && parallel_workers > 1) {
@@ -599,16 +729,14 @@ simulate_dynamics <- function(experiment_folder,
             call. = FALSE
           )
         }
-        write_case_result(case_result, case_index)
+        record_case_completion(case_result, case_index)
         active_jobs[[active_name]] <- NULL
-        update_progress()
       }
     }
   } else {
     for (i in case_indices) {
       case_result <- simulate_case(i)
-      write_case_result(case_result, i)
-      update_progress()
+      record_case_completion(case_result, i)
     }
   }
 
@@ -628,9 +756,9 @@ simulate_dynamics <- function(experiment_folder,
     announce_output_written(output_path, verbose = verbose, label = "dynamics database")
   }
 
-  saveRDS(dplyr::bind_rows(case_summaries), summaries_path)
+  checkpoint_summary_outputs(force = TRUE)
+  report_runtime_estimate(force = TRUE)
   announce_output_written(summaries_path, verbose = verbose, label = "simulation summaries file")
-  saveRDS(dplyr::bind_rows(population_summaries), population_summaries_path)
   announce_output_written(population_summaries_path, verbose = verbose, label = "population summaries file")
 
 }

@@ -54,6 +54,18 @@ estimate_experiment_outputs <- function(experiment_folder, experiment_design_fil
   }
   save_dynamics <- isTRUE(get_json_design_value(expt_def, "save_dynamics", TRUE))
   save_resources <- isTRUE(get_json_design_value(expt_def, "save_resources", TRUE))
+  summary_checkpoint_every <- as.integer(get_json_design_value(expt_def, "summary_checkpoint_every", 1))
+  if (is.na(summary_checkpoint_every) || summary_checkpoint_every < 1) {
+    summary_checkpoint_every <- 1L
+  }
+  runtime_update_every <- as.integer(get_json_design_value(
+    expt_def,
+    "runtime_update_every",
+    max(1L, floor(nrow(expt) / 100))
+  ))
+  if (is.na(runtime_update_every) || runtime_update_every < 1) {
+    runtime_update_every <- 1L
+  }
   dynamics_type <- get_json_design_value(expt_def, "dynamics_type", "discrete")
   parallel_simulations <- isTRUE(get_json_design_value(expt_def, "parallel_simulations", FALSE))
   parallel_workers <- as.integer(get_json_design_value(
@@ -132,6 +144,8 @@ estimate_experiment_outputs <- function(experiment_folder, experiment_design_fil
     saved_resource_time_points = saved_resource_time_points,
     dynamics_save_every = dynamics_save_every,
     resources_save_every = resources_save_every,
+    summary_checkpoint_every = summary_checkpoint_every,
+    runtime_update_every = runtime_update_every,
     save_dynamics = save_dynamics,
     save_resources = save_resources && dynamics_type == "consumer_resource_continuous",
     dynamics_rows = dynamics_rows,
@@ -164,6 +178,8 @@ confirm_experiment_run <- function(summary) {
   if (summary$save_resources) {
     message("resources_save_every: ", summary$resources_save_every)
   }
+  message("summary_checkpoint_every: ", summary$summary_checkpoint_every)
+  message("runtime_update_every: ", summary$runtime_update_every)
   if (summary$save_dynamics) {
     message("Expected dynamics rows: ", format(summary$dynamics_rows, big.mark = ","))
   }
@@ -213,11 +229,13 @@ confirm_experiment_run <- function(summary) {
 #' @details The preflight summary estimates output rows, database sizes, and
 #'   runtime from the experiment table and design settings, including output
 #'   controls such as `save_dynamics`, `save_resources`,
-#'   `dynamics_save_every`, and `resources_save_every`. Confirmation happens
-#'   before environment generation, dynamics simulation, and analysis. These
-#'   estimates are intended as rough guidance before launching large
-#'   experiments. Compact simulation summaries are always written and are used
-#'   to calculate `community_measures.RDS` even when `save_dynamics = FALSE`.
+#'   `dynamics_save_every`, `resources_save_every`,
+#'   `summary_checkpoint_every`, and `runtime_update_every`. Confirmation
+#'   happens before environment generation, dynamics simulation, and analysis.
+#'   These estimates are intended as rough guidance before launching large
+#'   experiments. Compact simulation summaries are checkpointed during
+#'   simulation and are used to calculate `community_measures.RDS` even when
+#'   `save_dynamics = FALSE`.
 #'
 #' @return Invisibly returns a named list containing the experiment folder and
 #'   the main output file paths.

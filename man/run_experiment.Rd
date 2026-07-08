@@ -45,11 +45,13 @@ summary measures.
 The preflight summary estimates output rows, database sizes, and
 runtime from the experiment table and design settings, including output
 controls such as \code{save_dynamics}, \code{save_resources},
-\code{dynamics_save_every}, and \code{resources_save_every}. Confirmation
-happens before environment generation, dynamics simulation, and analysis. These
-estimates are intended as rough guidance before launching large experiments.
-Compact simulation summaries are always written and are used to calculate
-\code{community_measures.RDS} even when \code{save_dynamics = FALSE}.
+\code{dynamics_save_every}, \code{resources_save_every},
+\code{summary_checkpoint_every}, and \code{runtime_update_every}. Confirmation
+happens before environment generation, dynamics simulation, and analysis.
+These estimates are intended as rough guidance before launching large
+experiments. Compact simulation summaries are checkpointed during
+simulation and are used to calculate \code{community_measures.RDS} even when
+\code{save_dynamics = FALSE}.
 }
 \examples{
 NULL

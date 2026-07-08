@@ -27,9 +27,9 @@ Nothing. Saves data to a file.
 Get various community level measures, e.g., community stability, response diversity, position of optimal temperature, etc.
 }
 \details{
-If \code{simulation_summaries.RDS} is present, dynamic abundance summaries are
-read from that compact file. Otherwise, the function falls back to calculating
-those summaries from \code{dynamics.db}.
+If \code{simulation_summaries.RDS} is present, dynamic abundance
+summaries are read from that compact file. Otherwise, the function falls
+back to calculating those summaries from \code{dynamics.db}.
 }
 \examples{
 NULL
