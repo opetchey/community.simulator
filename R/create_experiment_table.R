@@ -5,6 +5,12 @@
 #' @param overwrite Logical. If `TRUE`, overwrite an existing experiment table.
 #' @param verbose Logical. If `TRUE`, print messages about written outputs.
 #'
+#' @details LV experiment definitions can use the preferred `lv_interactions`
+#'   field to specify one or more named interaction treatments. Each treatment
+#'   can set `type`, `symmetry`, `distribution`, `parameters`, and `diagonal`.
+#'   Legacy `alpha_ij_*` fields are still supported and are converted to
+#'   interaction specifications internally.
+#'
 #' @return Returns the number of cases in the experiment. Also saves to RDS the experiment design, for later use.
 #' @importFrom rlang .data
 #' @export
@@ -45,6 +51,145 @@ create_experiment_table <- function(experiment_folder,
   number_of_species <- expt_def$number_of_species_treatment
   if (is.null(number_of_species)) {
     number_of_species <- expt_def$number_of_species
+  }
+
+  evaluate_design_value <- function(value) {
+    if (is.expression(value)) {
+      return(eval(value))
+    }
+    value
+  }
+
+  as_lv_interaction_spec_list <- function(value) {
+    is_missing_value <- function(x) {
+      length(x) == 0 || (length(x) == 1 && is.atomic(x) && is.na(x))
+    }
+    drop_missing <- function(x) {
+      x[!vapply(x, is_missing_value, logical(1))]
+    }
+
+    if (is.list(value) && length(value) == 1 && is.data.frame(value[[1]])) {
+      value <- value[[1]]
+    }
+    if (is.data.frame(value)) {
+      return(lapply(seq_len(nrow(value)), function(i) {
+        spec <- lapply(names(value), function(name) {
+          column <- value[[name]]
+          if (is.data.frame(column)) {
+            return(drop_missing(as.list(column[i, , drop = FALSE])))
+          }
+          column[[i]]
+        })
+        names(spec) <- names(value)
+        spec <- lapply(spec, function(x) {
+          if (is.list(x) && length(x) == 1 && !is.data.frame(x)) {
+            x[[1]]
+          } else {
+            x
+          }
+        })
+        drop_missing(spec)
+      }))
+    }
+    if (is.list(value) && length(value) > 0 && !is.null(names(value))) {
+      return(list(value))
+    }
+    if (is.list(value)) {
+      return(value)
+    }
+    stop("`lv_interactions` must evaluate to a list of interaction specifications.", call. = FALSE)
+  }
+
+  create_lv_interaction_treatments <- function() {
+    if (!is.null(expt_def$lv_interactions)) {
+      interaction_specs <- as_lv_interaction_spec_list(
+        evaluate_design_value(expt_def$lv_interactions)
+      )
+      alpha_jj_default <- if (is.null(expt_def$alpha_jj)) 1 else eval(expt_def$alpha_jj)
+
+      interaction_specs <- lapply(seq_along(interaction_specs), function(i) {
+        spec <- as.list(interaction_specs[[i]])
+        if (is.null(spec$diagonal)) {
+          spec$diagonal <- alpha_jj_default
+        }
+        if (is.null(spec$label)) {
+          spec$label <- paste0("interaction_", i)
+        }
+        spec
+      })
+
+      return(tibble::tibble(
+        lv_interaction_label = vapply(
+          interaction_specs,
+          function(spec) as.character(spec$label %||% ""),
+          character(1)
+        ),
+        lv_interaction_type = vapply(
+          interaction_specs,
+          function(spec) as.character(spec$type %||% "competition"),
+          character(1)
+        ),
+        lv_interaction_symmetry = vapply(
+          interaction_specs,
+          function(spec) as.character(spec$symmetry %||% "asymmetric"),
+          character(1)
+        ),
+        lv_interaction_distribution = vapply(
+          interaction_specs,
+          function(spec) as.character(spec$distribution %||% "constant"),
+          character(1)
+        ),
+        lv_interaction_spec = interaction_specs
+      ))
+    }
+
+    alpha_jj <- eval(expt_def$alpha_jj)
+    legacy_interactions <- expand.grid(
+      alpha_ij_distribution = eval(expt_def$alpha_ij_distribution),
+      alpha_ij_mean = eval(expt_def$alpha_ij_mean_treatment),
+      alpha_ij_sd = eval(expt_def$alpha_ij_sd_treatment)
+    )
+    legacy_specs <- Map(
+      function(alpha_ij_mean, alpha_ij_sd, alpha_ij_distribution) {
+        make_legacy_lv_interaction_spec(
+          alpha_ij_mean = alpha_ij_mean,
+          alpha_ij_sd = alpha_ij_sd,
+          alpha_jj = alpha_jj,
+          alpha_ij_distribution = alpha_ij_distribution
+        )
+      },
+      alpha_ij_mean = legacy_interactions$alpha_ij_mean,
+      alpha_ij_sd = legacy_interactions$alpha_ij_sd,
+      alpha_ij_distribution = legacy_interactions$alpha_ij_distribution
+    )
+
+    tibble::as_tibble(legacy_interactions) |>
+      dplyr::mutate(
+        lv_interaction_label = paste0(
+          "legacy_",
+          .data$alpha_ij_distribution,
+          "_mean_",
+          .data$alpha_ij_mean,
+          "_spread_",
+          .data$alpha_ij_sd
+        ),
+        lv_interaction_type = vapply(
+          legacy_specs,
+          function(spec) as.character(spec$type %||% "competition"),
+          character(1)
+        ),
+        lv_interaction_symmetry = vapply(
+          legacy_specs,
+          function(spec) as.character(spec$symmetry %||% "asymmetric"),
+          character(1)
+        ),
+        lv_interaction_distribution = vapply(
+          legacy_specs,
+          function(spec) as.character(spec$distribution %||% "constant"),
+          character(1)
+        ),
+        lv_interaction_spec = legacy_specs
+      )
   }
 
   if (dynamics_type == "consumer_resource_continuous") {
@@ -158,6 +303,8 @@ create_experiment_table <- function(experiment_folder,
     return(paste("Number of simulations in experiment is", nrow(expt)))
   }
 
+  lv_interaction_treatments <- create_lv_interaction_treatments()
+
   expt <- expand.grid(a_b_mean = eval(expt_def$a_b_mean_treatment),
                       a_b_range = eval(expt_def$a_b_range_treatment),
                       a_b_distribution = eval(expt_def$a_b_distribution),
@@ -170,9 +317,7 @@ create_experiment_table <- function(experiment_folder,
                       sd_perf_mean=eval(expt_def$sd_perf_mean),
                       sd_perf_range=eval(expt_def$sd_perf_range),
 
-                      alpha_ij_distribution = eval(expt_def$alpha_ij_distribution),
-                      alpha_ij_mean = eval(expt_def$alpha_ij_mean_treatment),
-                      alpha_ij_sd = eval(expt_def$alpha_ij_sd_treatment),
+                      lv_interaction_row = seq_len(nrow(lv_interaction_treatments)),
 
                       community_replicate = 1:eval(expt_def$number_of_community_replicates),
 
@@ -183,6 +328,11 @@ create_experiment_table <- function(experiment_folder,
                       temperature_replicate = 1:eval(expt_def$number_of_environment_replicates),
 
                       richness = eval(number_of_species)) |>
+    dplyr::left_join(
+      lv_interaction_treatments |>
+        dplyr::mutate(lv_interaction_row = dplyr::row_number()),
+      by = "lv_interaction_row"
+    ) |>
     dplyr::mutate(
       env_series_id = paste0("env_series_", temperature_mean, "_",
                              temperature_sd, "_",
@@ -197,9 +347,7 @@ create_experiment_table <- function(experiment_folder,
                             sd_perf_distribution, "_",
                             sd_perf_mean, "_",
                             sd_perf_range, "_",
-                            alpha_ij_distribution, "_",
-                            alpha_ij_mean, "_",
-                            alpha_ij_sd, "_",
+                            lv_interaction_label, "_",
                             community_replicate, "_",
                             richness),
       case_id = paste0("case_id_", dplyr::row_number())
@@ -231,7 +379,6 @@ create_experiment_table <- function(experiment_folder,
   #a_b <- eval(expt_def$a_b)
   a_d <- eval(expt_def$a_d)
   z <- eval(expt_def$z)
-  alpha_jj <- eval(expt_def$alpha_jj)
 
   community_object <- expt |>
     dplyr::mutate(case_id = dplyr::row_number()) |>
@@ -252,15 +399,11 @@ create_experiment_table <- function(experiment_folder,
                                            sd_perf_mean = .$sd_perf_mean,
                                            sd_perf_range = .$sd_perf_range,
 
-                                           alpha_ij_mean = .$alpha_ij_mean,
-                                           alpha_ij_sd = .$alpha_ij_sd,
-
                                            community_seed = .$community_seed,
 
                                            a_d = a_d,
                                            z = z,
-                                           alpha_jj = alpha_jj,
-                                           alpha_ij_distribution = .$alpha_ij_distribution
+                                           lv_interaction_spec = .$lv_interaction_spec
     ))
 
   expt <- cbind(expt, community_object)

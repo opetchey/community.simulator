@@ -16,9 +16,24 @@
     "sd_perf_mean": "c(10)",
     "sd_perf_range": "c(0)",
 
-    "alpha_ij_distribution": "c(\"random_uniform\")",
-    "alpha_ij_mean_treatment": 0,
-    "alpha_ij_sd_treatment": "c(0.2)",
+    "lv_interactions": [
+      {
+        "label": "no_interactions",
+        "type": "none",
+        "diagonal": 1
+      },
+      {
+        "label": "weak_asymmetric_competition",
+        "type": "competition",
+        "symmetry": "asymmetric",
+        "distribution": "uniform",
+        "parameters": {
+          "min": 0,
+          "max": 0.2
+        },
+        "diagonal": 1
+      }
+    ],
 
     "number_of_community_replicates": 1,
 
@@ -34,7 +49,6 @@
 
     "a_d": 0,
     "z": 0.05,
-    "alpha_jj": 1,
 
     "temperature_interpolation": "\"linear\"",
     "immigration_rate": 0.1,

@@ -46,3 +46,12 @@ require_dbplyr <- function() {
 
   invisible(TRUE)
 }
+
+#' @keywords internal
+`%||%` <- function(x, y) {
+  if (is.null(x)) {
+    y
+  } else {
+    x
+  }
+}

@@ -15,13 +15,14 @@ make_a_community(
   sd_perf_distribution,
   sd_perf_mean,
   sd_perf_range,
-  alpha_ij_mean,
-  alpha_ij_sd,
+  alpha_ij_mean = NULL,
+  alpha_ij_sd = NULL,
   community_seed,
   a_d,
   z,
-  alpha_jj,
-  alpha_ij_distribution
+  alpha_jj = 1,
+  alpha_ij_distribution = NULL,
+  lv_interaction_spec = NULL
 )
 }
 \arguments{
@@ -48,9 +49,11 @@ performance-curve widths are drawn.}
 \item{sd_perf_range}{Range of the distribution from which Gaussian
 performance-curve widths are drawn.}
 
-\item{alpha_ij_mean}{Mean of the distribution from which the off-diagonal elements of the community matrix are drawn.}
+\item{alpha_ij_mean}{Deprecated. Mean used by the legacy interaction
+generator.}
 
-\item{alpha_ij_sd}{Standard deviation of the distribution from which the off-diagonal elements of the community matrix are drawn.}
+\item{alpha_ij_sd}{Deprecated. Spread used by the legacy interaction
+generator.}
 
 \item{community_seed}{Random seed used when generating community traits.}
 
@@ -60,7 +63,15 @@ performance-curve widths are drawn.}
 
 \item{alpha_jj}{Value of the diagonal of the community matrix, shared across species.}
 
-\item{alpha_ij_distribution}{Distribution used to generate off-diagonal interaction coefficients.}
+\item{alpha_ij_distribution}{Deprecated. Distribution used by the legacy
+interaction generator.}
+
+\item{lv_interaction_spec}{Optional named list specifying LV interactions.
+Preferred over legacy \verb{alpha_ij_*} arguments. Fields include \code{type}
+(\code{"none"}, \code{"competition"}, \code{"any"}, or \code{"predator_prey"}), \code{symmetry}
+(\code{"asymmetric"}, \code{"symmetric"}, or \code{"antisymmetric"}), \code{distribution}
+(\code{"constant"}, \code{"uniform"}, \code{"normal"}, \code{"lognormal"}, or \code{"gamma"}),
+\code{parameters}, and \code{diagonal}.}
 }
 \value{
 Returns a list containing the community object.

@@ -2,7 +2,10 @@
 % Please edit documentation in R/read_experiment_design_json.R
 \name{read_experiment_design_json}
 \alias{read_experiment_design_json}
-\title{Read in the JSON formatted text file that contains the experiment design. All values in the JSON file must be expressions that can be evaluated (using the \code{eval} function) to get the values of the experiment design.}
+\title{Read in the JSON formatted text file that contains the experiment design.
+Most scalar values in the JSON file are expressions that can be evaluated
+with \code{eval()} to get the values of the experiment design. Structured values,
+such as list-based interaction specifications, are returned as-is.}
 \usage{
 read_experiment_design_json(experiment_folder, experiment_design_filename)
 }
@@ -12,10 +15,13 @@ read_experiment_design_json(experiment_folder, experiment_design_filename)
 \item{experiment_design_filename}{The name of the file that contains the experiment design. This file should be in the experiment_folder and should be a JSON file. The JSON file should contain a list of expressions that can be evaluated to get the values of the experiment design.}
 }
 \value{
-Returns a named list of expressions that can be evaluated to get the values of the experiment design
+Returns a named list of expressions or structured values.
 }
 \description{
-Read in the JSON formatted text file that contains the experiment design. All values in the JSON file must be expressions that can be evaluated (using the \code{eval} function) to get the values of the experiment design.
+Read in the JSON formatted text file that contains the experiment design.
+Most scalar values in the JSON file are expressions that can be evaluated
+with \code{eval()} to get the values of the experiment design. Structured values,
+such as list-based interaction specifications, are returned as-is.
 }
 \examples{
 NULL

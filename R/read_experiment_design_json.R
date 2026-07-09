@@ -1,9 +1,12 @@
-#' Read in the JSON formatted text file that contains the experiment design. All values in the JSON file must be expressions that can be evaluated (using the `eval` function) to get the values of the experiment design.
+#' Read in the JSON formatted text file that contains the experiment design.
+#' Most scalar values in the JSON file are expressions that can be evaluated
+#' with `eval()` to get the values of the experiment design. Structured values,
+#' such as list-based interaction specifications, are returned as-is.
 #'
 #' @param experiment_folder The folder where the experiment information is located
 #' @param experiment_design_filename The name of the file that contains the experiment design. This file should be in the experiment_folder and should be a JSON file. The JSON file should contain a list of expressions that can be evaluated to get the values of the experiment design.
 #'
-#' @return Returns a named list of expressions that can be evaluated to get the values of the experiment design
+#' @return Returns a named list of expressions or structured values.
 #' @export
 #'
 #' @examples NULL
@@ -25,7 +28,9 @@ read_experiment_design_json <- function(experiment_folder, experiment_design_fil
   expt_def <- jsonlite::fromJSON(design_path)
 
   for(i in 1:length(expt_def)) {
-    expt_def[[i]] <- parse(text = expt_def[[i]])
+    if (is.atomic(expt_def[[i]]) && length(expt_def[[i]]) == 1) {
+      expt_def[[i]] <- parse(text = as.character(expt_def[[i]]))
+    }
   }
 
   return(expt_def)
