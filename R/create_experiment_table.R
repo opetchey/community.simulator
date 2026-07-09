@@ -218,6 +218,22 @@ create_experiment_table <- function(experiment_folder,
       resource_use_mode = eval(expt_def$resource_use_mode),
       active_resource = eval_or_default("active_resource", 1),
       resource_specialization = eval_or_default("resource_specialization", 1),
+      resource_specialization_distribution = eval_or_default(
+        "resource_specialization_distribution",
+        "constant"
+      ),
+      resource_specialization_mean = eval_or_default(
+        "resource_specialization_mean",
+        eval_or_default("resource_specialization", 1)
+      ),
+      resource_specialization_range = eval_or_default(
+        "resource_specialization_range",
+        0
+      ),
+      resource_specialization_precision = eval_or_default(
+        "resource_specialization_precision",
+        10
+      ),
 
       community_replicate = 1:eval(expt_def$number_of_community_replicates),
 
@@ -247,7 +263,10 @@ create_experiment_table <- function(experiment_folder,
                               .data$resource_supply, "_",
                               .data$resource_use_mode, "_",
                               .data$active_resource, "_",
-                              .data$resource_specialization, "_",
+                              .data$resource_specialization_distribution, "_",
+                              .data$resource_specialization_mean, "_",
+                              .data$resource_specialization_range, "_",
+                              .data$resource_specialization_precision, "_",
                               .data$community_replicate, "_",
                               .data$richness),
         case_id = paste0("case_id_", dplyr::row_number()),
@@ -292,6 +311,10 @@ create_experiment_table <- function(experiment_folder,
         resource_use_mode = .$resource_use_mode,
         active_resource = .$active_resource,
         resource_specialization = .$resource_specialization,
+        resource_specialization_distribution = .$resource_specialization_distribution,
+        resource_specialization_mean = .$resource_specialization_mean,
+        resource_specialization_range = .$resource_specialization_range,
+        resource_specialization_precision = .$resource_specialization_precision,
         community_seed = .$community_seed
       ))
 

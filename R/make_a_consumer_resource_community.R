@@ -26,9 +26,19 @@
 #' @param active_resource Active resource index for
 #'   `"one_resource_all_consumers"` or shared resource index for
 #'   `"shared_to_private"`.
-#' @param resource_specialization Value between 0 and 1 controlling the
-#'   transition from shared-resource use to private-resource use when
-#'   `resource_use_mode = "shared_to_private"`.
+#' @param resource_specialization Backwards-compatible scalar value between 0
+#'   and 1 controlling the transition from shared-resource use to private-
+#'   resource use when `resource_use_mode = "shared_to_private"`.
+#' @param resource_specialization_distribution Distribution used to generate
+#'   species-level shared-private partition values. One of `"constant"`,
+#'   `"regular"`, `"random_uniform"`, or `"beta"`.
+#' @param resource_specialization_mean Mean species-level private-resource
+#'   specialization.
+#' @param resource_specialization_range Range for `"regular"` and
+#'   `"random_uniform"` species-level private-resource specialization.
+#' @param resource_specialization_precision Precision for beta-distributed
+#'   species-level private-resource specialization. Larger values produce less
+#'   among-species variation around `resource_specialization_mean`.
 #' @param community_seed Random seed used when generating community traits.
 #'
 #' @return A consumer-resource community parameter object.
@@ -55,6 +65,10 @@ make_a_consumer_resource_community <- function(S,
                                                resource_use_mode = "one_resource_all_consumers",
                                                active_resource = 1,
                                                resource_specialization = 1,
+                                               resource_specialization_distribution = "constant",
+                                               resource_specialization_mean = resource_specialization,
+                                               resource_specialization_range = 0,
+                                               resource_specialization_precision = 10,
                                                community_seed) {
 
   draw_values <- function(n, mean, range, distribution) {
@@ -75,6 +89,67 @@ make_a_consumer_resource_community <- function(S,
     }
   }
 
+  draw_resource_specialization <- function(n,
+                                           mean,
+                                           range,
+                                           distribution,
+                                           precision) {
+    if (distribution %in% c("constant", "regular", "random_uniform")) {
+      lower <- mean - 0.5 * range
+      upper <- mean + 0.5 * range
+      if (lower < 0 || upper > 1) {
+        stop(
+          "`resource_specialization_mean +/- 0.5 * resource_specialization_range` ",
+          "must stay within [0, 1].",
+          call. = FALSE
+        )
+      }
+    }
+
+    if (distribution == "constant") {
+      values <- rep(mean, n)
+    } else if (distribution == "regular") {
+      values <- seq(
+        from = mean - 0.5 * range,
+        to = mean + 0.5 * range,
+        length.out = n
+      )
+    } else if (distribution == "random_uniform") {
+      values <- stats::runif(
+        n,
+        min = mean - 0.5 * range,
+        max = mean + 0.5 * range
+      )
+    } else if (distribution == "beta") {
+      if (!is.numeric(mean) || length(mean) != 1 ||
+          !is.finite(mean) || mean <= 0 || mean >= 1) {
+        stop("Beta resource specialization requires `0 < mean < 1`.", call. = FALSE)
+      }
+      if (!is.numeric(precision) || length(precision) != 1 ||
+          !is.finite(precision) || precision <= 0) {
+        stop("Beta resource specialization requires `precision > 0`.", call. = FALSE)
+      }
+      values <- stats::rbeta(
+        n,
+        shape1 = mean * precision,
+        shape2 = (1 - mean) * precision
+      )
+    } else {
+      stop(
+        "Unsupported resource specialization distribution: ",
+        distribution,
+        call. = FALSE
+      )
+    }
+
+    values <- as.numeric(values)
+    if (length(values) != n || any(!is.finite(values)) ||
+        any(values < 0) || any(values > 1)) {
+      stop("Species-level resource specialization values must be in [0, 1].", call. = FALSE)
+    }
+    values
+  }
+
   set.seed(community_seed)
 
   if (resource_use_mode == "shared_to_private") {
@@ -87,13 +162,13 @@ make_a_consumer_resource_community <- function(S,
   if (active_resource < 1 || active_resource > R) {
     stop("`active_resource` must be between 1 and the number of resources.", call. = FALSE)
   }
-  if (!is.numeric(resource_specialization) ||
-      length(resource_specialization) != 1 ||
-      !is.finite(resource_specialization) ||
-      resource_specialization < 0 ||
-      resource_specialization > 1) {
-    stop("`resource_specialization` must be a single value between 0 and 1.", call. = FALSE)
-  }
+  resource_specialization_i <- draw_resource_specialization(
+    n = S,
+    mean = resource_specialization_mean,
+    range = resource_specialization_range,
+    distribution = resource_specialization_distribution,
+    precision = resource_specialization_precision
+  )
 
   u_max_i <- draw_values(S, u_max_mean, u_max_range, u_max_distribution)
   u_opt_i <- draw_values(S, u_opt_mean, u_opt_range, u_opt_distribution)
@@ -120,8 +195,8 @@ make_a_consumer_resource_community <- function(S,
     diag(resource_use_ij) <- 1
   } else if (resource_use_mode == "shared_to_private") {
     private_resources <- setdiff(seq_len(R), active_resource)
-    resource_use_ij[, active_resource] <- 1 - resource_specialization
-    resource_use_ij[cbind(seq_len(S), private_resources)] <- resource_specialization
+    resource_use_ij[, active_resource] <- 1 - resource_specialization_i
+    resource_use_ij[cbind(seq_len(S), private_resources)] <- resource_specialization_i
   } else {
     stop("Unsupported resource-use mode: ", resource_use_mode, call. = FALSE)
   }
@@ -156,7 +231,12 @@ make_a_consumer_resource_community <- function(S,
     K_R_j = K_R_j,
     resource_use_mode = resource_use_mode,
     active_resource = active_resource,
-    resource_specialization = resource_specialization,
+    resource_specialization = resource_specialization_i,
+    resource_specialization_i = resource_specialization_i,
+    resource_specialization_distribution = resource_specialization_distribution,
+    resource_specialization_mean = resource_specialization_mean,
+    resource_specialization_range = resource_specialization_range,
+    resource_specialization_precision = resource_specialization_precision,
     u_max_i = u_max_i,
     u_opt_i = u_opt_i,
     sd_u_i = sd_u_i,

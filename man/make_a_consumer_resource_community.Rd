@@ -25,6 +25,10 @@ make_a_consumer_resource_community(
   resource_use_mode = "one_resource_all_consumers",
   active_resource = 1,
   resource_specialization = 1,
+  resource_specialization_distribution = "constant",
+  resource_specialization_mean = resource_specialization,
+  resource_specialization_range = 0,
+  resource_specialization_precision = 10,
   community_seed
 )
 }
@@ -74,9 +78,23 @@ growth.}
 \code{"one_resource_all_consumers"} or shared resource index for
 \code{"shared_to_private"}.}
 
-\item{resource_specialization}{Value between 0 and 1 controlling the
-transition from shared-resource use to private-resource use when
-\code{resource_use_mode = "shared_to_private"}.}
+\item{resource_specialization}{Backwards-compatible scalar value between 0
+and 1 controlling the transition from shared-resource use to private-
+resource use when \code{resource_use_mode = "shared_to_private"}.}
+
+\item{resource_specialization_distribution}{Distribution used to generate
+species-level shared-private partition values. One of \code{"constant"},
+\code{"regular"}, \code{"random_uniform"}, or \code{"beta"}.}
+
+\item{resource_specialization_mean}{Mean species-level private-resource
+specialization.}
+
+\item{resource_specialization_range}{Range for \code{"regular"} and
+\code{"random_uniform"} species-level private-resource specialization.}
+
+\item{resource_specialization_precision}{Precision for beta-distributed
+species-level private-resource specialization. Larger values produce less
+among-species variation around \code{resource_specialization_mean}.}
 
 \item{community_seed}{Random seed used when generating community traits.}
 }

@@ -25,8 +25,11 @@
     "resource_supply_treatment": "c(1000)",
     "conversion_efficiency": "c(1)",
 
-    "resource_use_mode": "c(\"one_resource_all_consumers\")",
+    "resource_use_mode": "c(\"shared_to_private\")",
     "active_resource": 1,
+    "resource_specialization_distribution": "c(\"beta\")",
+    "resource_specialization_mean": "c(0.7)",
+    "resource_specialization_precision": "c(10)",
 
     "number_of_community_replicates": 1,
 
