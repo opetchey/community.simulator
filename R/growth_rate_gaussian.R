@@ -2,7 +2,7 @@
 #'
 #' @param a_b_i Value of birth rate when temperature is equal to b_opt_i
 #' @param b_opt_i Temperature at which birth rate is maximized
-#' @param s_i Spread of the Gaussian curve
+#' @param s_i Standard-deviation width of the Gaussian birth-rate curve.
 #' @param a_d_i Value of death rate when temperature is equal to 0
 #' @param z_i Slope of the exponential curve
 #' @param temperature Temperature at which to calculate the intrinsic growth rate
@@ -18,7 +18,7 @@ intrinsic_growth_gaussian <- function(a_b_i,
                                    z_i,
                                    temperature)
 {
-  b0 <- a_b_i * exp(-(temperature - b_opt_i)^2 / s_i)
+  b0 <- a_b_i * exp(-0.5 * ((temperature - b_opt_i) / s_i)^2)
   d0 <- a_d_i * exp(z_i * temperature)
   b0 - d0
 

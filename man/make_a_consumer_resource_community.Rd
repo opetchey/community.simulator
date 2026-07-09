@@ -45,11 +45,12 @@ number of resources is \code{S + 1}.}
 
 \item{u_opt_distribution}{Distribution for thermal optima.}
 
-\item{sd_u_mean}{Mean Gaussian uptake breadth.}
+\item{sd_u_mean}{Mean standard-deviation width of the Gaussian uptake curve.}
 
-\item{sd_u_range}{Range of Gaussian uptake breadths.}
+\item{sd_u_range}{Range of standard-deviation widths for Gaussian uptake
+curves.}
 
-\item{sd_u_distribution}{Distribution for Gaussian uptake breadths.}
+\item{sd_u_distribution}{Distribution for Gaussian uptake-curve widths.}
 
 \item{half_saturation_mean}{Mean Monod half-saturation constant.}
 

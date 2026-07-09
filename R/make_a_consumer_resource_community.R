@@ -9,9 +9,10 @@
 #' @param u_opt_mean Mean thermal optimum for maximum uptake.
 #' @param u_opt_range Range of thermal optima.
 #' @param u_opt_distribution Distribution for thermal optima.
-#' @param sd_u_mean Mean Gaussian uptake breadth.
-#' @param sd_u_range Range of Gaussian uptake breadths.
-#' @param sd_u_distribution Distribution for Gaussian uptake breadths.
+#' @param sd_u_mean Mean standard-deviation width of the Gaussian uptake curve.
+#' @param sd_u_range Range of standard-deviation widths for Gaussian uptake
+#'   curves.
+#' @param sd_u_distribution Distribution for Gaussian uptake-curve widths.
 #' @param half_saturation_mean Mean Monod half-saturation constant.
 #' @param half_saturation_range Range of half-saturation constants.
 #' @param half_saturation_distribution Distribution for half-saturation constants.
@@ -166,7 +167,8 @@ make_a_consumer_resource_community <- function(S,
     # Compatibility fields for expected consumer growth curves used in CPC summaries.
     a_b_i = e_i * active_u_max_i,
     b_opt_i = u_opt_i,
-    s_i = 2 * sd_u_i^2,
+    sd_perf_i = sd_u_i,
+    s_i = sd_u_i,
     a_d_i = d_i,
     z_i = rep(0, S)
   )

@@ -12,11 +12,13 @@
 #' @param b_opt_mean Mean of the distribution from which `b_opt_i` values are drawn.
 #' @param b_opt_range Range of the distribution from which `b_opt_i` values are drawn.
 #' @param b_opt_distribution Distribution used to generate `b_opt_i` values.
-#' @param sd_perf_distribution Distribution used to generate `s_i` values.
-#' @param sd_perf_mean Mean of the distribution from which `s_i` values are drawn.
-#' @param sd_perf_range Range of the distribution from which `s_i` values are drawn.
+#' @param sd_perf_distribution Distribution used to generate Gaussian
+#'   performance-curve widths.
+#' @param sd_perf_mean Mean of the distribution from which Gaussian
+#'   performance-curve widths are drawn.
+#' @param sd_perf_range Range of the distribution from which Gaussian
+#'   performance-curve widths are drawn.
 #' @param community_seed Random seed used when generating community traits.
-#' @param s Standard deviation of the Gaussian birth rate - temperature response curve; same for all species.
 #' @param a_d Death rate when temperature is equal to 0; same for all species.
 #' @param z Exponential rate of increase in death rate with temperature; same for all species.
 #' @param alpha_ij_mean Mean of the distribution from which the off-diagonal elements of the community matrix are drawn.
@@ -47,7 +49,6 @@ make_a_community <- function(S,
 
                              community_seed,
 
-                             s,
                              a_d,
                              z,
                              alpha_jj,
@@ -84,12 +85,22 @@ make_a_community <- function(S,
 
 
 
-  ## standard deviation of the Gaussian birth rate - temperature response curve
+  ## standard-deviation width of the Gaussian birth rate - temperature response curve
   ## not same for all species
   if(sd_perf_distribution == "random_uniform") {
     #set.seed(a_b_realisation_seed)
-    s_i <- stats::runif(S, min= sd_perf_mean - (0.5*sd_perf_range),
-                        max = sd_perf_mean + (0.5*sd_perf_range))
+    sd_perf_i <- stats::runif(S, min= sd_perf_mean - (0.5*sd_perf_range),
+                              max = sd_perf_mean + (0.5*sd_perf_range))
+  }
+  if(sd_perf_distribution == "regular") {
+    sd_perf_i <- seq(length.out = S, from = sd_perf_mean - (0.5*sd_perf_range),
+                     to = sd_perf_mean + (0.5*sd_perf_range))
+  }
+  if(!sd_perf_distribution %in% c("random_uniform", "regular")) {
+    stop("Unsupported performance-curve width distribution: ", sd_perf_distribution, call. = FALSE)
+  }
+  if (any(sd_perf_i <= 0)) {
+    stop("All performance-curve width values must be positive.", call. = FALSE)
   }
 
 
@@ -119,7 +130,8 @@ make_a_community <- function(S,
   community_pars_object <- list(S = S,
                                 a_b_i = a_b_i,
                                 b_opt_i = b_opt_i,
-                                s_i = s_i,
+                                sd_perf_i = sd_perf_i,
+                                s_i = sd_perf_i,
                                 a_d_i = a_d_i,
                                 z_i = z_i,
                                 alpha_ij = alpha_ij)

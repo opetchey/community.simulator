@@ -34,6 +34,15 @@ Create temperature times series. Currently three options for how times series va
 \item \code{all_different} all environmental time series are different
 }
 }
+\details{
+Experiment JSON files can optionally include
+\code{parallel_environments}, \code{parallel_simulations}, \code{parallel_workers},
+\code{environment_progress}, and \code{runtime_update_every}. When
+\code{parallel_environments} evaluates to \code{TRUE}, or when it is absent and
+\code{parallel_simulations} evaluates to \code{TRUE}, environmental time series are
+generated in parallel and SQLite tables are still written serially by the
+parent process. Parallel processing is intended for macOS/Linux.
+}
 \examples{
 NULL
 }

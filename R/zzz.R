@@ -52,6 +52,7 @@ utils::globalVariables(
     "s_i",
     "sd_igr_info",
     "sd_igr_naive",
+    "sd_perf_i",
     "sd_perf_distribution",
     "sd_perf_mean",
     "sd_perf_range",

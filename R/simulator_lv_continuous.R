@@ -47,7 +47,10 @@ simulator_lv_continuous <- function(input_com_params,
   S <- input_com_params$S
   al <- input_com_params$alpha_ij
   bopt <- input_com_params$b_opt_i
-  spread <- input_com_params$s_i
+  spread <- input_com_params$sd_perf_i
+  if (is.null(spread)) {
+    spread <- input_com_params$s_i
+  }
   ab <- input_com_params$a_b_i
   ad <- input_com_params$a_d_i
   z <- input_com_params$z_i
@@ -88,7 +91,7 @@ simulator_lv_continuous <- function(input_com_params,
     Nt <- pmax(as.numeric(state), 0)
     Tcel <- temperature_at_time(t)
 
-    b0 <- ab * exp(-(Tcel - bopt)^2 / spread)
+    b0 <- ab * exp(-0.5 * ((Tcel - bopt) / spread)^2)
     d0 <- ad * exp(z * Tcel)
     rms <- b0 - d0 + 1e-6
     K <- rms / (bet + delt)

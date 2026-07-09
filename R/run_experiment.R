@@ -68,6 +68,11 @@ estimate_experiment_outputs <- function(experiment_folder, experiment_design_fil
   }
   dynamics_type <- get_json_design_value(expt_def, "dynamics_type", "discrete")
   parallel_simulations <- isTRUE(get_json_design_value(expt_def, "parallel_simulations", FALSE))
+  parallel_environments <- isTRUE(get_json_design_value(
+    expt_def,
+    "parallel_environments",
+    parallel_simulations
+  ))
   parallel_workers <- as.integer(get_json_design_value(
     expt_def,
     "parallel_workers",
@@ -151,6 +156,7 @@ estimate_experiment_outputs <- function(experiment_folder, experiment_design_fil
     dynamics_rows = dynamics_rows,
     resource_rows = resource_rows,
     temperature_rows = temperature_rows,
+    parallel_environments = parallel_environments,
     parallel_simulations = parallel_simulations,
     parallel_workers = parallel_workers,
     estimated_dynamics_db_bytes = estimated_dynamics_db_bytes,
@@ -196,8 +202,10 @@ confirm_experiment_run <- function(summary) {
   message("Estimated temperatures.db size: ", format_bytes(summary$estimated_temperatures_db_bytes))
   message("Estimated total DB size: ", format_bytes(summary$estimated_total_db_bytes))
   message("Estimated runtime: ", format_duration(summary$estimated_total_seconds))
-  if (summary$parallel_simulations) {
+  if (summary$parallel_environments || summary$parallel_simulations) {
     message("Parallel workers: ", summary$parallel_workers)
+    message("Parallel environment generation: ", summary$parallel_environments)
+    message("Parallel simulations: ", summary$parallel_simulations)
   } else {
     message("Parallel workers: not enabled")
   }

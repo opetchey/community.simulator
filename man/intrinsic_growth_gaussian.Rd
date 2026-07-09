@@ -11,7 +11,7 @@ intrinsic_growth_gaussian(a_b_i, b_opt_i, s_i, a_d_i, z_i, temperature)
 
 \item{b_opt_i}{Temperature at which birth rate is maximized}
 
-\item{s_i}{Spread of the Gaussian curve}
+\item{s_i}{Standard-deviation width of the Gaussian birth-rate curve.}
 
 \item{a_d_i}{Value of death rate when temperature is equal to 0}
 

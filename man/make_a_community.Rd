@@ -18,7 +18,6 @@ make_a_community(
   alpha_ij_mean,
   alpha_ij_sd,
   community_seed,
-  s,
   a_d,
   z,
   alpha_jj,
@@ -40,19 +39,20 @@ make_a_community(
 
 \item{b_opt_distribution}{Distribution used to generate \code{b_opt_i} values.}
 
-\item{sd_perf_distribution}{Distribution used to generate \code{s_i} values.}
+\item{sd_perf_distribution}{Distribution used to generate Gaussian
+performance-curve widths.}
 
-\item{sd_perf_mean}{Mean of the distribution from which \code{s_i} values are drawn.}
+\item{sd_perf_mean}{Mean of the distribution from which Gaussian
+performance-curve widths are drawn.}
 
-\item{sd_perf_range}{Range of the distribution from which \code{s_i} values are drawn.}
+\item{sd_perf_range}{Range of the distribution from which Gaussian
+performance-curve widths are drawn.}
 
 \item{alpha_ij_mean}{Mean of the distribution from which the off-diagonal elements of the community matrix are drawn.}
 
 \item{alpha_ij_sd}{Standard deviation of the distribution from which the off-diagonal elements of the community matrix are drawn.}
 
 \item{community_seed}{Random seed used when generating community traits.}
-
-\item{s}{Standard deviation of the Gaussian birth rate - temperature response curve; same for all species.}
 
 \item{a_d}{Death rate when temperature is equal to 0; same for all species.}
 

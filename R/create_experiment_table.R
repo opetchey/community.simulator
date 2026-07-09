@@ -220,9 +220,16 @@ create_experiment_table <- function(experiment_folder,
     dplyr::left_join(temperature_seeds, by = "env_series_id")
 
 
+  if (!is.null(expt_def$sd_perf_curve)) {
+    stop(
+      "`sd_perf_curve` is deprecated. Use `sd_perf_mean` and `sd_perf_range` ",
+      "to define standard-deviation performance-curve widths.",
+      call. = FALSE
+    )
+  }
+
   #a_b <- eval(expt_def$a_b)
   a_d <- eval(expt_def$a_d)
-  s <- eval(expt_def$sd_perf_curve)
   z <- eval(expt_def$z)
   alpha_jj <- eval(expt_def$alpha_jj)
 
@@ -250,7 +257,6 @@ create_experiment_table <- function(experiment_folder,
 
                                            community_seed = .$community_seed,
 
-                                           s = s,
                                            a_d = a_d,
                                            z = z,
                                            alpha_jj = alpha_jj,
