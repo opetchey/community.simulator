@@ -151,6 +151,7 @@ The workflow saves intermediate and final outputs inside the experiment folder.
 These currently include:
 
 - `experiment_table.RDS`
+- `experiment_log.txt`
 - `temperatures.db`
 - `dynamics.db`
 - `community_measures.RDS`

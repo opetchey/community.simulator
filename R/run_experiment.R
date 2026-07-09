@@ -215,6 +215,134 @@ confirm_experiment_run <- function(summary) {
   tolower(trimws(answer)) %in% c("y", "yes")
 }
 
+append_experiment_log_entry <- function(log_path, event, fields = list()) {
+  entry <- c(
+    list(
+      timestamp = format(Sys.time(), "%Y-%m-%dT%H:%M:%OS3%z"),
+      event = event
+    ),
+    fields
+  )
+  cat(
+    jsonlite::toJSON(entry, auto_unbox = TRUE, null = "null", na = "null"),
+    "\n",
+    file = log_path,
+    append = TRUE
+  )
+
+  invisible(log_path)
+}
+
+read_experiment_specification_for_log <- function(design_path) {
+  parsed <- try(
+    jsonlite::fromJSON(design_path, simplifyVector = FALSE),
+    silent = TRUE
+  )
+  if (!inherits(parsed, "try-error")) {
+    return(list(specification = parsed))
+  }
+
+  list(
+    specification_parse_error = conditionMessage(attr(parsed, "condition")),
+    specification_text = paste(readLines(design_path, warn = FALSE), collapse = "\n")
+  )
+}
+
+initialise_experiment_log <- function(log_path,
+                                      experiment_folder,
+                                      experiment_name,
+                                      experiment_design_filename,
+                                      design_path,
+                                      overwrite,
+                                      verbose) {
+  prepare_output_path(
+    log_path,
+    overwrite = overwrite,
+    verbose = verbose,
+    label = "experiment log"
+  )
+
+  file.create(log_path)
+  append_experiment_log_entry(
+    log_path,
+    "workflow_started",
+    list(
+      log_format = "newline_delimited_json",
+      log_format_version = 1,
+      message = "Experiment workflow started.",
+      experiment_name = experiment_name,
+      experiment_folder = experiment_folder,
+      experiment_design_filename = experiment_design_filename,
+      design_path = design_path,
+      r_version = paste(R.version$major, R.version$minor, sep = "."),
+      platform = R.version$platform
+    )
+  )
+  append_experiment_log_entry(
+    log_path,
+    "experiment_specification",
+    c(
+      list(
+        message = "Experiment specification read from the design JSON file.",
+        experiment_design_filename = experiment_design_filename
+      ),
+      read_experiment_specification_for_log(design_path)
+    )
+  )
+
+  invisible(log_path)
+}
+
+run_logged_experiment_step <- function(step_name, log_path, code) {
+  started_at <- Sys.time()
+  append_experiment_log_entry(
+    log_path,
+    "step_started",
+    list(
+      step = step_name,
+      message = paste0("Started ", step_name, ".")
+    )
+  )
+
+  error <- NULL
+  result <- tryCatch(
+    force(code),
+    error = function(e) {
+      error <<- e
+      NULL
+    }
+  )
+
+  finished_at <- Sys.time()
+  elapsed_seconds <- as.numeric(difftime(finished_at, started_at, units = "secs"))
+  if (is.null(error)) {
+    append_experiment_log_entry(
+      log_path,
+      "step_completed",
+      list(
+        step = step_name,
+        message = paste0("Completed ", step_name, "."),
+        elapsed_seconds = elapsed_seconds,
+        elapsed = format_duration(elapsed_seconds)
+      )
+    )
+    return(result)
+  }
+
+  append_experiment_log_entry(
+    log_path,
+    "step_failed",
+    list(
+      step = step_name,
+      message = paste0("Failed ", step_name, "."),
+      elapsed_seconds = elapsed_seconds,
+      elapsed = format_duration(elapsed_seconds),
+      error = conditionMessage(error)
+    )
+  )
+  stop(conditionMessage(error), call. = FALSE)
+}
+
 #' Run a complete experiment workflow
 #'
 #' This is a convenience wrapper for the standard experiment workflow. It
@@ -243,7 +371,10 @@ confirm_experiment_run <- function(summary) {
 #'   These estimates are intended as rough guidance before launching large
 #'   experiments. Compact simulation summaries are checkpointed during
 #'   simulation and are used to calculate `community_measures.RDS` even when
-#'   `save_dynamics = FALSE`.
+#'   `save_dynamics = FALSE`. Each run also writes `experiment_log.txt`, a
+#'   plain-text newline-delimited JSON log containing the experiment
+#'   specification, preflight summary, output paths, workflow status, and elapsed
+#'   time for each workflow step.
 #'
 #' @return Invisibly returns a named list containing the experiment folder and
 #'   the main output file paths.
@@ -277,80 +408,148 @@ run_experiment <- function(experiment_folder_location,
     )
   }
 
-  if (verbose) {
-    message("Creating experiment table")
-  }
-  create_experiment_table(
-    experiment_folder,
-    experiment_design_filename,
-    overwrite = overwrite,
-    verbose = verbose
-  )
-
-  experiment_summary <- estimate_experiment_outputs(
-    experiment_folder,
-    experiment_design_filename
-  )
-
-  if (confirm_run) {
-    if (!interactive()) {
-      warning(
-        "`confirm_run = TRUE`, but the session is not interactive. ",
-        "Skipping confirmation prompt.",
-        call. = FALSE
-      )
-    } else if (!confirm_experiment_run(experiment_summary)) {
-      stop("Experiment run cancelled by user.", call. = FALSE)
-    }
-  }
-
-  if (verbose) {
-    message("Creating environments")
-  }
-  create_environments(
-    experiment_folder,
-    experiment_design_filename,
-    overwrite = overwrite,
-    verbose = verbose
-  )
-
-  if (verbose) {
-    message("Simulating dynamics")
-  }
-  simulate_dynamics(
-    experiment_folder,
-    experiment_design_filename,
-    overwrite = overwrite,
-    verbose = verbose
-  )
-
-  if (verbose) {
-    message("Calculating community measures")
-  }
-  get_community_measures(
-    experiment_folder,
-    experiment_design_filename,
-    overwrite = overwrite,
-    verbose = verbose
-  )
-
-  outputs <- list(
+  experiment_log <- file.path(experiment_folder, "experiment_log.txt")
+  initialise_experiment_log(
+    log_path = experiment_log,
     experiment_folder = experiment_folder,
-    experiment_table = file.path(experiment_folder, "experiment_table.RDS"),
-    temperatures_db = file.path(experiment_folder, "temperatures.db"),
-    simulation_summaries = file.path(experiment_folder, "simulation_summaries.RDS"),
-    population_summaries = file.path(experiment_folder, "population_summaries.RDS"),
-    community_measures = file.path(experiment_folder, "community_measures.RDS")
+    experiment_name = experiment_name,
+    experiment_design_filename = experiment_design_filename,
+    design_path = design_path,
+    overwrite = overwrite,
+    verbose = verbose
   )
-  if (experiment_summary$save_dynamics) {
-    outputs$dynamics_db <- file.path(experiment_folder, "dynamics.db")
-  }
-  if (experiment_summary$save_resources) {
-    outputs$resources_db <- file.path(experiment_folder, "resources.db")
+
+  workflow_started_at <- Sys.time()
+  workflow_error <- NULL
+  outputs <- tryCatch({
+    if (verbose) {
+      message("Creating experiment table")
+    }
+    run_logged_experiment_step("create_experiment_table", experiment_log, {
+      create_experiment_table(
+        experiment_folder,
+        experiment_design_filename,
+        overwrite = overwrite,
+        verbose = verbose
+      )
+    })
+
+    experiment_summary <- run_logged_experiment_step(
+      "estimate_experiment_outputs",
+      experiment_log,
+      {
+        estimate_experiment_outputs(
+          experiment_folder,
+          experiment_design_filename
+        )
+      }
+    )
+    append_experiment_log_entry(
+      experiment_log,
+      "experiment_preflight_summary",
+      list(
+        message = "Experiment output and runtime estimates.",
+        summary = experiment_summary
+      )
+    )
+
+    if (confirm_run) {
+      if (!interactive()) {
+        warning(
+          "`confirm_run = TRUE`, but the session is not interactive. ",
+          "Skipping confirmation prompt.",
+          call. = FALSE
+        )
+      } else if (!confirm_experiment_run(experiment_summary)) {
+        stop("Experiment run cancelled by user.", call. = FALSE)
+      }
+    }
+
+    if (verbose) {
+      message("Creating environments")
+    }
+    run_logged_experiment_step("create_environments", experiment_log, {
+      create_environments(
+        experiment_folder,
+        experiment_design_filename,
+        overwrite = overwrite,
+        verbose = verbose
+      )
+    })
+
+    if (verbose) {
+      message("Simulating dynamics")
+    }
+    run_logged_experiment_step("simulate_dynamics", experiment_log, {
+      simulate_dynamics(
+        experiment_folder,
+        experiment_design_filename,
+        overwrite = overwrite,
+        verbose = verbose
+      )
+    })
+
+    if (verbose) {
+      message("Calculating community measures")
+    }
+    run_logged_experiment_step("get_community_measures", experiment_log, {
+      get_community_measures(
+        experiment_folder,
+        experiment_design_filename,
+        overwrite = overwrite,
+        verbose = verbose
+      )
+    })
+
+    outputs <- list(
+      experiment_folder = experiment_folder,
+      experiment_log = experiment_log,
+      experiment_table = file.path(experiment_folder, "experiment_table.RDS"),
+      temperatures_db = file.path(experiment_folder, "temperatures.db"),
+      simulation_summaries = file.path(experiment_folder, "simulation_summaries.RDS"),
+      population_summaries = file.path(experiment_folder, "population_summaries.RDS"),
+      community_measures = file.path(experiment_folder, "community_measures.RDS")
+    )
+    if (experiment_summary$save_dynamics) {
+      outputs$dynamics_db <- file.path(experiment_folder, "dynamics.db")
+    }
+    if (experiment_summary$save_resources) {
+      outputs$resources_db <- file.path(experiment_folder, "resources.db")
+    }
+
+    outputs
+  }, error = function(e) {
+    workflow_error <<- e
+    NULL
+  })
+
+  workflow_finished_at <- Sys.time()
+  workflow_elapsed_seconds <- as.numeric(
+    difftime(workflow_finished_at, workflow_started_at, units = "secs")
+  )
+  append_experiment_log_entry(
+    experiment_log,
+    if (is.null(workflow_error)) "workflow_completed" else "workflow_failed",
+    list(
+      message = if (is.null(workflow_error)) {
+        "Experiment workflow complete."
+      } else {
+        "Experiment workflow failed."
+      },
+      elapsed_seconds = workflow_elapsed_seconds,
+      elapsed = format_duration(workflow_elapsed_seconds),
+      outputs = outputs,
+      error = if (is.null(workflow_error)) NULL else conditionMessage(workflow_error)
+    )
+  )
+
+  if (!is.null(workflow_error)) {
+    stop(conditionMessage(workflow_error), call. = FALSE)
   }
 
   if (verbose) {
     message("Experiment workflow complete")
+    message("Wrote experiment log: ", experiment_log)
   }
 
   invisible(outputs)

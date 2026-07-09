@@ -51,7 +51,10 @@ happens before environment generation, dynamics simulation, and analysis.
 These estimates are intended as rough guidance before launching large
 experiments. Compact simulation summaries are checkpointed during
 simulation and are used to calculate \code{community_measures.RDS} even when
-\code{save_dynamics = FALSE}.
+\code{save_dynamics = FALSE}. Each run also writes \code{experiment_log.txt}, a
+plain-text newline-delimited JSON log containing the experiment
+specification, preflight summary, output paths, workflow status, and elapsed
+time for each workflow step.
 }
 \examples{
 NULL
