@@ -1,0 +1,190 @@
+# Single-Community Walkthrough: Discrete-Time LV
+
+## Purpose
+
+This walkthrough defines one Lotka-Volterra community, exposes it to one
+temperature time series, runs the discrete-time simulator, and makes a
+few basic plots.
+
+``` r
+
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(community.simulator)
+
+theme_set(theme_minimal(base_size = 12))
+```
+
+## Define One Environment
+
+``` r
+
+set.seed(1)
+duration <- 120
+time <- seq_len(duration)
+temperature <- 20 +
+  3 * sin(2 * pi * time / 40) +
+  stats::arima.sim(model = list(ar = 0.65), n = duration, sd = 0.7)
+
+environment <- tibble(
+  time = time,
+  temperature = as.numeric(temperature)
+)
+
+ggplot(environment, aes(x = time, y = temperature)) +
+  geom_line(linewidth = 0.6) +
+  labs(x = "Time", y = "Temperature", title = "Temperature Environment")
+```
+
+![Line plot of temperature through time for the example
+environment.](lv_discrete_single_community_files/figure-html/environment-1.png)
+
+## Define One Community
+
+``` r
+
+community <- make_a_community(
+  S = 4,
+  a_b_mean = 0.34,
+  a_b_range = 0.00,
+  a_b_distribution = "regular",
+  b_opt_mean = 20,
+  b_opt_range = 8,
+  b_opt_distribution = "regular",
+  sd_perf_distribution = "regular",
+  sd_perf_mean = 7,
+  sd_perf_range = 2,
+  community_seed = 11,
+  a_d = 0.02,
+  z = 0.03,
+  lv_interaction_spec = list(
+    label = "weak_asymmetric_competition",
+    type = "competition",
+    symmetry = "asymmetric",
+    distribution = "uniform",
+    parameters = list(min = 0, max = 0.18),
+    diagonal = 1
+  )
+)
+```
+
+### Species traits
+
+``` r
+
+species_traits <- tibble(
+  species = paste0("Spp", seq_len(community$S)),
+  max_birth = community$a_b_i,
+  thermal_optimum = community$b_opt_i,
+  width = community$sd_perf_i,
+  death_intercept = community$a_d_i,
+  death_temperature_slope = community$z_i
+)
+
+species_traits
+#> # A tibble: 4 × 6
+#>   species max_birth thermal_optimum width death_intercept death_temperature_sl…¹
+#>   <chr>       <dbl>           <dbl> <dbl>           <dbl>                  <dbl>
+#> 1 Spp1         0.34            16    6               0.02                   0.03
+#> 2 Spp2         0.34            18.7  6.67            0.02                   0.03
+#> 3 Spp3         0.34            21.3  7.33            0.02                   0.03
+#> 4 Spp4         0.34            24    8               0.02                   0.03
+#> # ℹ abbreviated name: ¹​death_temperature_slope
+```
+
+### Temperature performance curves
+
+``` r
+
+temperature_grid <- tibble(temperature = seq(5, 35, length.out = 200))
+
+performance_curves <- tidyr::crossing(
+  species_traits,
+  temperature_grid
+) |>
+  mutate(
+    birth = max_birth * exp(-0.5 * ((temperature - thermal_optimum) / width)^2),
+    death = death_intercept * exp(death_temperature_slope * temperature),
+    intrinsic_growth = birth - death
+  )
+
+ggplot(performance_curves, aes(x = temperature, y = intrinsic_growth, colour = species)) +
+  geom_hline(yintercept = 0, linewidth = 0.3, colour = "grey50") +
+  geom_line(linewidth = 0.8) +
+  labs(
+    x = "Temperature",
+    y = "Intrinsic growth rate",
+    title = "Species Thermal Performance Curves"
+  )
+```
+
+![Line plot of intrinsic growth rate against temperature for each
+species.](lv_discrete_single_community_files/figure-html/performance-curves-1.png)
+
+### Interaction matrix
+
+``` r
+
+interaction_matrix <- as.data.frame(as.table(community$alpha_ij)) |>
+  rename(consumer = Var1, neighbour = Var2, interaction = Freq)
+
+ggplot(interaction_matrix, aes(x = neighbour, y = consumer, fill = interaction)) +
+  geom_tile(colour = "white") +
+  scale_fill_viridis_c() +
+  coord_equal() +
+  labs(
+    x = "Neighbour species",
+    y = "Focal species",
+    fill = "alpha",
+    title = "LV Interaction Matrix"
+  )
+```
+
+![Heatmap of the Lotka-Volterra interaction
+matrix.](lv_discrete_single_community_files/figure-html/interaction-matrix-1.png)
+
+## Run Dynamics
+
+``` r
+
+initial_abundances <- rep(25, community$S)
+
+abundances <- simulator_lv(
+  input_com_params = community,
+  TcelSeries = matrix(environment$temperature, nrow = 1),
+  initial_abundances = initial_abundances
+) |>
+  mutate(time = environment$time) |>
+  pivot_longer(
+    cols = starts_with("Spp"),
+    names_to = "species",
+    values_to = "abundance"
+  )
+```
+
+## Plot Dynamics
+
+``` r
+
+total_abundance <- abundances |>
+  group_by(time) |>
+  summarise(total_abundance = sum(abundance), .groups = "drop")
+
+ggplot(abundances, aes(x = time, y = abundance, colour = species)) +
+  geom_line(linewidth = 0.7) +
+  labs(x = "Time", y = "Abundance", title = "Population Dynamics")
+```
+
+![Line plot of abundance through time for each
+species.](lv_discrete_single_community_files/figure-html/plot-dynamics-1.png)
+
+``` r
+
+ggplot(total_abundance, aes(x = time, y = total_abundance)) +
+  geom_line(linewidth = 0.8) +
+  labs(x = "Time", y = "Total abundance", title = "Community Total Abundance")
+```
+
+![Line plot of total community abundance through
+time.](lv_discrete_single_community_files/figure-html/total-abundance-1.png)

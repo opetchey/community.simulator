@@ -1,8 +1,8 @@
 ---
-title: "Getting Started"
+title: "Getting Started with a Small Experiment"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting Started}
+  %\VignetteIndexEntry{Getting Started with a Small Experiment}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -10,15 +10,18 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
 ## Overview
 
-This vignette runs a very small end-to-end experiment using
+This guide runs a very small end-to-end experiment using
 `community.simulator`. The goal is to show the simplest successful workflow for
-new users.
+creating an experiment folder, running the standard workflow, and inspecting the
+main summary output.
 
 The example:
 
@@ -34,7 +37,7 @@ library(community.simulator)
 
 ## Run a Tiny Example
 
-```{r}
+```{r run-example}
 project_folder_location <- tempdir()
 experiment_name <- "getting_started_example"
 experiment_design_filename <- "experiment_definition.json"
@@ -57,7 +60,8 @@ outputs <- suppressWarnings(
       experiment_name = experiment_name,
       experiment_design_filename = experiment_design_filename,
       overwrite = TRUE,
-      verbose = FALSE
+      verbose = FALSE,
+      confirm_run = FALSE
     )
   )
 )
@@ -67,11 +71,34 @@ outputs
 
 ## Inspect the Main Output
 
-```{r}
+```{r inspect-output}
 community_measures <- readRDS(outputs$community_measures)
 
 community_measures[, c("case_id", "richness", "temperature_mean", "CV_totab")]
 ```
+
+## Inspect the Experiment Log
+
+Each run writes a plain-text log file. The log is newline-delimited JSON: each
+line is a complete record that can be read by humans or parsed by software.
+
+```{r inspect-log}
+readLines(outputs$experiment_log, n = 5)
+```
+
+## Main Output Files
+
+```{r output-files}
+names(outputs)
+```
+
+The most important outputs are:
+
+- `experiment_table.RDS`: one row per simulation case
+- `experiment_log.txt`: experiment specification, workflow events, and timings
+- `temperatures.db`: environmental time series
+- `dynamics.db`: saved population dynamics, when enabled
+- `community_measures.RDS`: case-level summary measures
 
 ## Next Steps
 
@@ -81,5 +108,7 @@ Once this small example works, the usual next steps are:
 - copy an example JSON file into each experiment folder, then edit it to change
   species, temperature, or replicate settings
 - rerun the workflow for a new experiment name
-- inspect `community_measures.RDS`, `dynamics.db`, and `temperatures.db`
-- use `make_plots_for_one_community()` for case-level plots
+- inspect `community_measures.RDS`, `experiment_log.txt`, `dynamics.db`, and
+  `temperatures.db`
+- use the single-community walkthroughs in `reports/examples` to understand how
+  each model behaves before scaling up to experiment grids

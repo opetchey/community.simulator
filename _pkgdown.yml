@@ -1,0 +1,22 @@
+url: https://opetchey.github.io/community.simulator/
+
+template:
+  bootstrap: 5
+
+navbar:
+  structure:
+    left: [intro, reference, articles]
+    right: [github]
+
+articles:
+  - title: Getting started
+    contents:
+      - experiment_getting_started
+  - title: Single-community walkthroughs
+    contents:
+      - lv_discrete_single_community
+      - lv_continuous_single_community
+      - consumer_resource_single_community
+  - title: Reference guide
+    contents:
+      - User_guide
