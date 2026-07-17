@@ -389,12 +389,15 @@ The usual workflow is:
 
 1.  Create a project folder that can contain multiple experiment
     folders.
-2.  Create or copy an experiment-definition JSON file.
-3.  Edit the JSON file to define model, community, environment, and
+2.  Create an experiment folder.
+3.  Create or copy an experiment-definition JSON file into the
+    experiment folder.
+4.  Edit the JSON file to define model, community, environment, and
     replicate treatments.
-4.  Run
+5.  Create an R script in the experiment folder. Use it to run the
+    experiment with
     [`run_experiment()`](https://opetchey.github.io/community.simulator/reference/run_experiment.md).
-5.  Inspect outputs in the experiment folder.
+6.  Inspect outputs in the experiment folder.
 
 A compact example is:
 
@@ -625,18 +628,3 @@ macOS/Linux.
 The experiment log records elapsed time for the main workflow steps. It
 is plain text newline-delimited JSON, so it is readable by humans and
 easy to parse from R or other tools.
-
-## Choosing Where To Start
-
-If you are reviewing the package, start with the rendered
-single-community walkthroughs, then run the getting-started experiment,
-then inspect this guide for parameter and workflow details.
-
-If you are planning a new experiment, start by copying the bundled JSON
-file closest to your model family. Make one change at a time, run a
-small experiment, and inspect `experiment_table.RDS` before scaling up.
-
-If you are learning a model, use the single-community walkthroughs
-before using the experiment-grid workflow. They define one community and
-one environment directly in R, which makes the model mechanics easier to
-see.

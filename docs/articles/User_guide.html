@@ -570,10 +570,13 @@ burn-in and experiment periods.</p>
 <ol style="list-style-type: decimal">
 <li>Create a project folder that can contain multiple experiment
 folders.</li>
-<li>Create or copy an experiment-definition JSON file.</li>
+<li>Create an experiment folder.</li>
+<li>Create or copy an experiment-definition JSON file into the
+experiment folder.</li>
 <li>Edit the JSON file to define model, community, environment, and
 replicate treatments.</li>
-<li>Run <code><a href="../reference/run_experiment.html">run_experiment()</a></code>.</li>
+<li>Create an R script in the experiment folder. Use it to run the
+experiment with <code><a href="../reference/run_experiment.html">run_experiment()</a></code>.</li>
 <li>Inspect outputs in the experiment folder.</li>
 </ol>
 <p>A compact example is:</p>
@@ -1144,21 +1147,6 @@ for macOS/Linux.</p>
 <p>The experiment log records elapsed time for the main workflow steps.
 It is plain text newline-delimited JSON, so it is readable by humans and
 easy to parse from R or other tools.</p>
-</div>
-<div class="section level2">
-<h2 id="choosing-where-to-start">Choosing Where To Start<a class="anchor" aria-label="anchor" href="#choosing-where-to-start"></a>
-</h2>
-<p>If you are reviewing the package, start with the rendered
-single-community walkthroughs, then run the getting-started experiment,
-then inspect this guide for parameter and workflow details.</p>
-<p>If you are planning a new experiment, start by copying the bundled
-JSON file closest to your model family. Make one change at a time, run a
-small experiment, and inspect <code>experiment_table.RDS</code> before
-scaling up.</p>
-<p>If you are learning a model, use the single-community walkthroughs
-before using the experiment-grid workflow. They define one community and
-one environment directly in R, which makes the model mechanics easier to
-see.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

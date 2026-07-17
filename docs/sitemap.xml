@@ -33,6 +33,11 @@
 <url><loc>https://opetchey.github.io/community.simulator/reference/make_a_community.html</loc></url>
 <url><loc>https://opetchey.github.io/community.simulator/reference/make_a_consumer_resource_community.html</loc></url>
 <url><loc>https://opetchey.github.io/community.simulator/reference/make_plots_for_one_community.html</loc></url>
+<url><loc>https://opetchey.github.io/community.simulator/reference/plot_case_abundances.html</loc></url>
+<url><loc>https://opetchey.github.io/community.simulator/reference/plot_case_temperature.html</loc></url>
+<url><loc>https://opetchey.github.io/community.simulator/reference/plot_case_total_abundance.html</loc></url>
+<url><loc>https://opetchey.github.io/community.simulator/reference/plot_community_matrix.html</loc></url>
+<url><loc>https://opetchey.github.io/community.simulator/reference/plot_resource_dynamics.html</loc></url>
 <url><loc>https://opetchey.github.io/community.simulator/reference/read_experiment_design_json.html</loc></url>
 <url><loc>https://opetchey.github.io/community.simulator/reference/run_experiment.html</loc></url>
 <url><loc>https://opetchey.github.io/community.simulator/reference/setup_example_experiment.html</loc></url>

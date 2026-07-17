@@ -2,21 +2,32 @@
 % Please edit documentation in R/make_plots_for_one_community.R
 \name{make_plots_for_one_community}
 \alias{make_plots_for_one_community}
-\title{Make graphs showing variance results from one case}
+\title{Make standard diagnostic plots for one simulation case}
 \usage{
-make_plots_for_one_community(experiment_folder, case_id_oi)
+make_plots_for_one_community(experiment_folder, case_id_oi, quiet = FALSE)
 }
 \arguments{
-\item{experiment_folder}{The folder where the experiment is stored}
+\item{experiment_folder}{Folder where the experiment outputs are stored.}
 
-\item{case_id_oi}{The case id of the case to be plotted}
+\item{case_id_oi}{Case identifier to plot, such as \code{"case_id_1"}.}
+
+\item{quiet}{Logical. If \code{FALSE}, explain why individual plots cannot be
+made.}
 }
 \value{
-List of graphs.
+Named list of available \code{ggplot} objects. Entries whose source data
+are unavailable are omitted.
 }
 \description{
-Make graphs showing variance results from one case
+\code{make_plots_for_one_community()} is a convenience wrapper around the smaller
+plotting helpers. It only uses standard workflow outputs and returns the
+plots that can be made from files currently present in the experiment folder.
+Missing optional outputs, such as \code{dynamics.db} or \code{resources.db}, are skipped
+rather than treated as errors.
 }
 \examples{
-NULL
+\dontrun{
+plots <- make_plots_for_one_community("path/to/experiment", "case_id_1")
+names(plots)
+}
 }

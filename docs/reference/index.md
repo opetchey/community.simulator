@@ -79,7 +79,22 @@
   : Make a consumer-resource community parameter object
 
 - [`make_plots_for_one_community()`](https://opetchey.github.io/community.simulator/reference/make_plots_for_one_community.md)
-  : Make graphs showing variance results from one case
+  : Make standard diagnostic plots for one simulation case
+
+- [`plot_case_abundances()`](https://opetchey.github.io/community.simulator/reference/plot_case_abundances.md)
+  : Plot species abundances for one simulation case
+
+- [`plot_case_temperature()`](https://opetchey.github.io/community.simulator/reference/plot_case_temperature.md)
+  : Plot the temperature time series for one simulation case
+
+- [`plot_case_total_abundance()`](https://opetchey.github.io/community.simulator/reference/plot_case_total_abundance.md)
+  : Plot total abundance through time for one simulation case
+
+- [`plot_community_matrix()`](https://opetchey.github.io/community.simulator/reference/plot_community_matrix.md)
+  : Plot the community matrix for one simulation case
+
+- [`plot_resource_dynamics()`](https://opetchey.github.io/community.simulator/reference/plot_resource_dynamics.md)
+  : Plot resource dynamics for one consumer-resource simulation case
 
 - [`read_experiment_design_json()`](https://opetchey.github.io/community.simulator/reference/read_experiment_design_json.md)
   :

@@ -141,11 +141,11 @@ useful plots.
     - Small functions are easier for users to compose and easier for the
       Shiny app to reuse.
     - Candidate functions:
-      - `plot_case_temperature()`
-      - `plot_case_abundances()`
-      - `plot_case_total_abundance()`
-      - `plot_community_matrix()`
-      - `plot_resource_dynamics()`
+      - [`plot_case_temperature()`](https://opetchey.github.io/community.simulator/reference/plot_case_temperature.md)
+      - [`plot_case_abundances()`](https://opetchey.github.io/community.simulator/reference/plot_case_abundances.md)
+      - [`plot_case_total_abundance()`](https://opetchey.github.io/community.simulator/reference/plot_case_total_abundance.md)
+      - [`plot_community_matrix()`](https://opetchey.github.io/community.simulator/reference/plot_community_matrix.md)
+      - [`plot_resource_dynamics()`](https://opetchey.github.io/community.simulator/reference/plot_resource_dynamics.md)
 3.  Add examples to function documentation.
     - Use `\dontrun{}` or tiny tempdir examples where needed.
     - Why: help pages should demonstrate the intended data flow.
