@@ -9,7 +9,10 @@ get_community_CPC_measures(
   expt,
   expt_def,
   every_t = 1,
-  soft_viability_scale = 0.01
+  soft_viability_scale = 0.01,
+  parallel_community_measures = FALSE,
+  parallel_workers = 1,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -31,6 +34,14 @@ get_community_CPC_measures(
 
 \item{soft_viability_scale}{Positive scale parameter for the soft viability
 transform \code{plogis(g_i(T) / soft_viability_scale)}.}
+
+\item{parallel_community_measures}{Logical. If \code{TRUE}, calculate per-case
+community performance curve measures in parallel where supported.}
+
+\item{parallel_workers}{Number of worker processes to use when
+\code{parallel_community_measures} is \code{TRUE}.}
+
+\item{verbose}{Logical. If \code{TRUE}, print progress messages.}
 }
 \value{
 A dataset containing measures of community performance curves, including CV of community performance, synchrony of performance curves, and average CV of species performance curves weighted by their mean contribution to community performance.

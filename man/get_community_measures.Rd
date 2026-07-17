@@ -29,7 +29,9 @@ Get various community level measures, e.g., community stability, response divers
 \details{
 If \code{simulation_summaries.RDS} is present, dynamic abundance
 summaries are read from that compact file. Otherwise, the function falls
-back to calculating those summaries from \code{dynamics.db}.
+back to calculating those summaries from \code{dynamics.db}. Experiment JSON
+files can include \code{parallel_community_measures} and \code{parallel_workers} to
+calculate community performance curve measures in parallel where supported.
 }
 \examples{
 NULL

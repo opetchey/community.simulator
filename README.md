@@ -5,9 +5,7 @@ experiments on multispecies communities with temperature-dependent vital rates.
 It was developed to explore how species traits, environmental variability, and
 response diversity influence community dynamics and stability.
 
-For rendered documentation, see the package website at
-<https://opetchey.github.io/community.simulator/>. For installation and local
-development setup, see [Installation](#installation) at the bottom of this
+For installation and local development setup, see [Installation](#installation) at the bottom of this
 README.
 
 The package currently supports three model families:

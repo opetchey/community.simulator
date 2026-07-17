@@ -7,7 +7,9 @@
 #'
 #' @details If `simulation_summaries.RDS` is present, dynamic abundance
 #'   summaries are read from that compact file. Otherwise, the function falls
-#'   back to calculating those summaries from `dynamics.db`.
+#'   back to calculating those summaries from `dynamics.db`. Experiment JSON
+#'   files can include `parallel_community_measures` and `parallel_workers` to
+#'   calculate community performance curve measures in parallel where supported.
 #'
 #' @return Nothing. Saves data to a file.
 #' @export
@@ -25,6 +27,34 @@ get_community_measures <- function(experiment_folder,
   expt_def <- jsonlite::fromJSON(paste0(experiment_folder, experiment_design_filename))
   output_path <- paste0(experiment_folder, "community_measures.RDS")
   prepare_output_path(output_path, overwrite = overwrite, verbose = verbose, label = "community-measures file")
+
+  get_design_value <- function(name, default) {
+    value <- expt_def[[name]]
+    if (is.null(value) || length(value) == 0) {
+      return(default)
+    }
+    value <- value[[1]]
+    if (is.character(value)) {
+      parsed_value <- try(eval(parse(text = value)), silent = TRUE)
+      if (!inherits(parsed_value, "try-error")) {
+        return(parsed_value)
+      }
+    }
+    value
+  }
+
+  parallel_community_measures <- isTRUE(get_design_value(
+    "parallel_community_measures",
+    get_design_value("parallel_simulations", FALSE)
+  ))
+  parallel_workers <- as.integer(get_design_value(
+    "parallel_workers",
+    max(1, parallel::detectCores(logical = FALSE) - 1)
+  ))
+  if (is.na(parallel_workers)) {
+    parallel_workers <- 1
+  }
+  parallel_workers <- max(1, min(parallel_workers, nrow(expt)))
 
   ## open connections to databases
   ## temperatures
@@ -101,7 +131,10 @@ get_community_measures <- function(experiment_folder,
   comm_cpc <- get_community_CPC_measures(temperatures,
                                    expt,
                                    expt_def,
-                                   every_t = 1)
+                                   every_t = 1,
+                                   parallel_community_measures = parallel_community_measures,
+                                   parallel_workers = parallel_workers,
+                                   verbose = verbose)
 
 
 
