@@ -611,6 +611,46 @@ output file already exists. Use <code>overwrite = TRUE</code> only when
 you deliberately want to replace existing outputs.</p>
 </div>
 <div class="section level2">
+<h2 id="interactive-shiny-explorer">Interactive Shiny Explorer<a class="anchor" aria-label="anchor" href="#interactive-shiny-explorer"></a>
+</h2>
+<p>The package includes a small Shiny app for interactively exploring
+one community at a time. It is intended as a learning and reviewer aid
+rather than a replacement for the JSON experiment workflow.</p>
+<p>Launch the app from an installed package with:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/run_simulation_explorer.html">run_simulation_explorer</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>If you are working from the RStudio project in a local checkout, you
+can also source the project launcher:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="st">"scripts/run_simulation_explorer.R"</span><span class="op">)</span></span></code></pre></div>
+<p>The app supports all three population dynamic models:</p>
+<ul>
+<li>discrete-time LV</li>
+<li>continuous-time LV</li>
+<li>continuous-time consumer-resource</li>
+</ul>
+<p>The app separates community construction from simulation. Press
+<strong>Build community</strong> to create one community and inspect its
+structure, traits, thermal performance curves, and community performance
+curve. Press <strong>Simulate</strong> only when you want to run the
+dynamics. If a simulation is running for too long, press <strong>Stop
+simulation</strong> to interrupt the background process.</p>
+<p>The app has two specification modes:</p>
+<ul>
+<li>
+<strong>Simple</strong>: a compact set of controls for quick
+exploration.</li>
+<li>
+<strong>Detailed</strong>: model-specific controls, including LV
+interaction type, symmetry, distribution, and diagonal value, and CR
+resource-use mode, private-resource use distribution, half-saturation,
+resource supply, and related parameters.</li>
+</ul>
+<p>For the consumer-resource model, the community performance curve is
+shown as a binary viability summary: at each temperature it gives the
+fraction of consumers with positive expected growth.</p>
+</div>
+<div class="section level2">
 <h2 id="bundled-example-designs">Bundled Example Designs<a class="anchor" aria-label="anchor" href="#bundled-example-designs"></a>
 </h2>
 <p>The package includes compact example JSON files under
@@ -631,14 +671,14 @@ useful as smoke tests and as templates for larger experiments.</p>
 Most scalar and vector treatment values are stored as R expressions and
 evaluated when the experiment table is created.</p>
 <p>Single numeric values can be written directly:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="st">"temperature_mean"</span><span class="er">:</span> <span class="dv">20</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="st">"temperature_mean"</span><span class="er">:</span> <span class="dv">20</span></span></code></pre></div>
 <p>Vectors are usually written as strings containing R expressions:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="st">"richness"</span><span class="er">:</span> <span class="st">"c(2, 4, 8)"</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="st">"richness"</span><span class="er">:</span> <span class="st">"c(2, 4, 8)"</span></span></code></pre></div>
 <p>Character values that need to evaluate to strings must include
 escaped quotes:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="st">"model_type"</span><span class="er">:</span> <span class="st">"</span><span class="ch">\"</span><span class="st">lv_continuous</span><span class="ch">\"</span><span class="st">"</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="st">"model_type"</span><span class="er">:</span> <span class="st">"</span><span class="ch">\"</span><span class="st">lv_continuous</span><span class="ch">\"</span><span class="st">"</span></span></code></pre></div>
 <p>Character vectors follow the same pattern:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="st">"birth_optimum_distribution"</span><span class="er">:</span> <span class="st">"c(</span><span class="ch">\"</span><span class="st">regular</span><span class="ch">\"</span><span class="st">, </span><span class="ch">\"</span><span class="st">random_uniform</span><span class="ch">\"</span><span class="st">)"</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="st">"birth_optimum_distribution"</span><span class="er">:</span> <span class="st">"c(</span><span class="ch">\"</span><span class="st">regular</span><span class="ch">\"</span><span class="st">, </span><span class="ch">\"</span><span class="st">random_uniform</span><span class="ch">\"</span><span class="st">)"</span></span></code></pre></div>
 <p>Structured fields, such as <code>interaction_treatments</code>, can
 be written as JSON lists and objects rather than R expression
 strings.</p>

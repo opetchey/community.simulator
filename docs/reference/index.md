@@ -2,6 +2,9 @@
 
 ## All functions
 
+- [`build_single_community()`](https://opetchey.github.io/community.simulator/reference/build_single_community.md)
+  : Build a single exploratory community
+
 - [`create_environments()`](https://opetchey.github.io/community.simulator/reference/create_environments.md)
   : Create temperature time series.
 
@@ -108,6 +111,9 @@
 - [`run_experiment()`](https://opetchey.github.io/community.simulator/reference/run_experiment.md)
   : Run a complete experiment workflow
 
+- [`run_simulation_explorer()`](https://opetchey.github.io/community.simulator/reference/run_simulation_explorer.md)
+  : Run the simulation explorer Shiny app
+
 - [`setup_example_experiment()`](https://opetchey.github.io/community.simulator/reference/setup_example_experiment.md)
   : Set up an experiment folder from a bundled example
 
@@ -115,6 +121,9 @@
   : Simulate the dynamics of all the cases in an experiment
   Unfortunately at the moment has features of temperature series hard
   coded in
+
+- [`simulate_single_community()`](https://opetchey.github.io/community.simulator/reference/simulate_single_community.md)
+  : Simulate one exploratory community
 
 - [`simulator_consumer_resource_continuous()`](https://opetchey.github.io/community.simulator/reference/simulator_consumer_resource_continuous.md)
   : Simulate consumer-resource dynamics in continuous time

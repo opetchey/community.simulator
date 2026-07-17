@@ -426,6 +426,49 @@ workflow. By default, workflow functions stop if an output file already exists.
 Use `overwrite = TRUE` only when you deliberately want to replace existing
 outputs.
 
+## Interactive Shiny Explorer
+
+The package includes a small Shiny app for interactively exploring one
+community at a time. It is intended as a learning and reviewer aid rather than
+a replacement for the JSON experiment workflow.
+
+Launch the app from an installed package with:
+
+```{r shiny-run, eval = FALSE}
+run_simulation_explorer()
+```
+
+If you are working from the RStudio project in a local checkout, you can also
+source the project launcher:
+
+```{r shiny-run-local, eval = FALSE}
+source("scripts/run_simulation_explorer.R")
+```
+
+The app supports all three population dynamic models:
+
+- discrete-time LV
+- continuous-time LV
+- continuous-time consumer-resource
+
+The app separates community construction from simulation. Press **Build
+community** to create one community and inspect its structure, traits, thermal
+performance curves, and community performance curve. Press **Simulate** only
+when you want to run the dynamics. If a simulation is running for too long,
+press **Stop simulation** to interrupt the background process.
+
+The app has two specification modes:
+
+- **Simple**: a compact set of controls for quick exploration.
+- **Detailed**: model-specific controls, including LV interaction type,
+  symmetry, distribution, and diagonal value, and CR resource-use mode,
+  private-resource use distribution, half-saturation, resource supply, and
+  related parameters.
+
+For the consumer-resource model, the community performance curve is shown as a
+binary viability summary: at each temperature it gives the fraction of
+consumers with positive expected growth.
+
 ## Bundled Example Designs
 
 The package includes compact example JSON files under `inst/test_experiments`:
@@ -609,4 +652,3 @@ handled by the parent process. Parallel processing is intended for macOS/Linux.
 The experiment log records elapsed time for the main workflow steps. It is
 plain text newline-delimited JSON, so it is readable by humans and easy to parse
 from R or other tools.
-

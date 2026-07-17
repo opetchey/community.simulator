@@ -25,6 +25,7 @@ The package can:
 - simulate community dynamics
 - calculate community-level summary measures
 - produce diagnostic plots and walkthrough reports for individual communities
+- launch a small Shiny simulation explorer with `run_simulation_explorer()`
 
 ## Scientific Scope
 
@@ -66,6 +67,10 @@ We suggest reviewing the package in two passes.
    [User Guide](https://opetchey.github.io/community.simulator/articles/User_guide.html).
    It provides a reference for the model families, parameters, and functions. It
    is a work in progress.
+4. Optionally, launch the Shiny simulation explorer with
+   `run_simulation_explorer()`. It lets you choose one model, build one
+   community, inspect its structure and performance curves, and simulate only
+   when you press the simulation button.
 
 Useful reviewer checks could include:
 
@@ -91,10 +96,13 @@ Start here in this order:
 3. View the
    [Experiment Getting Started](https://opetchey.github.io/community.simulator/articles/experiment_getting_started.html)
    guide to learn the experiment-folder workflow.
-4. View the provided JSON experiment
+4. Try the Shiny simulation explorer with `run_simulation_explorer()` if you
+   want to build one community, inspect its structure, and simulate it
+   interactively.
+5. View the provided JSON experiment
    definitions in [inst/test_experiments](inst/test_experiments) and run larger
    experiments.
-5. Use the
+6. Use the
    [User Guide](https://opetchey.github.io/community.simulator/articles/User_guide.html)
    as a reference. Some sections still need polish, so treat it as the
    developing reference rather than a finished manual.
@@ -120,6 +128,18 @@ For local development from a cloned repository:
 
 ```r
 devtools::load_all()
+```
+
+Then launch the Shiny simulation explorer from the project:
+
+```r
+run_simulation_explorer()
+```
+
+There is also a convenience launcher for RStudio project users:
+
+```r
+source("scripts/run_simulation_explorer.R")
 ```
 
 Installed vignettes can be opened from R:

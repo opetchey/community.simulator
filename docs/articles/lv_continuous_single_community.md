@@ -6,6 +6,22 @@ This walkthrough defines one Lotka-Volterra community, exposes it to one
 temperature time series, runs the continuous-time simulator, and makes a
 few basic plots.
 
+## Interactive Shiny Version
+
+You can explore the same kind of one-community setup interactively with
+the Shiny simulation explorer:
+
+``` r
+
+run_simulation_explorer()
+```
+
+In the app, choose **Continuous-time LV**, press **Build community** to
+inspect the interaction matrix and thermal performance curves, and press
+**Simulate** only when you want to run the ODE dynamics. The app has
+both a simple specification mode and a detailed mode for expanding the
+LV interaction treatment and continuous-time controls.
+
 ``` r
 
 library(dplyr)

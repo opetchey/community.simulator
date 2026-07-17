@@ -260,7 +260,8 @@ Add basic automated checks once the examples and app structure exist.
 ### Phase 4: Shiny Prototype
 
 - Build the minimal app around the same single-case helper.
-- Add `run_simulation_explorer()`.
+- Add
+  [`run_simulation_explorer()`](https://opetchey.github.io/community.simulator/reference/run_simulation_explorer.md).
 - Add documentation explaining that the app is exploratory.
 - Acceptance: user can choose a model, run a small simulation, see
   plots, and copy the parameterisation.

@@ -62,7 +62,22 @@
 <p>This walkthrough defines one consumer-resource community, exposes it
 to one temperature time series, runs the continuous-time
 consumer-resource simulator, and makes a few basic plots.</p>
+</div>
+<div class="section level2">
+<h2 id="interactive-shiny-version">Interactive Shiny Version<a class="anchor" aria-label="anchor" href="#interactive-shiny-version"></a>
+</h2>
+<p>You can explore the same kind of one-community setup interactively
+with the Shiny simulation explorer:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/run_simulation_explorer.html">run_simulation_explorer</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>In the app, choose <strong>Consumer-resource</strong>, press
+<strong>Build community</strong> to inspect the resource-use matrix,
+uptake curves, and binary viability-based community performance curve,
+and press <strong>Simulate</strong> only when you want to run the ODE
+dynamics. The app has both a simple specification mode and a detailed
+mode for expanding the CR resource-use and resource-supply
+parameters.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
@@ -73,7 +88,7 @@ consumer-resource simulator, and makes a few basic plots.</p>
 <div class="section level2">
 <h2 id="define-one-environment">Define One Environment<a class="anchor" aria-label="anchor" href="#define-one-environment"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">duration</span> <span class="op">&lt;-</span> <span class="fl">120</span></span>
 <span><span class="va">time</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">duration</span><span class="op">)</span></span>
@@ -94,7 +109,7 @@ consumer-resource simulator, and makes a few basic plots.</p>
 <div class="section level2">
 <h2 id="define-one-community">Define One Community<a class="anchor" aria-label="anchor" href="#define-one-community"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">community</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_a_consumer_resource_community.html">make_a_consumer_resource_community</a></span><span class="op">(</span></span>
 <span>  S <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  u_max_mean <span class="op">=</span> <span class="fl">0.08</span>,</span>
@@ -123,7 +138,7 @@ consumer-resource simulator, and makes a few basic plots.</p>
 <div class="section level3">
 <h3 id="consumer-traits">Consumer traits<a class="anchor" aria-label="anchor" href="#consumer-traits"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">consumer_traits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>  species <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Spp"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">community</span><span class="op">$</span><span class="va">S</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  max_uptake <span class="op">=</span> <span class="va">community</span><span class="op">$</span><span class="va">u_max_i</span>,</span>
@@ -148,7 +163,7 @@ consumer-resource simulator, and makes a few basic plots.</p>
 <div class="section level3">
 <h3 id="temperature-uptake-curves">Temperature uptake curves<a class="anchor" aria-label="anchor" href="#temperature-uptake-curves"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">temperature_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>temperature <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">35</span>, length.out <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">uptake_curves</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/expand.html" class="external-link">crossing</a></span><span class="op">(</span></span>
@@ -174,7 +189,7 @@ consumer-resource simulator, and makes a few basic plots.</p>
 <div class="section level3">
 <h3 id="resource-use-matrix">Resource-use matrix<a class="anchor" aria-label="anchor" href="#resource-use-matrix"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">resource_use</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">as.table</a></span><span class="op">(</span><span class="va">community</span><span class="op">$</span><span class="va">resource_use_ij</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>consumer <span class="op">=</span> <span class="va">Var1</span>, resource <span class="op">=</span> <span class="va">Var2</span>, use_fraction <span class="op">=</span> <span class="va">Freq</span><span class="op">)</span></span>
 <span></span>
@@ -194,7 +209,7 @@ consumer-resource simulator, and makes a few basic plots.</p>
 <div class="section level2">
 <h2 id="run-dynamics">Run Dynamics<a class="anchor" aria-label="anchor" href="#run-dynamics"></a>
 </h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">initial_consumer_abundances</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">12</span>, <span class="va">community</span><span class="op">$</span><span class="va">S</span><span class="op">)</span></span>
 <span><span class="va">initial_resource_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">600</span>, <span class="va">community</span><span class="op">$</span><span class="va">R</span><span class="op">)</span></span>
 <span></span>
@@ -232,7 +247,7 @@ consumer-resource simulator, and makes a few basic plots.</p>
 <div class="section level2">
 <h2 id="plot-dynamics">Plot Dynamics<a class="anchor" aria-label="anchor" href="#plot-dynamics"></a>
 </h2>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">total_abundance</span> <span class="op">&lt;-</span> <span class="va">consumers</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>total_abundance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">abundance</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span></span>
@@ -241,12 +256,12 @@ consumer-resource simulator, and makes a few basic plots.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time"</span>, y <span class="op">=</span> <span class="st">"Consumer abundance"</span>, title <span class="op">=</span> <span class="st">"Consumer Dynamics"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="consumer_resource_single_community_files/figure-html/plot-dynamics-1.png" class="r-plt" alt="Line plot of consumer abundance through time for each species." width="700"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">resources</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">time</span>, y <span class="op">=</span> <span class="va">amount</span>, colour <span class="op">=</span> <span class="va">resource</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time"</span>, y <span class="op">=</span> <span class="st">"Resource amount"</span>, title <span class="op">=</span> <span class="st">"Resource Dynamics"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="consumer_resource_single_community_files/figure-html/resource-dynamics-1.png" class="r-plt" alt="Line plot of resource amounts through time for each resource." width="700"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">total_abundance</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">time</span>, y <span class="op">=</span> <span class="va">total_abundance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time"</span>, y <span class="op">=</span> <span class="st">"Total consumer abundance"</span>, title <span class="op">=</span> <span class="st">"Community Total Abundance"</span><span class="op">)</span></span></code></pre></div>

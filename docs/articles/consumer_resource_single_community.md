@@ -6,6 +6,23 @@ This walkthrough defines one consumer-resource community, exposes it to
 one temperature time series, runs the continuous-time consumer-resource
 simulator, and makes a few basic plots.
 
+## Interactive Shiny Version
+
+You can explore the same kind of one-community setup interactively with
+the Shiny simulation explorer:
+
+``` r
+
+run_simulation_explorer()
+```
+
+In the app, choose **Consumer-resource**, press **Build community** to
+inspect the resource-use matrix, uptake curves, and binary
+viability-based community performance curve, and press **Simulate** only
+when you want to run the ODE dynamics. The app has both a simple
+specification mode and a detailed mode for expanding the CR resource-use
+and resource-supply parameters.
+
 ``` r
 
 library(dplyr)

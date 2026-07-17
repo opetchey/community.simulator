@@ -22,6 +22,21 @@ This walkthrough defines one Lotka-Volterra community, exposes it to one
 temperature time series, runs the discrete-time simulator, and makes a few basic
 plots.
 
+## Interactive Shiny Version
+
+You can explore the same kind of one-community setup interactively with the
+Shiny simulation explorer:
+
+```{r shiny-explorer, eval = FALSE}
+run_simulation_explorer()
+```
+
+In the app, choose **Discrete-time LV**, press **Build community** to inspect
+the interaction matrix and thermal performance curves, and press **Simulate**
+only when you want to run the dynamics. The app has both a simple
+specification mode and a detailed mode for expanding the LV interaction
+treatment.
+
 ```{r setup}
 library(dplyr)
 library(ggplot2)
