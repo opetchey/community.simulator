@@ -48,6 +48,62 @@ The package currently supports three model families.
 If `model_type` is omitted from the JSON file, the package uses the
 discrete-time Lotka-Volterra model.
 
+## Population Dynamic Models
+
+The package has three population dynamic models. They share the same
+broad workflow, but differ in how species interact and how abundance
+changes through time.
+
+| Model | State variables | Main ecological structure | Time update |
+|----|----|----|----|
+| Discrete-time LV | Species abundances | Direct species interactions through an LV interaction matrix | Difference-equation update with temperature-dependent intrinsic growth |
+| Continuous-time LV | Species abundances | Direct species interactions through an LV interaction matrix | ODE integration with temperature interpolation and optional immigration |
+| Continuous-time consumer-resource | Consumer abundances and resource concentrations | Indirect interactions through shared and private resources | ODE integration of consumer and resource dynamics |
+
+### Discrete-Time LV
+
+The discrete-time LV model updates species abundances one time step at a
+time. Temperature affects each species through its intrinsic growth
+rate, and the LV interaction matrix determines how species affect one
+another within each update. This model is useful for fast exploratory
+experiments and for cases where a discrete-time approximation is
+adequate.
+
+Select it with:
+
+``` json
+"model_type": "\"lv_discrete\""
+```
+
+### Continuous-Time LV
+
+The continuous-time LV model uses the same temperature-dependent species
+traits and LV interaction matrix, but integrates the dynamics with
+[`deSolve::ode()`](https://rdrr.io/pkg/deSolve/man/ode.html). This makes
+it useful when the continuous-time formulation is more natural, when
+solver tolerances matter, or when continuous immigration is part of the
+model.
+
+Select it with:
+
+``` json
+"model_type": "\"lv_continuous\""
+```
+
+### Continuous-Time Consumer-Resource
+
+The consumer-resource model simulates consumer abundances and resource
+concentrations together. Consumers have temperature-dependent uptake
+curves, and their interactions arise indirectly through resource use.
+Depending on `resource_use_mode`, consumers can use one common resource,
+species-specific resources, or a mix of shared and private resources.
+
+Select it with:
+
+``` json
+"model_type": "\"consumer_resource_continuous\""
+```
+
 ## How Species Traits Are Specified
 
 Species traits in a community are not usually specified by giving a
@@ -424,6 +480,90 @@ Character vectors follow the same pattern:
 
 Structured fields, such as `interaction_treatments`, can be written as
 JSON lists and objects rather than R expression strings.
+
+## JSON Parameter Reference
+
+This table describes the main public-facing JSON parameters used by the
+bundled example experiments. Many entries can be a single value or a
+vector of values; vectors expand the experiment table across treatment
+combinations.
+
+| Parameter | Models | Meaning and options |
+|----|----|----|
+| `random_seed` | All | Experiment-level random seed used to make generated communities and environments reproducible. |
+| `model_type` | All | Population dynamic model. Options are `"lv_discrete"`, `"lv_continuous"`, and `"consumer_resource_continuous"`. If omitted, the default is `"lv_discrete"`. |
+| `richness` | All | Number of species or consumers in each community. |
+| `number_of_community_replicates` | All | Number of replicate communities for each community-treatment combination. |
+| `temperature_mean` | All | Mean of the generated environmental temperature time series. |
+| `temperature_sd` | All | Standard deviation of the generated environmental temperature time series. |
+| `one_over_f_gamma` | All | Slope parameter for the `1/f` environmental noise process. |
+| `number_of_environment_replicates` | All | Number of replicate temperature series for each environmental treatment. |
+| `environment_sharing` | All | How generated environments are shared among simulation cases. Options are `"same_per_replicate"` and `"all_different"`. |
+| `burn_in_duration` | All | Number of initial time steps or time units treated as burn-in. |
+| `experiment_duration` | All | Number of post-burn-in time steps or time units used for the experiment. |
+| `parallel_environments` | All | Logical. If `TRUE`, generate environmental time series in parallel where supported. |
+| `parallel_simulations` | All | Logical. If `TRUE`, simulate cases in parallel where supported. |
+| `parallel_workers` | All | Number of worker processes for parallel environment generation or simulation. |
+| `runtime_update_every` | All | Number of cases between printed runtime/progress updates. |
+| `environment_progress` | All | Logical. If `TRUE`, print progress, elapsed time, and estimated remaining time during environment creation. |
+| `birth_maximum_mean` | LV | Mean maximum height of the species birth-rate performance curve. |
+| `birth_maximum_range` | LV | Total spread of maximum birth-rate values around `birth_maximum_mean`. |
+| `birth_maximum_distribution` | LV | Distribution used to assign species maximum birth rates. Options include `"regular"` and `"random_uniform"`. |
+| `birth_optimum_mean` | LV | Mean thermal optimum of the birth-rate performance curve. |
+| `birth_optimum_range` | LV | Total spread of birth thermal optima around `birth_optimum_mean`. |
+| `birth_optimum_distribution` | LV | Distribution used to assign species birth thermal optima. Options include `"regular"` and `"random_uniform"`. |
+| `birth_width_mean` | LV | Mean standard-deviation width of the Gaussian birth-rate performance curve. |
+| `birth_width_range` | LV | Total spread of birth-rate performance-curve widths around `birth_width_mean`. |
+| `birth_width_distribution` | LV | Distribution used to assign species birth-rate performance-curve widths. Options include `"regular"` and `"random_uniform"`. |
+| `death_intercept` | LV | Intercept of the exponential death-rate curve, shared across species. |
+| `death_temperature_slope` | LV | Temperature sensitivity of the exponential death-rate curve, shared across species. |
+| `interaction_treatments` | LV | List of LV interaction-matrix treatments. Each treatment can include `label`, `type`, `symmetry`, `distribution`, `parameters`, and `diagonal`. |
+| `interaction_treatments[].label` | LV | Human-readable name for an interaction treatment. |
+| `interaction_treatments[].type` | LV | Interaction type. Options are `"none"`, `"competition"`, `"any"`, and `"predator_prey"`. |
+| `interaction_treatments[].symmetry` | LV | Off-diagonal symmetry. Options are `"asymmetric"`, `"symmetric"`, and `"antisymmetric"`. |
+| `interaction_treatments[].distribution` | LV | Distribution for off-diagonal interaction strengths. Options include `"constant"`, `"uniform"`, `"normal"`, `"lognormal"`, and `"gamma"`. |
+| `interaction_treatments[].parameters` | LV | Named numeric parameters for the selected interaction-strength distribution. |
+| `interaction_treatments[].diagonal` | LV | Diagonal interaction value, usually `1`. |
+| `temperature_interpolation` | Continuous LV, CR | How the continuous-time simulator interpolates temperature between generated values. Options are `"linear"` and `"constant"`. |
+| `immigration_rate` | Continuous LV | Immigration rate per species. |
+| `immigration_mode` | Continuous LV | How immigration is applied. Options are `"continuous"` and `"pulse"`. |
+| `ode_method` | Continuous LV, CR | ODE solver method passed to [`deSolve::ode()`](https://rdrr.io/pkg/deSolve/man/ode.html), commonly `"lsoda"`. |
+| `ode_rtol` | Continuous LV, CR | Relative tolerance for the ODE solver. |
+| `ode_atol` | Continuous LV, CR | Absolute tolerance for the ODE solver. |
+| `ode_max_step` | Continuous LV, CR | Maximum ODE solver step size. |
+| `blowup_threshold` | Continuous LV, CR | Abundance threshold above which a simulation is treated as having blown up. |
+| `uptake_maximum_mean` | CR | Mean maximum height of the consumer uptake curve. |
+| `uptake_maximum_range` | CR | Total spread of maximum uptake values around `uptake_maximum_mean`. |
+| `uptake_maximum_distribution` | CR | Distribution used to assign species maximum uptake values. Options include `"regular"` and `"random_uniform"`. |
+| `uptake_optimum_mean` | CR | Mean thermal optimum of the consumer uptake curve. |
+| `uptake_optimum_range` | CR | Total spread of uptake thermal optima around `uptake_optimum_mean`. |
+| `uptake_optimum_distribution` | CR | Distribution used to assign species uptake thermal optima. Options include `"regular"` and `"random_uniform"`. |
+| `uptake_width_mean` | CR | Mean standard-deviation width of the Gaussian uptake curve. |
+| `uptake_width_range` | CR | Total spread of uptake-curve widths around `uptake_width_mean`. |
+| `uptake_width_distribution` | CR | Distribution used to assign species uptake-curve widths. Options include `"regular"` and `"random_uniform"`. |
+| `half_saturation_mean` | CR | Mean Monod half-saturation constant. |
+| `half_saturation_range` | CR | Total spread of half-saturation constants around `half_saturation_mean`. |
+| `half_saturation_distribution` | CR | Distribution used to assign half-saturation constants. Options include `"regular"` and `"random_uniform"`. |
+| `consumer_death_rate` | CR | Consumer death rate, shared across consumers. |
+| `resource_renewal_rate` | CR | Chemostat resource renewal rate. |
+| `resource_supply` | CR | Resource supply concentration. |
+| `conversion_efficiency` | CR | Conversion efficiency from resource uptake to consumer growth. |
+| `resource_use_mode` | CR | Resource-use structure. Options are `"one_resource_all_consumers"`, `"diagonal"`, and `"shared_to_private"`. |
+| `active_resource` | CR | Resource index used as the common active or shared resource. |
+| `private_resource_use_distribution` | CR | Distribution for species-level private-resource use in `"shared_to_private"` mode. Options are `"constant"`, `"regular"`, `"random_uniform"`, and `"beta"`. |
+| `private_resource_use_mean` | CR | Mean private-resource use fraction. Shared-resource use is `1 - private_resource_use`. |
+| `private_resource_use_range` | CR | Total spread of private-resource use fractions for `"regular"` and `"random_uniform"` distributions. |
+| `private_resource_use_precision` | CR | Precision of the beta distribution around `private_resource_use_mean`; higher values give less among-species variation. |
+| `consumer_immigration_rate` | CR | Immigration rate for consumers. |
+| `initial_consumer_total_abundance` | CR | Initial total consumer abundance distributed across consumers. |
+| `resource_initial_value` | CR | Initial concentration for each resource. |
+| `negative_tolerance` | CR | Small numerical tolerance used when checking negative values in ODE output. |
+
+Legacy field names such as `dynamics_type`,
+`number_of_species_treatment`, `temperature_series_control`, `a_b_*`,
+`b_opt_*`, `sd_perf_*`, `u_max_*`, `u_opt_*`, `sd_u_*`, and
+`resource_specialization_*` are still accepted as aliases for backwards
+compatibility. New experiments should use the names in the table above.
 
 ## Outputs
 

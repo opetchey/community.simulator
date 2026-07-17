@@ -136,6 +136,84 @@ uptake</td>
 uses the discrete-time Lotka-Volterra model.</p>
 </div>
 <div class="section level2">
+<h2 id="population-dynamic-models">Population Dynamic Models<a class="anchor" aria-label="anchor" href="#population-dynamic-models"></a>
+</h2>
+<p>The package has three population dynamic models. They share the same
+broad workflow, but differ in how species interact and how abundance
+changes through time.</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr class="header">
+<th>Model</th>
+<th>State variables</th>
+<th>Main ecological structure</th>
+<th>Time update</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Discrete-time LV</td>
+<td>Species abundances</td>
+<td>Direct species interactions through an LV interaction matrix</td>
+<td>Difference-equation update with temperature-dependent intrinsic
+growth</td>
+</tr>
+<tr class="even">
+<td>Continuous-time LV</td>
+<td>Species abundances</td>
+<td>Direct species interactions through an LV interaction matrix</td>
+<td>ODE integration with temperature interpolation and optional
+immigration</td>
+</tr>
+<tr class="odd">
+<td>Continuous-time consumer-resource</td>
+<td>Consumer abundances and resource concentrations</td>
+<td>Indirect interactions through shared and private resources</td>
+<td>ODE integration of consumer and resource dynamics</td>
+</tr>
+</tbody>
+</table>
+<div class="section level3">
+<h3 id="discrete-time-lv">Discrete-Time LV<a class="anchor" aria-label="anchor" href="#discrete-time-lv"></a>
+</h3>
+<p>The discrete-time LV model updates species abundances one time step
+at a time. Temperature affects each species through its intrinsic growth
+rate, and the LV interaction matrix determines how species affect one
+another within each update. This model is useful for fast exploratory
+experiments and for cases where a discrete-time approximation is
+adequate.</p>
+<p>Select it with:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="st">"model_type"</span><span class="er">:</span> <span class="st">"</span><span class="ch">\"</span><span class="st">lv_discrete</span><span class="ch">\"</span><span class="st">"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="continuous-time-lv">Continuous-Time LV<a class="anchor" aria-label="anchor" href="#continuous-time-lv"></a>
+</h3>
+<p>The continuous-time LV model uses the same temperature-dependent
+species traits and LV interaction matrix, but integrates the dynamics
+with <code><a href="https://rdrr.io/pkg/deSolve/man/ode.html" class="external-link">deSolve::ode()</a></code>. This makes it useful when the
+continuous-time formulation is more natural, when solver tolerances
+matter, or when continuous immigration is part of the model.</p>
+<p>Select it with:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="st">"model_type"</span><span class="er">:</span> <span class="st">"</span><span class="ch">\"</span><span class="st">lv_continuous</span><span class="ch">\"</span><span class="st">"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="continuous-time-consumer-resource">Continuous-Time Consumer-Resource<a class="anchor" aria-label="anchor" href="#continuous-time-consumer-resource"></a>
+</h3>
+<p>The consumer-resource model simulates consumer abundances and
+resource concentrations together. Consumers have temperature-dependent
+uptake curves, and their interactions arise indirectly through resource
+use. Depending on <code>resource_use_mode</code>, consumers can use one
+common resource, species-specific resources, or a mix of shared and
+private resources.</p>
+<p>Select it with:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="st">"model_type"</span><span class="er">:</span> <span class="st">"</span><span class="ch">\"</span><span class="st">consumer_resource_continuous</span><span class="ch">\"</span><span class="st">"</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
 <h2 id="how-species-traits-are-specified">How Species Traits Are Specified<a class="anchor" aria-label="anchor" href="#how-species-traits-are-specified"></a>
 </h2>
 <p>Species traits in a community are not usually specified by giving a
@@ -282,19 +360,19 @@ parameters.</li>
 <code>diagonal</code>: diagonal value, usually <code>1</code>.</li>
 </ul>
 <p>For example:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="st">"interaction_treatments"</span><span class="er">:</span> <span class="ot">[</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="fu">{</span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>    <span class="dt">"label"</span><span class="fu">:</span> <span class="st">"weak_asymmetric_competition"</span><span class="fu">,</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"competition"</span><span class="fu">,</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    <span class="dt">"symmetry"</span><span class="fu">:</span> <span class="st">"asymmetric"</span><span class="fu">,</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>    <span class="dt">"distribution"</span><span class="fu">:</span> <span class="st">"uniform"</span><span class="fu">,</span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    <span class="dt">"parameters"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>      <span class="dt">"min"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>      <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">0.2</span></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>    <span class="fu">},</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>    <span class="dt">"diagonal"</span><span class="fu">:</span> <span class="dv">1</span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>  <span class="fu">}</span></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="ot">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="st">"interaction_treatments"</span><span class="er">:</span> <span class="ot">[</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>    <span class="dt">"label"</span><span class="fu">:</span> <span class="st">"weak_asymmetric_competition"</span><span class="fu">,</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>    <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"competition"</span><span class="fu">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>    <span class="dt">"symmetry"</span><span class="fu">:</span> <span class="st">"asymmetric"</span><span class="fu">,</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>    <span class="dt">"distribution"</span><span class="fu">:</span> <span class="st">"uniform"</span><span class="fu">,</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>    <span class="dt">"parameters"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>      <span class="dt">"min"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>      <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">0.2</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>    <span class="dt">"diagonal"</span><span class="fu">:</span> <span class="dv">1</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="ot">]</span></span></code></pre></div>
 <p>For <code>type = "competition"</code>, off-diagonal effects are
 positive. This is the recommended way to ensure that all pairwise LV
 interactions are competitive. The older <code>lv_interactions</code> and
@@ -499,7 +577,7 @@ replicate treatments.</li>
 <li>Inspect outputs in the experiment folder.</li>
 </ol>
 <p>A compact example is:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">project_folder_location</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"~/Desktop"</span>, <span class="st">"community_simulator_projects"</span><span class="op">)</span></span>
 <span><span class="va">experiment_name</span> <span class="op">&lt;-</span> <span class="st">"discrete_lv_example"</span></span>
 <span><span class="va">experiment_design_filename</span> <span class="op">&lt;-</span> <span class="st">"experiment_definition.json"</span></span>
@@ -550,17 +628,446 @@ useful as smoke tests and as templates for larger experiments.</p>
 Most scalar and vector treatment values are stored as R expressions and
 evaluated when the experiment table is created.</p>
 <p>Single numeric values can be written directly:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="st">"temperature_mean"</span><span class="er">:</span> <span class="dv">20</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="st">"temperature_mean"</span><span class="er">:</span> <span class="dv">20</span></span></code></pre></div>
 <p>Vectors are usually written as strings containing R expressions:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="st">"richness"</span><span class="er">:</span> <span class="st">"c(2, 4, 8)"</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="st">"richness"</span><span class="er">:</span> <span class="st">"c(2, 4, 8)"</span></span></code></pre></div>
 <p>Character values that need to evaluate to strings must include
 escaped quotes:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="st">"model_type"</span><span class="er">:</span> <span class="st">"</span><span class="ch">\"</span><span class="st">lv_continuous</span><span class="ch">\"</span><span class="st">"</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="st">"model_type"</span><span class="er">:</span> <span class="st">"</span><span class="ch">\"</span><span class="st">lv_continuous</span><span class="ch">\"</span><span class="st">"</span></span></code></pre></div>
 <p>Character vectors follow the same pattern:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="st">"birth_optimum_distribution"</span><span class="er">:</span> <span class="st">"c(</span><span class="ch">\"</span><span class="st">regular</span><span class="ch">\"</span><span class="st">, </span><span class="ch">\"</span><span class="st">random_uniform</span><span class="ch">\"</span><span class="st">)"</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="st">"birth_optimum_distribution"</span><span class="er">:</span> <span class="st">"c(</span><span class="ch">\"</span><span class="st">regular</span><span class="ch">\"</span><span class="st">, </span><span class="ch">\"</span><span class="st">random_uniform</span><span class="ch">\"</span><span class="st">)"</span></span></code></pre></div>
 <p>Structured fields, such as <code>interaction_treatments</code>, can
 be written as JSON lists and objects rather than R expression
 strings.</p>
+</div>
+<div class="section level2">
+<h2 id="json-parameter-reference">JSON Parameter Reference<a class="anchor" aria-label="anchor" href="#json-parameter-reference"></a>
+</h2>
+<p>This table describes the main public-facing JSON parameters used by
+the bundled example experiments. Many entries can be a single value or a
+vector of values; vectors expand the experiment table across treatment
+combinations.</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Parameter</th>
+<th>Models</th>
+<th>Meaning and options</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>random_seed</code></td>
+<td>All</td>
+<td>Experiment-level random seed used to make generated communities and
+environments reproducible.</td>
+</tr>
+<tr class="even">
+<td><code>model_type</code></td>
+<td>All</td>
+<td>Population dynamic model. Options are <code>"lv_discrete"</code>,
+<code>"lv_continuous"</code>, and
+<code>"consumer_resource_continuous"</code>. If omitted, the default is
+<code>"lv_discrete"</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>richness</code></td>
+<td>All</td>
+<td>Number of species or consumers in each community.</td>
+</tr>
+<tr class="even">
+<td><code>number_of_community_replicates</code></td>
+<td>All</td>
+<td>Number of replicate communities for each community-treatment
+combination.</td>
+</tr>
+<tr class="odd">
+<td><code>temperature_mean</code></td>
+<td>All</td>
+<td>Mean of the generated environmental temperature time series.</td>
+</tr>
+<tr class="even">
+<td><code>temperature_sd</code></td>
+<td>All</td>
+<td>Standard deviation of the generated environmental temperature time
+series.</td>
+</tr>
+<tr class="odd">
+<td><code>one_over_f_gamma</code></td>
+<td>All</td>
+<td>Slope parameter for the <code>1/f</code> environmental noise
+process.</td>
+</tr>
+<tr class="even">
+<td><code>number_of_environment_replicates</code></td>
+<td>All</td>
+<td>Number of replicate temperature series for each environmental
+treatment.</td>
+</tr>
+<tr class="odd">
+<td><code>environment_sharing</code></td>
+<td>All</td>
+<td>How generated environments are shared among simulation cases.
+Options are <code>"same_per_replicate"</code> and
+<code>"all_different"</code>.</td>
+</tr>
+<tr class="even">
+<td><code>burn_in_duration</code></td>
+<td>All</td>
+<td>Number of initial time steps or time units treated as burn-in.</td>
+</tr>
+<tr class="odd">
+<td><code>experiment_duration</code></td>
+<td>All</td>
+<td>Number of post-burn-in time steps or time units used for the
+experiment.</td>
+</tr>
+<tr class="even">
+<td><code>parallel_environments</code></td>
+<td>All</td>
+<td>Logical. If <code>TRUE</code>, generate environmental time series in
+parallel where supported.</td>
+</tr>
+<tr class="odd">
+<td><code>parallel_simulations</code></td>
+<td>All</td>
+<td>Logical. If <code>TRUE</code>, simulate cases in parallel where
+supported.</td>
+</tr>
+<tr class="even">
+<td><code>parallel_workers</code></td>
+<td>All</td>
+<td>Number of worker processes for parallel environment generation or
+simulation.</td>
+</tr>
+<tr class="odd">
+<td><code>runtime_update_every</code></td>
+<td>All</td>
+<td>Number of cases between printed runtime/progress updates.</td>
+</tr>
+<tr class="even">
+<td><code>environment_progress</code></td>
+<td>All</td>
+<td>Logical. If <code>TRUE</code>, print progress, elapsed time, and
+estimated remaining time during environment creation.</td>
+</tr>
+<tr class="odd">
+<td><code>birth_maximum_mean</code></td>
+<td>LV</td>
+<td>Mean maximum height of the species birth-rate performance
+curve.</td>
+</tr>
+<tr class="even">
+<td><code>birth_maximum_range</code></td>
+<td>LV</td>
+<td>Total spread of maximum birth-rate values around
+<code>birth_maximum_mean</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>birth_maximum_distribution</code></td>
+<td>LV</td>
+<td>Distribution used to assign species maximum birth rates. Options
+include <code>"regular"</code> and <code>"random_uniform"</code>.</td>
+</tr>
+<tr class="even">
+<td><code>birth_optimum_mean</code></td>
+<td>LV</td>
+<td>Mean thermal optimum of the birth-rate performance curve.</td>
+</tr>
+<tr class="odd">
+<td><code>birth_optimum_range</code></td>
+<td>LV</td>
+<td>Total spread of birth thermal optima around
+<code>birth_optimum_mean</code>.</td>
+</tr>
+<tr class="even">
+<td><code>birth_optimum_distribution</code></td>
+<td>LV</td>
+<td>Distribution used to assign species birth thermal optima. Options
+include <code>"regular"</code> and <code>"random_uniform"</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>birth_width_mean</code></td>
+<td>LV</td>
+<td>Mean standard-deviation width of the Gaussian birth-rate performance
+curve.</td>
+</tr>
+<tr class="even">
+<td><code>birth_width_range</code></td>
+<td>LV</td>
+<td>Total spread of birth-rate performance-curve widths around
+<code>birth_width_mean</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>birth_width_distribution</code></td>
+<td>LV</td>
+<td>Distribution used to assign species birth-rate performance-curve
+widths. Options include <code>"regular"</code> and
+<code>"random_uniform"</code>.</td>
+</tr>
+<tr class="even">
+<td><code>death_intercept</code></td>
+<td>LV</td>
+<td>Intercept of the exponential death-rate curve, shared across
+species.</td>
+</tr>
+<tr class="odd">
+<td><code>death_temperature_slope</code></td>
+<td>LV</td>
+<td>Temperature sensitivity of the exponential death-rate curve, shared
+across species.</td>
+</tr>
+<tr class="even">
+<td><code>interaction_treatments</code></td>
+<td>LV</td>
+<td>List of LV interaction-matrix treatments. Each treatment can include
+<code>label</code>, <code>type</code>, <code>symmetry</code>,
+<code>distribution</code>, <code>parameters</code>, and
+<code>diagonal</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>interaction_treatments[].label</code></td>
+<td>LV</td>
+<td>Human-readable name for an interaction treatment.</td>
+</tr>
+<tr class="even">
+<td><code>interaction_treatments[].type</code></td>
+<td>LV</td>
+<td>Interaction type. Options are <code>"none"</code>,
+<code>"competition"</code>, <code>"any"</code>, and
+<code>"predator_prey"</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>interaction_treatments[].symmetry</code></td>
+<td>LV</td>
+<td>Off-diagonal symmetry. Options are <code>"asymmetric"</code>,
+<code>"symmetric"</code>, and <code>"antisymmetric"</code>.</td>
+</tr>
+<tr class="even">
+<td><code>interaction_treatments[].distribution</code></td>
+<td>LV</td>
+<td>Distribution for off-diagonal interaction strengths. Options include
+<code>"constant"</code>, <code>"uniform"</code>, <code>"normal"</code>,
+<code>"lognormal"</code>, and <code>"gamma"</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>interaction_treatments[].parameters</code></td>
+<td>LV</td>
+<td>Named numeric parameters for the selected interaction-strength
+distribution.</td>
+</tr>
+<tr class="even">
+<td><code>interaction_treatments[].diagonal</code></td>
+<td>LV</td>
+<td>Diagonal interaction value, usually <code>1</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>temperature_interpolation</code></td>
+<td>Continuous LV, CR</td>
+<td>How the continuous-time simulator interpolates temperature between
+generated values. Options are <code>"linear"</code> and
+<code>"constant"</code>.</td>
+</tr>
+<tr class="even">
+<td><code>immigration_rate</code></td>
+<td>Continuous LV</td>
+<td>Immigration rate per species.</td>
+</tr>
+<tr class="odd">
+<td><code>immigration_mode</code></td>
+<td>Continuous LV</td>
+<td>How immigration is applied. Options are <code>"continuous"</code>
+and <code>"pulse"</code>.</td>
+</tr>
+<tr class="even">
+<td><code>ode_method</code></td>
+<td>Continuous LV, CR</td>
+<td>ODE solver method passed to <code><a href="https://rdrr.io/pkg/deSolve/man/ode.html" class="external-link">deSolve::ode()</a></code>, commonly
+<code>"lsoda"</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>ode_rtol</code></td>
+<td>Continuous LV, CR</td>
+<td>Relative tolerance for the ODE solver.</td>
+</tr>
+<tr class="even">
+<td><code>ode_atol</code></td>
+<td>Continuous LV, CR</td>
+<td>Absolute tolerance for the ODE solver.</td>
+</tr>
+<tr class="odd">
+<td><code>ode_max_step</code></td>
+<td>Continuous LV, CR</td>
+<td>Maximum ODE solver step size.</td>
+</tr>
+<tr class="even">
+<td><code>blowup_threshold</code></td>
+<td>Continuous LV, CR</td>
+<td>Abundance threshold above which a simulation is treated as having
+blown up.</td>
+</tr>
+<tr class="odd">
+<td><code>uptake_maximum_mean</code></td>
+<td>CR</td>
+<td>Mean maximum height of the consumer uptake curve.</td>
+</tr>
+<tr class="even">
+<td><code>uptake_maximum_range</code></td>
+<td>CR</td>
+<td>Total spread of maximum uptake values around
+<code>uptake_maximum_mean</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>uptake_maximum_distribution</code></td>
+<td>CR</td>
+<td>Distribution used to assign species maximum uptake values. Options
+include <code>"regular"</code> and <code>"random_uniform"</code>.</td>
+</tr>
+<tr class="even">
+<td><code>uptake_optimum_mean</code></td>
+<td>CR</td>
+<td>Mean thermal optimum of the consumer uptake curve.</td>
+</tr>
+<tr class="odd">
+<td><code>uptake_optimum_range</code></td>
+<td>CR</td>
+<td>Total spread of uptake thermal optima around
+<code>uptake_optimum_mean</code>.</td>
+</tr>
+<tr class="even">
+<td><code>uptake_optimum_distribution</code></td>
+<td>CR</td>
+<td>Distribution used to assign species uptake thermal optima. Options
+include <code>"regular"</code> and <code>"random_uniform"</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>uptake_width_mean</code></td>
+<td>CR</td>
+<td>Mean standard-deviation width of the Gaussian uptake curve.</td>
+</tr>
+<tr class="even">
+<td><code>uptake_width_range</code></td>
+<td>CR</td>
+<td>Total spread of uptake-curve widths around
+<code>uptake_width_mean</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>uptake_width_distribution</code></td>
+<td>CR</td>
+<td>Distribution used to assign species uptake-curve widths. Options
+include <code>"regular"</code> and <code>"random_uniform"</code>.</td>
+</tr>
+<tr class="even">
+<td><code>half_saturation_mean</code></td>
+<td>CR</td>
+<td>Mean Monod half-saturation constant.</td>
+</tr>
+<tr class="odd">
+<td><code>half_saturation_range</code></td>
+<td>CR</td>
+<td>Total spread of half-saturation constants around
+<code>half_saturation_mean</code>.</td>
+</tr>
+<tr class="even">
+<td><code>half_saturation_distribution</code></td>
+<td>CR</td>
+<td>Distribution used to assign half-saturation constants. Options
+include <code>"regular"</code> and <code>"random_uniform"</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>consumer_death_rate</code></td>
+<td>CR</td>
+<td>Consumer death rate, shared across consumers.</td>
+</tr>
+<tr class="even">
+<td><code>resource_renewal_rate</code></td>
+<td>CR</td>
+<td>Chemostat resource renewal rate.</td>
+</tr>
+<tr class="odd">
+<td><code>resource_supply</code></td>
+<td>CR</td>
+<td>Resource supply concentration.</td>
+</tr>
+<tr class="even">
+<td><code>conversion_efficiency</code></td>
+<td>CR</td>
+<td>Conversion efficiency from resource uptake to consumer growth.</td>
+</tr>
+<tr class="odd">
+<td><code>resource_use_mode</code></td>
+<td>CR</td>
+<td>Resource-use structure. Options are
+<code>"one_resource_all_consumers"</code>, <code>"diagonal"</code>, and
+<code>"shared_to_private"</code>.</td>
+</tr>
+<tr class="even">
+<td><code>active_resource</code></td>
+<td>CR</td>
+<td>Resource index used as the common active or shared resource.</td>
+</tr>
+<tr class="odd">
+<td><code>private_resource_use_distribution</code></td>
+<td>CR</td>
+<td>Distribution for species-level private-resource use in
+<code>"shared_to_private"</code> mode. Options are
+<code>"constant"</code>, <code>"regular"</code>,
+<code>"random_uniform"</code>, and <code>"beta"</code>.</td>
+</tr>
+<tr class="even">
+<td><code>private_resource_use_mean</code></td>
+<td>CR</td>
+<td>Mean private-resource use fraction. Shared-resource use is
+<code>1 - private_resource_use</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>private_resource_use_range</code></td>
+<td>CR</td>
+<td>Total spread of private-resource use fractions for
+<code>"regular"</code> and <code>"random_uniform"</code>
+distributions.</td>
+</tr>
+<tr class="even">
+<td><code>private_resource_use_precision</code></td>
+<td>CR</td>
+<td>Precision of the beta distribution around
+<code>private_resource_use_mean</code>; higher values give less
+among-species variation.</td>
+</tr>
+<tr class="odd">
+<td><code>consumer_immigration_rate</code></td>
+<td>CR</td>
+<td>Immigration rate for consumers.</td>
+</tr>
+<tr class="even">
+<td><code>initial_consumer_total_abundance</code></td>
+<td>CR</td>
+<td>Initial total consumer abundance distributed across consumers.</td>
+</tr>
+<tr class="odd">
+<td><code>resource_initial_value</code></td>
+<td>CR</td>
+<td>Initial concentration for each resource.</td>
+</tr>
+<tr class="even">
+<td><code>negative_tolerance</code></td>
+<td>CR</td>
+<td>Small numerical tolerance used when checking negative values in ODE
+output.</td>
+</tr>
+</tbody>
+</table>
+<p>Legacy field names such as <code>dynamics_type</code>,
+<code>number_of_species_treatment</code>,
+<code>temperature_series_control</code>, <code>a_b_*</code>,
+<code>b_opt_*</code>, <code>sd_perf_*</code>, <code>u_max_*</code>,
+<code>u_opt_*</code>, <code>sd_u_*</code>, and
+<code>resource_specialization_*</code> are still accepted as aliases for
+backwards compatibility. New experiments should use the names in the
+table above.</p>
 </div>
 <div class="section level2">
 <h2 id="outputs">Outputs<a class="anchor" aria-label="anchor" href="#outputs"></a>
