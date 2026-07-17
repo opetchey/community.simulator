@@ -137,3 +137,15 @@ Installed vignettes can be opened from R:
 
 browseVignettes("community.simulator")
 ```
+
+## Developer Note
+
+Some user-facing JSON parameter names have been renamed to be clearer
+for reviewers and users. These changes preserve backwards compatibility
+through aliases, so older experiment-definition files should continue to
+work.
+
+As a result, internal parameter names, function arguments, and
+output-column names may differ from the preferred user-facing JSON
+names. When changing the experiment schema, please preserve existing
+aliases unless there is a deliberate reason to make a breaking change.

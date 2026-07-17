@@ -30,9 +30,14 @@ create_one_environment <- function(i, environments, expt_def) {
     dplyr::filter(time > expt_def$burn_in_duration)
 }
 
-#' Create temperature times series. Currently three options for how times series vary among cases.
-#' 1) `same_per_replicate` replicates of the same number share the same environmental time series. E.g., `case1_rep1` and `case2_rep1` share the same time series.
-#' 2) `all_different` all environmental time series are different
+#' Create temperature time series.
+#'
+#' Environmental series sharing is controlled in the experiment table by the
+#' JSON field `environment_sharing`. With `"same_per_replicate"`, cases with
+#' the same environment treatment and replicate number share an environmental
+#' time series. With `"all_different"`, each simulation case gets its own
+#' environmental time series. The legacy field `temperature_series_control` is
+#' still accepted as an alias.
 #'
 #' @param experiment_folder The folder where all information about the experiment is stored
 #' @param experiment_design_filename The filename of the experiment design file

@@ -1,21 +1,22 @@
 [
   {
     "random_seed": 123,
-    "number_of_species_treatment": "c(2)",
+    "model_type": "\"lv_discrete\"",
+    "richness": "c(2)",
 
-    "a_b_mean_treatment": 0.3,
-    "a_b_range_treatment": "c(0)",
-    "a_b_distribution": "c(\"random_uniform\")",
+    "birth_maximum_mean": 0.3,
+    "birth_maximum_range": "c(0)",
+    "birth_maximum_distribution": "c(\"random_uniform\")",
 
-    "b_opt_mean_treatment": "c(20)",
-    "b_opt_range_treatment": "c(4)",
-    "b_opt_distribution": "c(\"random_uniform\")",
+    "birth_optimum_mean": "c(20)",
+    "birth_optimum_range": "c(4)",
+    "birth_optimum_distribution": "c(\"random_uniform\")",
 
-    "sd_perf_distribution": "c(\"random_uniform\")",
-    "sd_perf_mean": "c(10)",
-    "sd_perf_range": "c(0)",
+    "birth_width_distribution": "c(\"random_uniform\")",
+    "birth_width_mean": "c(10)",
+    "birth_width_range": "c(0)",
 
-    "lv_interactions": [
+    "interaction_treatments": [
       {
         "label": "no_interactions",
         "type": "none",
@@ -41,12 +42,12 @@
     "one_over_f_gamma": 0.8,
     "number_of_environment_replicates": 1,
 
-    "temperature_series_control": "c(\"same_per_replicate\")",
+    "environment_sharing": "c(\"same_per_replicate\")",
 
     "burn_in_duration": 10,
     "experiment_duration": 20,
 
-    "a_d": 0,
-    "z": 0.05
+    "death_intercept": 0,
+    "death_temperature_slope": 0.05
   }
 ]

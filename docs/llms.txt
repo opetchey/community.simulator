@@ -138,21 +138,24 @@ Installed vignettes can be opened from R:
 browseVignettes("community.simulator")
 ```
 
+## Developer Note
+
+Some user-facing JSON parameter names have been renamed to be clearer
+for reviewers and users. These changes preserve backwards compatibility
+through aliases, so older experiment-definition files should continue to
+work.
+
+As a result, internal parameter names, function arguments, and
+output-column names may differ from the preferred user-facing JSON
+names. When changing the experiment schema, please preserve existing
+aliases unless there is a deliberate reason to make a breaking change.
+
 # Package index
 
 ## All functions
 
 - [`create_environments()`](https://opetchey.github.io/community.simulator/reference/create_environments.md)
-  :
-
-  Create temperature times series. Currently three options for how times
-  series vary among cases.
-
-  1.  `same_per_replicate` replicates of the same number share the same
-      environmental time series. E.g., `case1_rep1` and `case2_rep1`
-      share the same time series.
-
-  2.  `all_different` all environmental time series are different
+  : Create temperature time series.
 
 - [`create_experiment_folder()`](https://opetchey.github.io/community.simulator/reference/create_experiment_folder.md)
   : Create folder for experiment
@@ -279,4 +282,5 @@ browseVignettes("community.simulator")
 
 ### Reference guide
 
-- [User_guide](https://opetchey.github.io/community.simulator/articles/User_guide.md):
+- [User
+  Guide](https://opetchey.github.io/community.simulator/articles/User_guide.md):

@@ -3,16 +3,7 @@
 ## All functions
 
 - [`create_environments()`](https://opetchey.github.io/community.simulator/reference/create_environments.md)
-  :
-
-  Create temperature times series. Currently three options for how times
-  series vary among cases.
-
-  1.  `same_per_replicate` replicates of the same number share the same
-      environmental time series. E.g., `case1_rep1` and `case2_rep1`
-      share the same time series.
-
-  2.  `all_different` all environmental time series are different
+  : Create temperature time series.
 
 - [`create_experiment_folder()`](https://opetchey.github.io/community.simulator/reference/create_experiment_folder.md)
   : Create folder for experiment

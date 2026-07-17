@@ -2,11 +2,7 @@
 % Please edit documentation in R/create_environments.R
 \name{create_environments}
 \alias{create_environments}
-\title{Create temperature times series. Currently three options for how times series vary among cases.
-\enumerate{
-\item \code{same_per_replicate} replicates of the same number share the same environmental time series. E.g., \code{case1_rep1} and \code{case2_rep1} share the same time series.
-\item \code{all_different} all environmental time series are different
-}}
+\title{Create temperature time series.}
 \usage{
 create_environments(
   experiment_folder,
@@ -28,11 +24,12 @@ create_environments(
 Returns nothing. Saves to SQLite databases the temperature time series.
 }
 \description{
-Create temperature times series. Currently three options for how times series vary among cases.
-\enumerate{
-\item \code{same_per_replicate} replicates of the same number share the same environmental time series. E.g., \code{case1_rep1} and \code{case2_rep1} share the same time series.
-\item \code{all_different} all environmental time series are different
-}
+Environmental series sharing is controlled in the experiment table by the
+JSON field \code{environment_sharing}. With \code{"same_per_replicate"}, cases with
+the same environment treatment and replicate number share an environmental
+time series. With \code{"all_different"}, each simulation case gets its own
+environmental time series. The legacy field \code{temperature_series_control} is
+still accepted as an alias.
 }
 \details{
 Experiment JSON files can optionally include

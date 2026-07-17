@@ -27,11 +27,12 @@ Returns the number of cases in the experiment. Also saves to RDS the experiment 
 This function takes the experimental design from the specified JSON experiment design file and creates a table of all the simulations that will be run.
 }
 \details{
-LV experiment definitions can use the preferred \code{lv_interactions}
+LV experiment definitions can use the preferred
+\code{interaction_treatments}
 field to specify one or more named interaction treatments. Each treatment
 can set \code{type}, \code{symmetry}, \code{distribution}, \code{parameters}, and \code{diagonal}.
-Legacy \verb{alpha_ij_*} fields are still supported and are converted to
-interaction specifications internally.
+Legacy \code{lv_interactions} and \verb{alpha_ij_*} fields are still supported and
+are converted to interaction specifications internally.
 }
 \examples{
 NULL

@@ -40,11 +40,11 @@ experiment design, for later use.
 
 ## Details
 
-LV experiment definitions can use the preferred `lv_interactions` field
-to specify one or more named interaction treatments. Each treatment can
-set `type`, `symmetry`, `distribution`, `parameters`, and `diagonal`.
-Legacy `alpha_ij_*` fields are still supported and are converted to
-interaction specifications internally.
+LV experiment definitions can use the preferred `interaction_treatments`
+field to specify one or more named interaction treatments. Each
+treatment can set `type`, `symmetry`, `distribution`, `parameters`, and
+`diagonal`. Legacy `lv_interactions` and `alpha_ij_*` fields are still
+supported and are converted to interaction specifications internally.
 
 ## Examples
 

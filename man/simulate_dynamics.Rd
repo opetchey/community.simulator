@@ -31,7 +31,10 @@ Simulate the dynamics of all the cases in an experiment
 Unfortunately at the moment has features of temperature series hard coded in
 }
 \details{
-Experiment JSON files can optionally include
+Experiment JSON files can set \code{model_type} to \code{"lv_discrete"},
+\code{"lv_continuous"}, or \code{"consumer_resource_continuous"}. Legacy
+\code{dynamics_type} values are still accepted as aliases. Experiment JSON files
+can also optionally include
 \code{parallel_simulations}, \code{parallel_workers}, and
 \code{initial_abundance_seed_base}. They can also include output-control options:
 \code{save_dynamics}, \code{save_resources}, \code{dynamics_save_every}, and

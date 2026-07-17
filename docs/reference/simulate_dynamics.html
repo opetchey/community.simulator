@@ -76,7 +76,10 @@ databases depending on output-control settings.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Experiment JSON files can optionally include
+    <p>Experiment JSON files can set <code>model_type</code> to <code>"lv_discrete"</code>,
+<code>"lv_continuous"</code>, or <code>"consumer_resource_continuous"</code>. Legacy
+<code>dynamics_type</code> values are still accepted as aliases. Experiment JSON files
+can also optionally include
 <code>parallel_simulations</code>, <code>parallel_workers</code>, and
 <code>initial_abundance_seed_base</code>. They can also include output-control options:
 <code>save_dynamics</code>, <code>save_resources</code>, <code>dynamics_save_every</code>, and

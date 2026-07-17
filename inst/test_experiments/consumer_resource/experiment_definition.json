@@ -1,35 +1,35 @@
 [
   {
     "random_seed": 789,
-    "dynamics_type": "\"consumer_resource_continuous\"",
-    "number_of_species_treatment": "c(2)",
+    "model_type": "\"consumer_resource_continuous\"",
+    "richness": "c(2)",
 
-    "u_max_mean_treatment": "c(0.06)",
-    "u_max_range_treatment": "c(0)",
-    "u_max_distribution": "c(\"random_uniform\")",
+    "uptake_maximum_mean": "c(0.06)",
+    "uptake_maximum_range": "c(0)",
+    "uptake_maximum_distribution": "c(\"random_uniform\")",
 
-    "u_opt_mean_treatment": "c(20)",
-    "u_opt_range_treatment": "c(4)",
-    "u_opt_distribution": "c(\"random_uniform\")",
+    "uptake_optimum_mean": "c(20)",
+    "uptake_optimum_range": "c(4)",
+    "uptake_optimum_distribution": "c(\"random_uniform\")",
 
-    "sd_u_distribution": "c(\"random_uniform\")",
-    "sd_u_mean": "c(5)",
-    "sd_u_range": "c(0)",
+    "uptake_width_distribution": "c(\"random_uniform\")",
+    "uptake_width_mean": "c(5)",
+    "uptake_width_range": "c(0)",
 
-    "half_saturation_mean_treatment": "c(100)",
-    "half_saturation_range_treatment": "c(0)",
+    "half_saturation_mean": "c(100)",
+    "half_saturation_range": "c(0)",
     "half_saturation_distribution": "c(\"random_uniform\")",
 
-    "consumer_death_rate_treatment": "c(0.03)",
-    "resource_renewal_rate_treatment": "c(1)",
-    "resource_supply_treatment": "c(1000)",
+    "consumer_death_rate": "c(0.03)",
+    "resource_renewal_rate": "c(1)",
+    "resource_supply": "c(1000)",
     "conversion_efficiency": "c(1)",
 
     "resource_use_mode": "c(\"shared_to_private\")",
     "active_resource": 1,
-    "resource_specialization_distribution": "c(\"beta\")",
-    "resource_specialization_mean": "c(0.7)",
-    "resource_specialization_precision": "c(10)",
+    "private_resource_use_distribution": "c(\"beta\")",
+    "private_resource_use_mean": "c(0.7)",
+    "private_resource_use_precision": "c(10)",
 
     "number_of_community_replicates": 1,
 
@@ -38,7 +38,7 @@
     "one_over_f_gamma": 0.8,
     "number_of_environment_replicates": 1,
 
-    "temperature_series_control": "c(\"same_per_replicate\")",
+    "environment_sharing": "c(\"same_per_replicate\")",
 
     "burn_in_duration": 10,
     "experiment_duration": 20,

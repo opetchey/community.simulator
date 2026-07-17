@@ -55,3 +55,21 @@ require_dbplyr <- function() {
     x
   }
 }
+
+#' @keywords internal
+normalize_model_type <- function(model_type) {
+  model_type <- as.character(model_type)
+  switch(
+    model_type,
+    lv_discrete = "discrete",
+    discrete = "discrete",
+    lv_continuous = "continuous",
+    continuous = "continuous",
+    consumer_resource_continuous = "consumer_resource_continuous",
+    stop(
+      "`model_type` must be 'lv_discrete', 'lv_continuous', or ",
+      "'consumer_resource_continuous'.",
+      call. = FALSE
+    )
+  )
+}

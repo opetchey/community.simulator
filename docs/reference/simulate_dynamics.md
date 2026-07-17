@@ -40,7 +40,10 @@ databases depending on output-control settings.
 
 ## Details
 
-Experiment JSON files can optionally include `parallel_simulations`,
+Experiment JSON files can set `model_type` to `"lv_discrete"`,
+`"lv_continuous"`, or `"consumer_resource_continuous"`. Legacy
+`dynamics_type` values are still accepted as aliases. Experiment JSON
+files can also optionally include `parallel_simulations`,
 `parallel_workers`, and `initial_abundance_seed_base`. They can also
 include output-control options: `save_dynamics`, `save_resources`,
 `dynamics_save_every`, and `resources_save_every`. They can also include

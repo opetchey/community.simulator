@@ -23,8 +23,16 @@ format_duration <- function(seconds) {
   paste0(round(seconds / 3600, 1), " hr")
 }
 
-get_json_design_value <- function(expt_def, name, default) {
-  value <- expt_def[[name]]
+get_json_design_value <- function(expt_def, name, default, aliases = character()) {
+  candidates <- c(name, aliases)
+  selected <- candidates[vapply(candidates, function(candidate) {
+    !is.null(expt_def[[candidate]]) && length(expt_def[[candidate]]) > 0
+  }, logical(1))]
+  if (length(selected) == 0) {
+    return(default)
+  }
+
+  value <- expt_def[[selected[[1]]]]
   if (is.null(value) || length(value) == 0) {
     return(default)
   }
@@ -66,7 +74,12 @@ estimate_experiment_outputs <- function(experiment_folder, experiment_design_fil
   if (is.na(runtime_update_every) || runtime_update_every < 1) {
     runtime_update_every <- 1L
   }
-  dynamics_type <- get_json_design_value(expt_def, "dynamics_type", "discrete")
+  dynamics_type <- normalize_model_type(get_json_design_value(
+    expt_def,
+    "model_type",
+    "lv_discrete",
+    aliases = "dynamics_type"
+  ))
   parallel_simulations <- isTRUE(get_json_design_value(expt_def, "parallel_simulations", FALSE))
   parallel_environments <- isTRUE(get_json_design_value(
     expt_def,

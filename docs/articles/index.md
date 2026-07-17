@@ -16,4 +16,5 @@
 
 ### Reference guide
 
-- [User_guide](https://opetchey.github.io/community.simulator/articles/User_guide.md):
+- [User
+  Guide](https://opetchey.github.io/community.simulator/articles/User_guide.md):

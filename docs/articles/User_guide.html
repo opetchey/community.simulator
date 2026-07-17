@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>User_guide • community.simulator</title>
+<title>User Guide • community.simulator</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="User_guide">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="User Guide">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -43,11 +43,11 @@
 
 
 
-<script src="User_guide_files/kePrint-0.0.1/kePrint.js"></script><link href="User_guide_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>User_guide</h1>
+      <h1>User Guide</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/opetchey/community.simulator/blob/HEAD/vignettes/User_guide.Rmd" class="external-link"><code>vignettes/User_guide.Rmd</code></a></small>
@@ -57,250 +57,448 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/opetchey/community.simulator" class="external-link">community.simulator</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://opetchey.github.io/community.simulator/">community.simulator</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="purpose">Purpose<a class="anchor" aria-label="anchor" href="#purpose"></a>
 </h2>
-<blockquote>
-<p>Draft note: this user guide is still a work in progress. Some parts
-may change as the package interface and documentation continue to
-improve.</p>
-</blockquote>
-<p>This <code>community.simulator</code> package is a tool to simulate
-the dynamics of a community of species and to design and run experiments
-where features of species and the environment can be manipulated.</p>
-<p>It was originally created to allow investigation of how response
-diversity influences community stability.</p>
-<div class="section level3">
-<h3 id="the-population-dynamic-model">The population dynamic model<a class="anchor" aria-label="anchor" href="#the-population-dynamic-model"></a>
-</h3>
-<p>We have
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
-species that can be interacting and whose vital rates are temperature
-dependent. We assume density-dependent birth rate,
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>),
-and death rate
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>D</mi><annotation encoding="application/x-tex">D</annotation></semantics></math>)
-in a discrete-time version of the classical Lotka–Volterra model <span class="citation">[@de2013predicting; @vasseur2020impact]</span> to get
-instantaneous growth rate,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>r</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\tilde{r}_{i}(t)</annotation></semantics></math>,
-for species,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
-in year
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>:</p>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>r</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>l</mi><mi>n</mi><msub><mi>N</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>l</mi><mi>n</mi><msub><mi>N</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>B</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>N</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><msub><mi>N</mi><mi>j</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>D</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>N</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><msub><mi>N</mi><mi>j</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>r</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}\label{eq.r}
-   \tilde{r}_{i}(t) = ln N_{i}(t+1) - ln N_{i}(t) = B(N_{i}(t),N_{j}(t),T(t)) - D(N_{i}(t),N_{j}(t),T(t))(\#eq:r)
-\end{equation}</annotation></semantics></math><p>Here,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">N(t)</annotation></semantics></math>
-represents the biomass at year
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow><annotation encoding="application/x-tex">i,j</annotation></semantics></math>
-are indices for two different species.</p>
-<p>The per-capita birth and death rates for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>i</mi><mrow><mi>t</mi><mi>h</mi></mrow></msup><annotation encoding="application/x-tex">i^{th}</annotation></semantics></math>
-species are represented as:</p>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>B</mi><mi>i</mi></msub><mo>=</mo><msub><mi>b</mi><mrow><mn>0</mn><mo>,</mo><mi>i</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>β</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>N</mi><mi>i</mi></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>≠</mo><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>S</mi></munderover><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msub><mi>N</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>B</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}\label{eq.B}
-   B_{i} = b_{0,i}(T)-\beta (N_{i}+\sum_{i \neq j = 1}^{S} \alpha_{ij}N_{j})(\#eq:B)
-\end{equation}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>D</mi><mi>i</mi></msub><mo>=</mo><msub><mi>d</mi><mrow><mn>0</mn><mo>,</mo><mi>i</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>δ</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>N</mi><mi>i</mi></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>≠</mo><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>S</mi></munderover><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msub><mi>N</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>D</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}\label{eq.D}
-   D_{i} = d_{0,i}(T)-\delta (N_{i}+\sum_{i \neq j = 1}^{S} \alpha_{ij}N_{j})(\#eq:D)
-\end{equation}</annotation></semantics></math><p>where,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>
-are density-dependent constants,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">\alpha_{i,j}</annotation></semantics></math>
-is the competition coefficient between species
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>,
-and</p>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>b</mi><mrow><mn>0</mn><mo>,</mo><mi>i</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>a</mi><mi>b</mi></msub><msup><mi>e</mi><mrow><mi>−</mi><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo>−</mo><msub><mi>b</mi><mrow><mi>o</mi><mi>p</mi><mi>t</mi><mo>,</mo><mi>i</mi></mrow></msub><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup><mi>/</mi><msub><mi>s</mi><mi>i</mi></msub></mrow></msup><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>b</mi><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}\label{eq.b0}
-   b_{0,i}(T) = a_{b} e^{-(T-b_{opt,i})^2/s_{i}} (\#eq:b0)
-\end{equation}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mrow><mn>0</mn><mo>,</mo><mi>i</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>a</mi><mi>d</mi></msub><msup><mi>e</mi><mrow><msub><mi>z</mi><mi>i</mi></msub><mi>T</mi></mrow></msup><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>d</mi><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}\label{eq.d0}
-   d_{0,i}(T) = a_{d} e^{z_{i}T} (\#eq:d0)
-\end{equation}</annotation></semantics></math><p>with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mi>b</mi></msub><annotation encoding="application/x-tex">a_{b}</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mi>d</mi></msub><annotation encoding="application/x-tex">a_{d}</annotation></semantics></math>
-as intercepts, and for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>i</mi><mrow><mi>t</mi><mi>h</mi></mrow></msup><annotation encoding="application/x-tex">i^{th}</annotation></semantics></math>
-species,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>b</mi><mrow><mi>o</mi><mi>p</mi><mi>t</mi><mo>,</mo><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">b_{opt,i}</annotation></semantics></math>
-is the temperature that optimizes birth rate,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>s</mi><mi>i</mi></msub><annotation encoding="application/x-tex">s_{i}</annotation></semantics></math>
-governs the breadth of the birth function,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>z</mi><mi>i</mi></msub><annotation encoding="application/x-tex">z_{i}</annotation></semantics></math>
-scales the effect of temperature (in °C) to mimic the Arrhenius
-relationship.</p>
-<p>Substituting Eqs. () - () in Eq. (), we get the following,</p>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>r</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>r</mi><mrow><mi>m</mi><mo>,</mo><mi>i</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mstyle displaystyle="true"><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>,</mo><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>S</mi></munderover><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msub><mi>N</mi><mi>j</mi></msub></mrow><msub><mi>K</mi><mi>i</mi></msub></mfrac></mstyle><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>r</mi><mn>2</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}\label{eq.r2}
-   \tilde{r}_{i}(t) = r_{m,i} \left( 1-\dfrac{\sum_{i, j = 1}^{S} \alpha_{ij}N_{j}}{K_{i}} \right) (\#eq:r2)
-\end{equation}</annotation></semantics></math><p>where,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>α</mi><mrow><mi>i</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\alpha_{ii} = 1</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mrow><mi>m</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>b</mi><mrow><mn>0</mn><mo>,</mo><mi>i</mi></mrow></msub><mo>−</mo><msub><mi>d</mi><mrow><mn>0</mn><mo>,</mo><mi>i</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">r_{m,i} = (b_{0,i} - d_{0,i})</annotation></semantics></math>
-is the intrinsic (maximum) rate of increase and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>K</mi><mi>i</mi></msub><mo>=</mo><msub><mi>r</mi><mrow><mi>m</mi><mo>,</mo><mi>i</mi></mrow></msub><mi>/</mi><mo stretchy="false" form="prefix">(</mo><mi>β</mi><mo>+</mo><mi>δ</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">K_{i} = r_{m,i}/(\beta+\delta)</annotation></semantics></math>
-is the carrying capacity for the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>i</mi><mrow><mi>t</mi><mi>h</mi></mrow></msup><annotation encoding="application/x-tex">i^{th}</annotation></semantics></math>
-species, respectively.</p>
-<p>At each time step there is a small amount of immigration into the
-system. This is implemented by adding 0.1 to all species’ biomass at
-each time step. Done in the <code>simulator_lv</code> function.</p>
+<p><code>community.simulator</code> is an R package for designing and
+running simulation experiments on multispecies communities with
+temperature-dependent vital rates. It was developed to explore how
+species traits, environmental variability, and response diversity
+influence community dynamics and stability.</p>
+<p>This guide is the package-level reference for users and reviewers. It
+explains the model families, the experiment workflow, the JSON
+experiment specification, and the main outputs. For executable,
+one-community examples, start with the single-community walkthroughs.
+For a small end-to-end experiment, see the getting-started vignette.</p>
 </div>
-<div class="section level3">
-<h3 id="model-parameters">Model parameters<a class="anchor" aria-label="anchor" href="#model-parameters"></a>
-</h3>
-<p>The following need to be specified for a community (in addition to
-the number of species):</p>
-<table class="table table" style="margin-left: auto; margin-right: auto;">
-<thead><tr>
-<th style="text-align:left;">
-Property
-</th>
-<th style="text-align:left;">
-Level
-</th>
-<th style="text-align:left;">
-Notes
-</th>
+<div class="section level2">
+<h2 id="main-ideas">Main Ideas<a class="anchor" aria-label="anchor" href="#main-ideas"></a>
+</h2>
+<p>The package separates a simulation study into four layers:</p>
+<ul>
+<li>
+<strong>Community specification</strong>: species traits,
+interaction structure, or consumer-resource parameters.</li>
+<li>
+<strong>Environment specification</strong>: environmental
+temperature time series.</li>
+<li>
+<strong>Experiment design</strong>: the grid of community
+treatments, environment treatments, and replicates.</li>
+<li>
+<strong>Workflow execution</strong>: creating the experiment table,
+generating environments, simulating dynamics, and calculating summary
+measures.</li>
+</ul>
+<p>The central workflow is controlled by a JSON experiment-definition
+file. The package reads that file, expands treatment values into an
+experiment table, and runs one simulation case for each row of that
+table.</p>
+</div>
+<div class="section level2">
+<h2 id="supported-model-families">Supported Model Families<a class="anchor" aria-label="anchor" href="#supported-model-families"></a>
+</h2>
+<p>The package currently supports three model families.</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Model family</th>
+<th><code>model_type</code></th>
+<th>Main use</th>
 </tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-a_b
-</td>
-<td style="text-align:left;">
-Species
-</td>
-<td style="text-align:left;">
-Intercept of intrinsic growth rate - temperature function of species i.
-</td>
+<tr class="odd">
+<td>Discrete-time Lotka-Volterra</td>
+<td><code>"lv_discrete"</code></td>
+<td>Fast experiments with temperature-dependent intrinsic growth and LV
+interaction matrices</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-b_{opt,i}
-</td>
-<td style="text-align:left;">
-Species
-</td>
-<td style="text-align:left;">
-Temperature at which intrinsic growth rate is highest for species i.
-</td>
+<tr class="even">
+<td>Continuous-time Lotka-Volterra</td>
+<td><code>"lv_continuous"</code></td>
+<td>ODE-based LV dynamics with temperature interpolation and immigration
+controls</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-s_i
-</td>
-<td style="text-align:left;">
-Species
-</td>
-<td style="text-align:left;">
-Width of intrinsic growth rate - temperature function of species i.
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-a_d
-</td>
-<td style="text-align:left;">
-Species
-</td>
-<td style="text-align:left;">
-Intercept of death rate - temperature function of species i.
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-z_i
-</td>
-<td style="text-align:left;">
-Species
-</td>
-<td style="text-align:left;">
-Slope of death rate - temperature function of species i.
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-alpha_{i,j}
-</td>
-<td style="text-align:left;">
-Interaction
-</td>
-<td style="text-align:left;">
-Strength of interspecific effect of species j on species i.
-</td>
+<tr class="odd">
+<td>Continuous-time consumer-resource</td>
+<td><code>"consumer_resource_continuous"</code></td>
+<td>Resource-mediated consumer dynamics with temperature-dependent
+uptake</td>
 </tr>
 </tbody>
 </table>
-</div>
+<p>If <code>model_type</code> is omitted from the JSON file, the package
+uses the discrete-time Lotka-Volterra model.</p>
 </div>
 <div class="section level2">
-<h2 id="designing-an-experiment">Designing an Experiment<a class="anchor" aria-label="anchor" href="#designing-an-experiment"></a>
+<h2 id="how-species-traits-are-specified">How Species Traits Are Specified<a class="anchor" aria-label="anchor" href="#how-species-traits-are-specified"></a>
 </h2>
-<p>An experiment consists of a number of “cases”. Each case consists of
-a combination of community composition and environmental variability.
-The community composition is defined by the species present and their
-properties. The environmental variability is a time series of
-environmental conditions that the community is exposed to. When a single
-community has multiple replicates, then each replicate has the same
-community composition but different environmental variability.</p>
-<p>The features of the experiment are given in a JSON file.</p>
-<div class="section level3">
-<h3 id="creating-environmental-variability">Creating environmental variability<a class="anchor" aria-label="anchor" href="#creating-environmental-variability"></a>
-</h3>
-<p>Currently created by 1 over f process with <em>gamma</em> (slope of
-frequency-power relationship) given in the json file. The 1 over f
-process is created with the <code>one_over_f</code> function from the
-(<code>primer</code> package)[<a href="https://search.r-project.org/CRAN/refmans/primer/html/00Index.html" class="external-link uri">https://search.r-project.org/CRAN/refmans/primer/html/00Index.html</a>].</p>
-<p>Also given in the json file are:</p>
+<p>Species traits in a community are not usually specified by giving a
+separate value for each trait of each species. Instead, an experiment
+usually defines the distribution from which each species-level trait is
+generated.</p>
+<p>This is why many trait fields appear as a set of three related
+specifications:</p>
 <ul>
-<li>The mean of the environmental time series.</li>
-<li>The standard deviation of the environmental time series.</li>
-<li>How the environmental time series vary among cases.</li>
+<li>a <strong>mean</strong>
+</li>
+<li>a <strong>range</strong>
+</li>
+<li>a <strong>distribution</strong>
+</li>
 </ul>
-<p>Currently three options for how environmental time series vary among
-cases.</p>
-<ol style="list-style-type: decimal">
+<p>The <strong>mean</strong> is the central value of the trait
+distribution. For example, if <code>birth_optimum_mean</code> is
+<code>20</code>, the birth-rate thermal optima are centred around 20
+degrees.</p>
+<p>The <strong>range</strong> is the total spread of trait values around
+the mean. A range of <code>4</code> means that generated values are
+drawn or placed across <code>mean +/- 0.5 * range</code>. For a mean of
+<code>20</code> and a range of <code>4</code>, the trait values come
+from the interval 18 to 22.</p>
+<p>The <strong>distribution</strong> defines how species-level values
+are chosen within that range. The two main trait distributions are:</p>
+<ul>
 <li>
-<code>same_per_replicate</code> replicates of the same number share
-the same environmental time series. E.g., <code>community1_rep1</code>
-and <code>case2_rep1</code> share the same time series.</li>
+<code>"regular"</code>: species are assigned evenly spaced trait
+values across the interval.</li>
 <li>
-<code>all_different</code> all simulations have different
-environmental time series</li>
-</ol>
+<code>"random_uniform"</code>: species trait values are drawn
+independently from a uniform distribution across the interval.</li>
+</ul>
+<p>This distribution-based specification is useful for experiments
+because it lets the user vary community-level properties, such as
+average thermal optimum or among-species trait spread, without manually
+writing every species trait value. Each community replicate receives a
+seed, so randomly generated trait values are reproducible.</p>
+</div>
+<div class="section level2">
+<h2 id="temperature-dependent-performance">Temperature-Dependent Performance<a class="anchor" aria-label="anchor" href="#temperature-dependent-performance"></a>
+</h2>
+<p>Both LV model variants use a Gaussian birth-rate curve and an
+exponential death-rate curve. For species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+at temperature
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>b</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>a</mi><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mrow><mo stretchy="true" form="prefix">[</mo><mi>−</mi><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>T</mi><mo>−</mo><msub><mi>b</mi><mrow><mrow><mi mathvariant="normal">o</mi><mi mathvariant="normal">p</mi><mi mathvariant="normal">t</mi></mrow><mo>,</mo><mi>i</mi></mrow></msub></mrow><mrow><mi>s</mi><msub><mi>d</mi><mrow><mrow><mi mathvariant="normal">p</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">f</mi></mrow><mo>,</mo><mi>i</mi></mrow></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
+b_i(T) = a_{b,i} \exp\left[-\frac{1}{2}
+  \left(\frac{T - b_{\mathrm{opt},i}}{sd_{\mathrm{perf},i}}\right)^2
+\right]
+</annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>a</mi><mrow><mi>d</mi><mo>,</mo><mi>i</mi></mrow></msub><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>z</mi><mi>i</mi></msub><mi>T</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">
+d_i(T) = a_{d,i} \exp(z_i T)
+</annotation></semantics></math></p>
+<p>The intrinsic growth rate is:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>b</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><msub><mi>d</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">
+r_i(T) = b_i(T) - d_i(T)
+</annotation></semantics></math></p>
+<p>The width parameter <code>sd_perf_i</code> is the standard-deviation
+scale of the Gaussian performance curve. In experiment JSON files, the
+distribution of these widths is controlled by:</p>
+<ul>
+<li><code>birth_width_distribution</code></li>
+<li><code>birth_width_mean</code></li>
+<li><code>birth_width_range</code></li>
+</ul>
+<p>The consumer-resource model uses the same Gaussian width convention
+for uptake curves. The corresponding JSON fields are:</p>
+<ul>
+<li><code>uptake_width_distribution</code></li>
+<li><code>uptake_width_mean</code></li>
+<li><code>uptake_width_range</code></li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="lotka-volterra-models">Lotka-Volterra Models<a class="anchor" aria-label="anchor" href="#lotka-volterra-models"></a>
+</h2>
+<div class="section level3">
+<h3 id="community-traits">Community Traits<a class="anchor" aria-label="anchor" href="#community-traits"></a>
+</h3>
+<p>LV communities are created by <code><a href="../reference/make_a_community.html">make_a_community()</a></code>. At the
+experiment level, the main trait treatments are:</p>
+<ul>
+<li>
+<code>richness</code>: number of species in each community.</li>
+<li>
+<code>birth_maximum_mean</code>, <code>birth_maximum_range</code>,
+<code>birth_maximum_distribution</code>: maximum birth-rate
+heights.</li>
+<li>
+<code>birth_optimum_mean</code>, <code>birth_optimum_range</code>,
+<code>birth_optimum_distribution</code>: thermal optima.</li>
+<li>
+<code>birth_width_distribution</code>,
+<code>birth_width_mean</code>, <code>birth_width_range</code>: Gaussian
+performance-curve widths.</li>
+<li>
+<code>death_intercept</code>: death-rate intercept, shared across
+species.</li>
+<li>
+<code>death_temperature_slope</code>: exponential temperature
+sensitivity of death rate, shared across species.</li>
+</ul>
+<p>Trait distributions currently support:</p>
+<ul>
+<li>
+<code>"regular"</code>: evenly spaced values across
+<code>mean +/- 0.5 * range</code>.</li>
+<li>
+<code>"random_uniform"</code>: independent uniform draws across the
+same interval.</li>
+</ul>
+<p>Each unique community treatment gets a reproducible
+<code>community_seed</code> generated from the experiment-level
+<code>random_seed</code>.</p>
+</div>
+<div class="section level3">
+<h3 id="interaction-matrices">Interaction Matrices<a class="anchor" aria-label="anchor" href="#interaction-matrices"></a>
+</h3>
+<p>LV interactions are specified with the preferred
+<code>interaction_treatments</code> field. This is a list of named
+interaction treatments. Each treatment can include:</p>
+<ul>
+<li>
+<code>label</code>: readable treatment name used in the experiment
+table.</li>
+<li>
+<code>type</code>: <code>"none"</code>, <code>"competition"</code>,
+<code>"any"</code>, or <code>"predator_prey"</code>.</li>
+<li>
+<code>symmetry</code>: <code>"asymmetric"</code>,
+<code>"symmetric"</code>, or <code>"antisymmetric"</code>.</li>
+<li>
+<code>distribution</code>: <code>"constant"</code>,
+<code>"uniform"</code>, <code>"normal"</code>, <code>"lognormal"</code>,
+or <code>"gamma"</code>.</li>
+<li>
+<code>parameters</code>: distribution-specific numeric
+parameters.</li>
+<li>
+<code>diagonal</code>: diagonal value, usually <code>1</code>.</li>
+</ul>
+<p>For example:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="st">"interaction_treatments"</span><span class="er">:</span> <span class="ot">[</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>    <span class="dt">"label"</span><span class="fu">:</span> <span class="st">"weak_asymmetric_competition"</span><span class="fu">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"competition"</span><span class="fu">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    <span class="dt">"symmetry"</span><span class="fu">:</span> <span class="st">"asymmetric"</span><span class="fu">,</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>    <span class="dt">"distribution"</span><span class="fu">:</span> <span class="st">"uniform"</span><span class="fu">,</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    <span class="dt">"parameters"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>      <span class="dt">"min"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>      <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">0.2</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>    <span class="dt">"diagonal"</span><span class="fu">:</span> <span class="dv">1</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="ot">]</span></span></code></pre></div>
+<p>For <code>type = "competition"</code>, off-diagonal effects are
+positive. This is the recommended way to ensure that all pairwise LV
+interactions are competitive. The older <code>lv_interactions</code> and
+<code>alpha_ij_*</code> fields are still supported for backwards
+compatibility, but new experiments should use
+<code>interaction_treatments</code>.</p>
+<p>Older LV trait-field names are also still accepted for backwards
+compatibility. New experiment JSON files should use the clearer
+<code>birth_maximum_*</code>, <code>birth_optimum_*</code>,
+<code>birth_width_*</code>, <code>death_intercept</code>, and
+<code>death_temperature_slope</code> names. The older
+<code>number_of_species_treatment</code> field is also accepted as an
+alias for <code>richness</code>.</p>
+</div>
+<div class="section level3">
+<h3 id="discrete-time-lv-dynamics">Discrete-Time LV Dynamics<a class="anchor" aria-label="anchor" href="#discrete-time-lv-dynamics"></a>
+</h3>
+<p>The discrete-time LV simulator is <code><a href="../reference/simulator_lv.html">simulator_lv()</a></code>. It
+updates species abundances through time using temperature-dependent
+intrinsic growth and the LV interaction matrix.</p>
+<p>This model is the default when <code>model_type</code> is absent or
+set to <code>"lv_discrete"</code>.</p>
+</div>
+<div class="section level3">
+<h3 id="continuous-time-lv-dynamics">Continuous-Time LV Dynamics<a class="anchor" aria-label="anchor" href="#continuous-time-lv-dynamics"></a>
+</h3>
+<p>The continuous-time LV simulator is
+<code><a href="../reference/simulator_lv_continuous.html">simulator_lv_continuous()</a></code>. It uses
+<code><a href="https://rdrr.io/pkg/deSolve/man/ode.html" class="external-link">deSolve::ode()</a></code> and adds ODE-specific controls:</p>
+<ul>
+<li>
+<code>temperature_interpolation</code>: <code>"linear"</code> or
+<code>"constant"</code>.</li>
+<li>
+<code>immigration_rate</code>: immigration rate per species.</li>
+<li>
+<code>immigration_mode</code>: <code>"continuous"</code> or
+<code>"pulse"</code>.</li>
+<li>
+<code>ode_method</code>: ODE solver method passed to
+<code><a href="https://rdrr.io/pkg/deSolve/man/ode.html" class="external-link">deSolve::ode()</a></code>.</li>
+<li>
+<code>ode_rtol</code>, <code>ode_atol</code>: relative and absolute
+tolerances.</li>
+<li>
+<code>ode_max_step</code>: maximum solver step.</li>
+<li>
+<code>blowup_threshold</code>: abundance threshold above which the
+run stops.</li>
+</ul>
+<p>Use <code>model_type = "\"lv_continuous\""</code> in the JSON file to
+select this model.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="typical-experiment-workflow">Typical Experiment Workflow<a class="anchor" aria-label="anchor" href="#typical-experiment-workflow"></a>
+<h2 id="consumer-resource-model">Consumer-Resource Model<a class="anchor" aria-label="anchor" href="#consumer-resource-model"></a>
 </h2>
-<p>The typical workflow is as follows:</p>
-<ol style="list-style-type: decimal">
-<li>Set a project folder that can contain multiple experiment
-subfolders.</li>
-<li>Set an experiment name and create a folder for that experiment.</li>
-<li>Copy an example experiment-definition JSON file into the experiment
-folder.</li>
-<li>Edit the JSON file to define the experiment you want to run.</li>
-<li>Run the experiment workflow.</li>
-<li>Inspect saved outputs and make plots.</li>
-</ol>
+<p>The consumer-resource model is created by
+<code><a href="../reference/make_a_consumer_resource_community.html">make_a_consumer_resource_community()</a></code> and simulated by
+<code><a href="../reference/simulator_consumer_resource_continuous.html">simulator_consumer_resource_continuous()</a></code>.</p>
+<p>Consumers have temperature-dependent uptake curves:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>u</mi><mrow><mrow><mi mathvariant="normal">max</mi><mo>⁡</mo></mrow><mo>,</mo><mi>i</mi></mrow></msub><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mrow><mo stretchy="true" form="prefix">[</mo><mi>−</mi><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>T</mi><mo>−</mo><msub><mi>u</mi><mrow><mrow><mi mathvariant="normal">o</mi><mi mathvariant="normal">p</mi><mi mathvariant="normal">t</mi></mrow><mo>,</mo><mi>i</mi></mrow></msub></mrow><mrow><mi>s</mi><msub><mi>d</mi><mrow><mi>u</mi><mo>,</mo><mi>i</mi></mrow></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">
+u_i(T) = u_{\max,i} \exp\left[-\frac{1}{2}
+  \left(\frac{T - u_{\mathrm{opt},i}}{sd_{u,i}}\right)^2
+\right]
+</annotation></semantics></math></p>
+<p>The main consumer-resource trait treatments are:</p>
+<ul>
+<li>
+<code>uptake_maximum_mean</code>, <code>uptake_maximum_range</code>,
+<code>uptake_maximum_distribution</code>: maximum uptake rates.</li>
+<li>
+<code>uptake_optimum_mean</code>, <code>uptake_optimum_range</code>,
+<code>uptake_optimum_distribution</code>: thermal optima for
+uptake.</li>
+<li>
+<code>uptake_width_distribution</code>,
+<code>uptake_width_mean</code>, <code>uptake_width_range</code>:
+uptake-curve widths.</li>
+<li>
+<code>half_saturation_mean</code>,
+<code>half_saturation_range</code>,
+<code>half_saturation_distribution</code>: Monod half-saturation
+constants.</li>
+<li>
+<code>consumer_death_rate</code>: consumer death rate.</li>
+<li>
+<code>resource_renewal_rate</code>: resource renewal rate.</li>
+<li>
+<code>resource_supply</code>: resource supply concentration.</li>
+<li>
+<code>conversion_efficiency</code>: conversion from uptake to
+consumer growth.</li>
+</ul>
+<p>Use <code>model_type = "\"consumer_resource_continuous\""</code> in
+the JSON file to select this model.</p>
+<p>Older consumer-resource trait-field names are still accepted for
+backwards compatibility. New experiment JSON files should use the
+clearer <code>uptake_maximum_*</code>, <code>uptake_optimum_*</code>,
+and <code>uptake_width_*</code> names.</p>
 <div class="section level3">
-<h3 id="project-folder-and-experiment-folder">Project Folder and Experiment Folder<a class="anchor" aria-label="anchor" href="#project-folder-and-experiment-folder"></a>
+<h3 id="resource-use-modes">Resource-Use Modes<a class="anchor" aria-label="anchor" href="#resource-use-modes"></a>
 </h3>
-<p>One way to organise work is to create a project folder that contains
-multiple experiment subfolders:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">project_folder_location</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"~/Desktop"</span>, <span class="st">"community_simulator_projects"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">project_folder_location</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p>The consumer-resource model supports three resource-use modes:</p>
+<ul>
+<li>
+<code>"one_resource_all_consumers"</code>: all consumers use one
+active resource.</li>
+<li>
+<code>"diagonal"</code>: each consumer uses its corresponding
+resource.</li>
+<li>
+<code>"shared_to_private"</code>: each consumer splits uptake
+between one shared resource and a species-specific private
+resource.</li>
+</ul>
+<p>For <code>"shared_to_private"</code>, the number of resources is
+<code>S + 1</code>. The <code>active_resource</code> is the shared
+resource. Each species gets a private-resource use fraction; its
+shared-resource fraction is one minus that private-resource fraction.
+This is stored internally as <code>resource_specialization_i</code>.</p>
+<p>Species-level private-resource use is controlled by:</p>
+<ul>
+<li><code>private_resource_use_distribution</code></li>
+<li><code>private_resource_use_mean</code></li>
+<li><code>private_resource_use_range</code></li>
+<li><code>private_resource_use_precision</code></li>
+</ul>
+<p>Supported distributions are:</p>
+<ul>
+<li>
+<code>"constant"</code>: all species have the same specialization
+value.</li>
+<li>
+<code>"regular"</code>: evenly spaced values across
+<code>mean +/- 0.5 * range</code>.</li>
+<li>
+<code>"random_uniform"</code>: independent uniform draws across that
+interval.</li>
+<li>
+<code>"beta"</code>: beta-distributed species values with mean
+<code>private_resource_use_mean</code> and precision
+<code>private_resource_use_precision</code>.</li>
+</ul>
+<p>Higher beta precision gives less among-species variation around the
+mean. The older <code>resource_specialization_*</code> JSON fields are
+still accepted as aliases.</p>
 </div>
-<div class="section level3">
-<h3 id="copy-an-example-json-design-file">Copy an Example JSON Design File<a class="anchor" aria-label="anchor" href="#copy-an-example-json-design-file"></a>
-</h3>
-<p>The package includes bundled example experiment-definition files. A
-convenient way to create an experiment folder and copy one of those JSON
-files into it is to use <code><a href="../reference/setup_example_experiment.html">setup_example_experiment()</a></code>:</p>
+</div>
+<div class="section level2">
+<h2 id="environment-specification">Environment Specification<a class="anchor" aria-label="anchor" href="#environment-specification"></a>
+</h2>
+<p>Environmental variation is generated as temperature time series. The
+current experiment workflow uses a <code>1/f</code> process from the
+<code>primer</code> package. The main temperature fields are:</p>
+<ul>
+<li>
+<code>temperature_mean</code>: mean temperature.</li>
+<li>
+<code>temperature_sd</code>: standard deviation of the temperature
+series.</li>
+<li>
+<code>one_over_f_gamma</code>: slope of the frequency-power
+relationship.</li>
+<li>
+<code>number_of_environment_replicates</code>: number of
+environmental replicates.</li>
+<li>
+<code>environment_sharing</code>: how temperature series are shared
+among cases.</li>
+</ul>
+<p>The main <code>environment_sharing</code> options are:</p>
+<ul>
+<li>
+<code>"same_per_replicate"</code>: cases with the same temperature
+treatment and replicate number share an environmental time series.</li>
+<li>
+<code>"all_different"</code>: each simulation case gets its own
+environmental time series.</li>
+</ul>
+<p>The older <code>temperature_series_control</code> field is still
+accepted as an alias for <code>environment_sharing</code>.</p>
+<p>The duration of each run is controlled by:</p>
+<ul>
+<li><code>burn_in_duration</code></li>
+<li><code>experiment_duration</code></li>
+</ul>
+<p>The workflow creates temperature series long enough to include both
+burn-in and experiment periods.</p>
+</div>
+<div class="section level2">
+<h2 id="experiment-workflow">Experiment Workflow<a class="anchor" aria-label="anchor" href="#experiment-workflow"></a>
+</h2>
+<p>The usual workflow is:</p>
+<ol style="list-style-type: decimal">
+<li>Create a project folder that can contain multiple experiment
+folders.</li>
+<li>Create or copy an experiment-definition JSON file.</li>
+<li>Edit the JSON file to define model, community, environment, and
+replicate treatments.</li>
+<li>Run <code><a href="../reference/run_experiment.html">run_experiment()</a></code>.</li>
+<li>Inspect outputs in the experiment folder.</li>
+</ol>
+<p>A compact example is:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">project_folder_location</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"~/Desktop"</span>, <span class="st">"community_simulator_projects"</span><span class="op">)</span></span>
 <span><span class="va">experiment_name</span> <span class="op">&lt;-</span> <span class="st">"discrete_lv_example"</span></span>
@@ -311,238 +509,149 @@ files into it is to use <code><a href="../reference/setup_example_experiment.htm
 <span>  experiment_name <span class="op">=</span> <span class="va">experiment_name</span>,</span>
 <span>  example_experiment_name <span class="op">=</span> <span class="st">"discrete_lv"</span>,</span>
 <span>  experiment_design_filename <span class="op">=</span> <span class="va">experiment_design_filename</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>This creates the experiment folder and copies the example JSON into
-it. At that point, edit the JSON file in the experiment folder so it
-matches the experiment you want to run.</p>
-<p>The package includes three compact example designs, one for each
-supported model type:</p>
-<ul>
-<li><code>inst/test_experiments/discrete_lv/experiment_definition.json</code></li>
-<li><code>inst/test_experiments/continuous_lv/experiment_definition.json</code></li>
-<li><code>inst/test_experiments/consumer_resource/experiment_definition.json</code></li>
-</ul>
-</div>
-<div class="section level3">
-<h3 id="run-the-experiment">Run the Experiment<a class="anchor" aria-label="anchor" href="#run-the-experiment"></a>
-</h3>
-<p>Once the JSON file is in place and edited as needed, run the workflow
-with the high-level wrapper:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">outputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_experiment.html">run_experiment</a></span><span class="op">(</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">outputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_experiment.html">run_experiment</a></span><span class="op">(</span></span>
 <span>  experiment_folder_location <span class="op">=</span> <span class="va">project_folder_location</span>,</span>
 <span>  experiment_name <span class="op">=</span> <span class="va">experiment_name</span>,</span>
 <span>  experiment_design_filename <span class="op">=</span> <span class="va">experiment_design_filename</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>By default, workflow functions stop if an output file already exists.
-To replace existing outputs deliberately, re-run with
-<code>overwrite = TRUE</code>.</p>
-<p>The main outputs are saved inside the experiment folder and typically
-include:</p>
+<p>The high-level wrapper runs the main steps in order:</p>
 <ul>
-<li><code>experiment_table.RDS</code></li>
-<li><code>temperatures.db</code></li>
-<li><code>dynamics.db</code></li>
-<li><code>community_measures.RDS</code></li>
-</ul>
-</div>
-</div>
-<div class="section level2">
-<h2 id="json-file-specification">JSON File Specification<a class="anchor" aria-label="anchor" href="#json-file-specification"></a>
-</h2>
-<p>The design of an experiment is given in a JSON file.</p>
-<p>An example of an experiment design file is included in the package.
-If you want to copy it manually rather than using
-<code><a href="../reference/setup_example_experiment.html">setup_example_experiment()</a></code>, you can do so like this:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path_to_example_experiment_design_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"test_experiments"</span>,</span>
-<span>                      <span class="st">"discrete_lv"</span>,</span>
-<span>                      <span class="st">"experiment_definition.json"</span><span class="op">)</span>,</span>
-<span>            package <span class="op">=</span> <span class="st">"community.simulator"</span><span class="op">)</span></span>
-<span><span class="va">file_to_copy_to</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"~/Desktop"</span>, <span class="st">"experiment_definition.json"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">path_to_example_experiment_design_file</span>, to <span class="op">=</span> <span class="va">file_to_copy_to</span><span class="op">)</span></span></code></pre></div>
-<div class="section level4">
-<h4 id="allowed-values">Allowed values<a class="anchor" aria-label="anchor" href="#allowed-values"></a>
-</h4>
-<p>All values in that file are parsed and then must be R expressions
-that can be evaluated.</p>
-<p><strong>Single numbers</strong></p>
-<p>“name”: 0</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/parse.html" class="external-link">parse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">"0"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
-<p><strong>Multiple numbers and functions</strong></p>
-<p>“name”: “c(0, 1, 2)”</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/parse.html" class="external-link">parse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">"c(0, 1, 2)"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0 1 2</span></span></code></pre></div>
-<p>“name”: “0:10”</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/parse.html" class="external-link">parse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">"0:10"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1]  0  1  2  3  4  5  6  7  8  9 10</span></span></code></pre></div>
-<p>“name”: “seq(0, 10, 2)”</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/parse.html" class="external-link">parse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">"seq(0, 10, 2)"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1]  0  2  4  6  8 10</span></span></code></pre></div>
-<p><strong>Single words</strong></p>
-<p>Do not use: “name”: “word”</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/parse.html" class="external-link">parse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">"word"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>It must be:</p>
-<p>“name”: “"word"”</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/parse.html" class="external-link">parse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">"\"word\""</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "word"</span></span></code></pre></div>
-<p><strong>Multiple words</strong></p>
-<p>“name”: “c("word1", "word2")”</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/parse.html" class="external-link">parse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">"c(\"word1\", \"word2\")"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "word1" "word2"</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
-</h3>
-<p>Install from GitHub:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"opetchey/community.simulator"</span><span class="op">)</span></span></code></pre></div>
-<p>Install from GitHub and build the vignettes during installation:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"remotes"</span>, <span class="st">"knitr"</span>, <span class="st">"rmarkdown"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span></span>
-<span>  <span class="st">"opetchey/community.simulator"</span>,</span>
-<span>  build_vignettes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  dependencies <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  upgrade <span class="op">=</span> <span class="st">"never"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>Install from a local checkout:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_local.html" class="external-link">install_local</a></span><span class="op">(</span><span class="st">"."</span><span class="op">)</span></span></code></pre></div>
-<p>Install from a local checkout and build the vignettes during
-installation:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"remotes"</span>, <span class="st">"knitr"</span>, <span class="st">"rmarkdown"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_local.html" class="external-link">install_local</a></span><span class="op">(</span></span>
-<span>  <span class="st">"."</span>,</span>
-<span>  build_vignettes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  dependencies <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  upgrade <span class="op">=</span> <span class="st">"never"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>After installation, you can view the installed vignettes with:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/browseVignettes.html" class="external-link">browseVignettes</a></span><span class="op">(</span><span class="st">"community.simulator"</span><span class="op">)</span></span></code></pre></div>
-<p>You can also open the current user guide directly:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"experiment_getting_started"</span>, package <span class="op">=</span> <span class="st">"community.simulator"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"User_guide"</span>, package <span class="op">=</span> <span class="st">"community.simulator"</span><span class="op">)</span></span></code></pre></div>
-<p>If you are working interactively inside the repository during
-development:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">load_all</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="quick-example">Quick Example<a class="anchor" aria-label="anchor" href="#quick-example"></a>
-</h3>
-<p>The typical workflow is:</p>
-<ol style="list-style-type: decimal">
-<li>Set a project folder that can contain multiple experiment
-subfolders.</li>
-<li>Set an experiment name and create a folder for that experiment.</li>
-<li>Copy an example experiment-definition JSON file into the experiment
-folder.</li>
-<li>Edit the JSON file to define the experiment you want to run.</li>
-<li>Run the experiment workflow.</li>
-<li>Inspect plots and saved outputs.</li>
-</ol>
-<p>The main user-facing functions are:</p>
-<ul>
-<li><code><a href="../reference/run_experiment.html">run_experiment()</a></code></li>
-<li><code><a href="../reference/setup_example_experiment.html">setup_example_experiment()</a></code></li>
-<li><code><a href="../reference/create_experiment_folder.html">create_experiment_folder()</a></code></li>
 <li><code><a href="../reference/create_experiment_table.html">create_experiment_table()</a></code></li>
 <li><code><a href="../reference/create_environments.html">create_environments()</a></code></li>
 <li><code><a href="../reference/simulate_dynamics.html">simulate_dynamics()</a></code></li>
 <li><code><a href="../reference/get_community_measures.html">get_community_measures()</a></code></li>
-<li><code><a href="../reference/make_plots_for_one_community.html">make_plots_for_one_community()</a></code></li>
 </ul>
-<p>Bundled example experiment designs are available under
-<code>inst/test_experiments</code>. The package currently ships one
-compact design for each supported model type:</p>
+<p>These functions can also be run individually when debugging or
+developing a new workflow. By default, workflow functions stop if an
+output file already exists. Use <code>overwrite = TRUE</code> only when
+you deliberately want to replace existing outputs.</p>
+</div>
+<div class="section level2">
+<h2 id="bundled-example-designs">Bundled Example Designs<a class="anchor" aria-label="anchor" href="#bundled-example-designs"></a>
+</h2>
+<p>The package includes compact example JSON files under
+<code>inst/test_experiments</code>:</p>
 <ul>
 <li><code>discrete_lv/experiment_definition.json</code></li>
 <li><code>continuous_lv/experiment_definition.json</code></li>
 <li><code>consumer_resource/experiment_definition.json</code></li>
 </ul>
-<p>One way to get started is to create a project folder on your Desktop
-that can contain multiple experiments:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">project_folder_location</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"~/Desktop"</span>, <span class="st">"community_simulator_projects"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">project_folder_location</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p>Then create a folder for a single experiment:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/opetchey/community.simulator" class="external-link">community.simulator</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">project_folder_location</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"~/Desktop"</span>, <span class="st">"community_simulator_projects"</span><span class="op">)</span></span>
-<span><span class="va">experiment_name</span> <span class="op">&lt;-</span> <span class="st">"discrete_lv_example"</span></span>
-<span><span class="va">experiment_design_filename</span> <span class="op">&lt;-</span> <span class="st">"experiment_definition.json"</span></span>
-<span></span>
-<span><span class="va">setup</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/setup_example_experiment.html">setup_example_experiment</a></span><span class="op">(</span></span>
-<span>  experiment_folder_location <span class="op">=</span> <span class="va">project_folder_location</span>,</span>
-<span>  experiment_name <span class="op">=</span> <span class="va">experiment_name</span>,</span>
-<span>  example_experiment_name <span class="op">=</span> <span class="st">"discrete_lv"</span>,</span>
-<span>  experiment_design_filename <span class="op">=</span> <span class="va">experiment_design_filename</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>At this point, edit the JSON file in the experiment folder so it
-matches the experiment you want to run.</p>
-<p>Then run the experiment:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">outputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_experiment.html">run_experiment</a></span><span class="op">(</span></span>
-<span>  experiment_folder_location <span class="op">=</span> <span class="va">project_folder_location</span>,</span>
-<span>  experiment_name <span class="op">=</span> <span class="va">experiment_name</span>,</span>
-<span>  experiment_design_filename <span class="op">=</span> <span class="va">experiment_design_filename</span>,</span>
-<span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>By default, workflow functions now stop if an output file already
-exists. To replace existing outputs deliberately, re-run with
-<code>overwrite = TRUE</code>.</p>
-<p>For a more guided version of this example, see <a href="vignettes/experiment_getting_started.Rmd">vignettes/experiment_getting_started.Rmd</a>.</p>
+<p>Use <code><a href="../reference/setup_example_experiment.html">setup_example_experiment()</a></code> to copy one into an
+experiment folder. These examples are intentionally small, so they are
+useful as smoke tests and as templates for larger experiments.</p>
 </div>
-<div class="section level3">
-<h3 id="data-and-outputs">Data and Outputs<a class="anchor" aria-label="anchor" href="#data-and-outputs"></a>
-</h3>
-<p>The workflow saves intermediate and final outputs inside the
-experiment folder. These currently include:</p>
+<div class="section level2">
+<h2 id="json-file-conventions">JSON File Conventions<a class="anchor" aria-label="anchor" href="#json-file-conventions"></a>
+</h2>
+<p>The JSON file is read by <code><a href="../reference/read_experiment_design_json.html">read_experiment_design_json()</a></code>.
+Most scalar and vector treatment values are stored as R expressions and
+evaluated when the experiment table is created.</p>
+<p>Single numeric values can be written directly:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="st">"temperature_mean"</span><span class="er">:</span> <span class="dv">20</span></span></code></pre></div>
+<p>Vectors are usually written as strings containing R expressions:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="st">"richness"</span><span class="er">:</span> <span class="st">"c(2, 4, 8)"</span></span></code></pre></div>
+<p>Character values that need to evaluate to strings must include
+escaped quotes:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="st">"model_type"</span><span class="er">:</span> <span class="st">"</span><span class="ch">\"</span><span class="st">lv_continuous</span><span class="ch">\"</span><span class="st">"</span></span></code></pre></div>
+<p>Character vectors follow the same pattern:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="st">"birth_optimum_distribution"</span><span class="er">:</span> <span class="st">"c(</span><span class="ch">\"</span><span class="st">regular</span><span class="ch">\"</span><span class="st">, </span><span class="ch">\"</span><span class="st">random_uniform</span><span class="ch">\"</span><span class="st">)"</span></span></code></pre></div>
+<p>Structured fields, such as <code>interaction_treatments</code>, can
+be written as JSON lists and objects rather than R expression
+strings.</p>
+</div>
+<div class="section level2">
+<h2 id="outputs">Outputs<a class="anchor" aria-label="anchor" href="#outputs"></a>
+</h2>
+<p>The workflow writes outputs inside the experiment folder. The core
+outputs are:</p>
 <ul>
-<li><code>experiment_table.RDS</code></li>
-<li><code>experiment_log.txt</code></li>
-<li><code>temperatures.db</code></li>
-<li><code>dynamics.db</code></li>
-<li><code>community_measures.RDS</code></li>
+<li>
+<code>experiment_table.RDS</code>: one row per simulation case,
+including the community object for each case.</li>
+<li>
+<code>experiment_log.txt</code>: newline-delimited JSON records
+describing the experiment specification, workflow events, output paths,
+and elapsed time for each step.</li>
+<li>
+<code>temperatures.db</code>: SQLite database containing generated
+environmental temperature series.</li>
+<li>
+<code>dynamics.db</code>: SQLite database containing saved
+population dynamics, when dynamic output is enabled.</li>
+<li>
+<code>community_measures.RDS</code>: case-level summary
+measures.</li>
 </ul>
-<p>Some optional downstream steps also create additional derivative or
-diagnostic databases.</p>
-</div>
-<div class="section level3">
-<h3 id="learning-one-model-at-a-time">Learning One Model At A Time<a class="anchor" aria-label="anchor" href="#learning-one-model-at-a-time"></a>
-</h3>
-<p>The QMD files in <a href="reports/examples">reports/examples</a>
-define one community, one temperature environment, and one simulation
-directly in R. They are intended for learning and experimentation rather
-than large simulation studies.</p>
+<p>Recent workflows also save compact summary files during
+simulation:</p>
 <ul>
-<li><a href="reports/examples/lv_discrete_single_community.qmd">Discrete-time
-LV walkthrough</a></li>
-<li><a href="reports/examples/lv_continuous_single_community.qmd">Continuous-time
-LV walkthrough</a></li>
-<li><a href="reports/examples/consumer_resource_single_community.qmd">Consumer-resource
-walkthrough</a></li>
+<li><code>simulation_summaries.RDS</code></li>
+<li><code>population_summaries.RDS</code></li>
 </ul>
-<p>Render any of them from the package root with:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">quarto</span><span class="fu">::</span><span class="fu"><a href="https://quarto-dev.github.io/quarto-r/reference/quarto_render.html" class="external-link">quarto_render</a></span><span class="op">(</span><span class="st">"reports/examples/lv_discrete_single_community.qmd"</span><span class="op">)</span></span></code></pre></div>
+<p>These compact summaries allow downstream community-measure
+calculations without always reading full dynamics from SQLite.</p>
 </div>
+<div class="section level2">
+<h2 id="community-measures">Community Measures<a class="anchor" aria-label="anchor" href="#community-measures"></a>
+</h2>
+<p><code><a href="../reference/get_community_measures.html">get_community_measures()</a></code> calculates case-level summary
+measures. The exact columns depend on the model type and available
+intermediate outputs, but common outputs include:</p>
+<ul>
+<li>community stability, including <code>CV_totab</code>, the
+coefficient of variation of total abundance through time</li>
+<li>mean and standard deviation of total abundance</li>
+<li>environmental summaries, such as mean temperature</li>
+<li>community performance or viability summaries used in
+response-diversity analyses</li>
+</ul>
+<p>For most analyses, <code>community_measures.RDS</code> is the first
+file to inspect after a successful experiment.</p>
+</div>
+<div class="section level2">
+<h2 id="parallel-processing-and-runtime-reporting">Parallel Processing and Runtime Reporting<a class="anchor" aria-label="anchor" href="#parallel-processing-and-runtime-reporting"></a>
+</h2>
+<p>Experiment JSON files can include runtime controls for larger
+runs:</p>
+<ul>
+<li>
+<code>parallel_environments</code>: generate environmental time
+series in parallel.</li>
+<li>
+<code>parallel_simulations</code>: simulate cases in parallel.</li>
+<li>
+<code>parallel_workers</code>: number of worker processes.</li>
+<li>
+<code>runtime_update_every</code>: how often progress updates are
+printed.</li>
+<li>
+<code>environment_progress</code>: whether environment-generation
+progress is printed.</li>
+</ul>
+<p>When parallel generation or simulation is enabled, database writing
+is still handled by the parent process. Parallel processing is intended
+for macOS/Linux.</p>
+<p>The experiment log records elapsed time for the main workflow steps.
+It is plain text newline-delimited JSON, so it is readable by humans and
+easy to parse from R or other tools.</p>
+</div>
+<div class="section level2">
+<h2 id="choosing-where-to-start">Choosing Where To Start<a class="anchor" aria-label="anchor" href="#choosing-where-to-start"></a>
+</h2>
+<p>If you are reviewing the package, start with the rendered
+single-community walkthroughs, then run the getting-started experiment,
+then inspect this guide for parameter and workflow details.</p>
+<p>If you are planning a new experiment, start by copying the bundled
+JSON file closest to your model family. Make one change at a time, run a
+small experiment, and inspect <code>experiment_table.RDS</code> before
+scaling up.</p>
+<p>If you are learning a model, use the single-community walkthroughs
+before using the experiment-grid workflow. They define one community and
+one environment directly in R, which makes the model mechanics easier to
+see.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

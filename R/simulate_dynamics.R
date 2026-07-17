@@ -310,7 +310,10 @@ simulate_one_dynamics_case <- function(i,
 #' @param overwrite Logical. If `TRUE`, overwrite an existing dynamics database.
 #' @param verbose Logical. If `TRUE`, print progress and output messages.
 #'
-#' @details Experiment JSON files can optionally include
+#' @details Experiment JSON files can set `model_type` to `"lv_discrete"`,
+#'   `"lv_continuous"`, or `"consumer_resource_continuous"`. Legacy
+#'   `dynamics_type` values are still accepted as aliases. Experiment JSON files
+#'   can also optionally include
 #'   `parallel_simulations`, `parallel_workers`, and
 #'   `initial_abundance_seed_base`. They can also include output-control options:
 #'   `save_dynamics`, `save_resources`, `dynamics_save_every`, and
@@ -350,8 +353,16 @@ simulate_dynamics <- function(experiment_folder,
 
   expt_def <- jsonlite::fromJSON(paste0(experiment_folder, experiment_design_filename))
 
-  get_design_value <- function(name, default) {
-    value <- expt_def[[name]]
+  get_design_value <- function(name, default, aliases = character()) {
+    candidates <- c(name, aliases)
+    selected <- candidates[vapply(candidates, function(candidate) {
+      !is.null(expt_def[[candidate]]) && length(expt_def[[candidate]]) > 0
+    }, logical(1))]
+    if (length(selected) == 0) {
+      return(default)
+    }
+
+    value <- expt_def[[selected[[1]]]]
     if (is.null(value) || length(value) == 0) {
       return(default)
     }
@@ -365,7 +376,11 @@ simulate_dynamics <- function(experiment_folder,
     value
   }
 
-  dynamics_type <- get_design_value("dynamics_type", "discrete")
+  dynamics_type <- normalize_model_type(get_design_value(
+    "model_type",
+    "lv_discrete",
+    aliases = "dynamics_type"
+  ))
   temperature_interpolation <- get_design_value("temperature_interpolation", "linear")
   immigration_rate <- get_design_value("immigration_rate", 0.1)
   consumer_immigration_rate <- get_design_value("consumer_immigration_rate", immigration_rate)
@@ -426,7 +441,8 @@ simulate_dynamics <- function(experiment_folder,
 
   if (!dynamics_type %in% c("discrete", "continuous", "consumer_resource_continuous")) {
     stop(
-      "`dynamics_type` must be 'discrete', 'continuous', or 'consumer_resource_continuous'.",
+      "`model_type` must be 'lv_discrete', 'lv_continuous', or ",
+      "'consumer_resource_continuous'.",
       call. = FALSE
     )
   }

@@ -5,11 +5,12 @@
 #' @param overwrite Logical. If `TRUE`, overwrite an existing experiment table.
 #' @param verbose Logical. If `TRUE`, print messages about written outputs.
 #'
-#' @details LV experiment definitions can use the preferred `lv_interactions`
+#' @details LV experiment definitions can use the preferred
+#'   `interaction_treatments`
 #'   field to specify one or more named interaction treatments. Each treatment
 #'   can set `type`, `symmetry`, `distribution`, `parameters`, and `diagonal`.
-#'   Legacy `alpha_ij_*` fields are still supported and are converted to
-#'   interaction specifications internally.
+#'   Legacy `lv_interactions` and `alpha_ij_*` fields are still supported and
+#'   are converted to interaction specifications internally.
 #'
 #' @return Returns the number of cases in the experiment. Also saves to RDS the experiment design, for later use.
 #' @importFrom rlang .data
@@ -46,12 +47,11 @@ create_experiment_table <- function(experiment_folder,
     eval(value)
   }
 
-  dynamics_type <- eval_or_default("dynamics_type", "discrete")
-
-  number_of_species <- expt_def$number_of_species_treatment
-  if (is.null(number_of_species)) {
-    number_of_species <- expt_def$number_of_species
-  }
+  model_type <- eval_or_default(
+    if (!is.null(expt_def$model_type)) "model_type" else "dynamics_type",
+    "lv_discrete"
+  )
+  dynamics_type <- normalize_model_type(model_type)
 
   evaluate_design_value <- function(value) {
     if (is.expression(value)) {
@@ -59,6 +59,38 @@ create_experiment_table <- function(experiment_folder,
     }
     value
   }
+
+  eval_design_field <- function(name, aliases = character(), default = NULL, required = TRUE) {
+    candidates <- c(name, aliases)
+    selected <- candidates[vapply(candidates, function(candidate) {
+      !is.null(expt_def[[candidate]])
+    }, logical(1))]
+
+    if (length(selected) == 0) {
+      if (required) {
+        stop(
+          "Missing required experiment design field `",
+          name,
+          "`.",
+          call. = FALSE
+        )
+      }
+      return(default)
+    }
+
+    evaluate_design_value(expt_def[[selected[[1]]]])
+  }
+
+  number_of_species <- eval_design_field(
+    "richness",
+    aliases = c("number_of_species_treatment", "number_of_species")
+  )
+  environment_sharing_values <- eval_design_field(
+    "environment_sharing",
+    aliases = "temperature_series_control",
+    default = "same_per_replicate",
+    required = FALSE
+  )
 
   as_lv_interaction_spec_list <- function(value) {
     is_missing_value <- function(x) {
@@ -97,13 +129,24 @@ create_experiment_table <- function(experiment_folder,
     if (is.list(value)) {
       return(value)
     }
-    stop("`lv_interactions` must evaluate to a list of interaction specifications.", call. = FALSE)
+    stop(
+      "`interaction_treatments` must evaluate to a list of interaction ",
+      "specifications.",
+      call. = FALSE
+    )
   }
 
   create_lv_interaction_treatments <- function() {
-    if (!is.null(expt_def$lv_interactions)) {
+    interaction_treatments <- NULL
+    if (!is.null(expt_def$interaction_treatments)) {
+      interaction_treatments <- expt_def$interaction_treatments
+    } else if (!is.null(expt_def$lv_interactions)) {
+      interaction_treatments <- expt_def$lv_interactions
+    }
+
+    if (!is.null(interaction_treatments)) {
       interaction_specs <- as_lv_interaction_spec_list(
-        evaluate_design_value(expt_def$lv_interactions)
+        evaluate_design_value(interaction_treatments)
       )
       alpha_jj_default <- if (is.null(expt_def$alpha_jj)) 1 else eval(expt_def$alpha_jj)
 
@@ -194,45 +237,105 @@ create_experiment_table <- function(experiment_folder,
 
   if (dynamics_type == "consumer_resource_continuous") {
     expt <- expand.grid(
-      u_max_mean = eval(expt_def$u_max_mean_treatment),
-      u_max_range = eval(expt_def$u_max_range_treatment),
-      u_max_distribution = eval(expt_def$u_max_distribution),
-
-      u_opt_mean = eval(expt_def$u_opt_mean_treatment),
-      u_opt_range = eval(expt_def$u_opt_range_treatment),
-      u_opt_distribution = eval(expt_def$u_opt_distribution),
-
-      sd_u_distribution = eval(expt_def$sd_u_distribution),
-      sd_u_mean = eval(expt_def$sd_u_mean),
-      sd_u_range = eval(expt_def$sd_u_range),
-
-      half_saturation_mean = eval(expt_def$half_saturation_mean_treatment),
-      half_saturation_range = eval(expt_def$half_saturation_range_treatment),
-      half_saturation_distribution = eval(expt_def$half_saturation_distribution),
-
-      consumer_death_rate = eval(expt_def$consumer_death_rate_treatment),
-      resource_renewal_rate = eval(expt_def$resource_renewal_rate_treatment),
-      resource_supply = eval(expt_def$resource_supply_treatment),
-      conversion_efficiency = eval(expt_def$conversion_efficiency),
-      consumer_immigration_rate = eval(expt_def$consumer_immigration_rate),
-      resource_use_mode = eval(expt_def$resource_use_mode),
-      active_resource = eval_or_default("active_resource", 1),
-      resource_specialization = eval_or_default("resource_specialization", 1),
-      resource_specialization_distribution = eval_or_default(
-        "resource_specialization_distribution",
-        "constant"
+      u_max_mean = eval_design_field(
+        "uptake_maximum_mean",
+        aliases = "u_max_mean_treatment"
       ),
-      resource_specialization_mean = eval_or_default(
-        "resource_specialization_mean",
-        eval_or_default("resource_specialization", 1)
+      u_max_range = eval_design_field(
+        "uptake_maximum_range",
+        aliases = "u_max_range_treatment"
       ),
-      resource_specialization_range = eval_or_default(
-        "resource_specialization_range",
-        0
+      u_max_distribution = eval_design_field(
+        "uptake_maximum_distribution",
+        aliases = "u_max_distribution"
       ),
-      resource_specialization_precision = eval_or_default(
-        "resource_specialization_precision",
-        10
+
+      u_opt_mean = eval_design_field(
+        "uptake_optimum_mean",
+        aliases = "u_opt_mean_treatment"
+      ),
+      u_opt_range = eval_design_field(
+        "uptake_optimum_range",
+        aliases = "u_opt_range_treatment"
+      ),
+      u_opt_distribution = eval_design_field(
+        "uptake_optimum_distribution",
+        aliases = "u_opt_distribution"
+      ),
+
+      sd_u_distribution = eval_design_field(
+        "uptake_width_distribution",
+        aliases = "sd_u_distribution"
+      ),
+      sd_u_mean = eval_design_field(
+        "uptake_width_mean",
+        aliases = "sd_u_mean"
+      ),
+      sd_u_range = eval_design_field(
+        "uptake_width_range",
+        aliases = "sd_u_range"
+      ),
+
+      half_saturation_mean = eval_design_field(
+        "half_saturation_mean",
+        aliases = "half_saturation_mean_treatment"
+      ),
+      half_saturation_range = eval_design_field(
+        "half_saturation_range",
+        aliases = "half_saturation_range_treatment"
+      ),
+      half_saturation_distribution = eval_design_field("half_saturation_distribution"),
+
+      consumer_death_rate = eval_design_field(
+        "consumer_death_rate",
+        aliases = "consumer_death_rate_treatment"
+      ),
+      resource_renewal_rate = eval_design_field(
+        "resource_renewal_rate",
+        aliases = "resource_renewal_rate_treatment"
+      ),
+      resource_supply = eval_design_field(
+        "resource_supply",
+        aliases = "resource_supply_treatment"
+      ),
+      conversion_efficiency = eval_design_field("conversion_efficiency"),
+      consumer_immigration_rate = eval_design_field("consumer_immigration_rate"),
+      resource_use_mode = eval_design_field("resource_use_mode"),
+      active_resource = eval_design_field("active_resource", default = 1, required = FALSE),
+      resource_specialization = eval_design_field(
+        "private_resource_use",
+        aliases = "resource_specialization",
+        default = 1,
+        required = FALSE
+      ),
+      resource_specialization_distribution = eval_design_field(
+        "private_resource_use_distribution",
+        aliases = "resource_specialization_distribution",
+        default = "constant",
+        required = FALSE
+      ),
+      resource_specialization_mean = eval_design_field(
+        "private_resource_use_mean",
+        aliases = "resource_specialization_mean",
+        default = eval_design_field(
+          "private_resource_use",
+          aliases = "resource_specialization",
+          default = 1,
+          required = FALSE
+        ),
+        required = FALSE
+      ),
+      resource_specialization_range = eval_design_field(
+        "private_resource_use_range",
+        aliases = "resource_specialization_range",
+        default = 0,
+        required = FALSE
+      ),
+      resource_specialization_precision = eval_design_field(
+        "private_resource_use_precision",
+        aliases = "resource_specialization_precision",
+        default = 10,
+        required = FALSE
       ),
 
       community_replicate = 1:eval(expt_def$number_of_community_replicates),
@@ -242,14 +345,26 @@ create_experiment_table <- function(experiment_folder,
       one_over_f_gamma = eval(expt_def$one_over_f_gamma),
 
       temperature_replicate = 1:eval(expt_def$number_of_environment_replicates),
+      environment_sharing = environment_sharing_values,
 
-      richness = eval(number_of_species)
+      richness = number_of_species
     ) |>
+      dplyr::mutate(case_id = paste0("case_id_", dplyr::row_number())) |>
       dplyr::mutate(
-        env_series_id = paste0("env_series_", temperature_mean, "_",
-                               temperature_sd, "_",
-                               one_over_f_gamma, "_",
-                               temperature_replicate),
+        env_series_id = dplyr::case_when(
+          .data$environment_sharing == "same_per_replicate" ~ paste0(
+            "env_series_",
+            .data$temperature_mean,
+            "_",
+            .data$temperature_sd,
+            "_",
+            .data$one_over_f_gamma,
+            "_",
+            .data$temperature_replicate
+          ),
+          .data$environment_sharing == "all_different" ~ paste0("env_series_", .data$case_id),
+          TRUE ~ NA_character_
+        ),
         community_id = paste0("cr_community_", .data$u_max_mean, "_",
                               .data$u_max_range, "_",
                               .data$u_opt_mean, "_",
@@ -269,9 +384,15 @@ create_experiment_table <- function(experiment_folder,
                               .data$resource_specialization_precision, "_",
                               .data$community_replicate, "_",
                               .data$richness),
-        case_id = paste0("case_id_", dplyr::row_number()),
         dynamics_type = dynamics_type
       )
+
+    if (any(is.na(expt$env_series_id))) {
+      stop(
+        "`environment_sharing` must be 'same_per_replicate' or 'all_different'.",
+        call. = FALSE
+      )
+    }
 
     community_seeds <- expt |>
       dplyr::select(community_id) |>
@@ -328,17 +449,44 @@ create_experiment_table <- function(experiment_folder,
 
   lv_interaction_treatments <- create_lv_interaction_treatments()
 
-  expt <- expand.grid(a_b_mean = eval(expt_def$a_b_mean_treatment),
-                      a_b_range = eval(expt_def$a_b_range_treatment),
-                      a_b_distribution = eval(expt_def$a_b_distribution),
+  expt <- expand.grid(a_b_mean = eval_design_field(
+                        "birth_maximum_mean",
+                        aliases = "a_b_mean_treatment"
+                      ),
+                      a_b_range = eval_design_field(
+                        "birth_maximum_range",
+                        aliases = "a_b_range_treatment"
+                      ),
+                      a_b_distribution = eval_design_field(
+                        "birth_maximum_distribution",
+                        aliases = "a_b_distribution"
+                      ),
 
-                      b_opt_mean = eval(expt_def$b_opt_mean_treatment),
-                      b_opt_range = eval(expt_def$b_opt_range_treatment),
-                      b_opt_distribution = eval(expt_def$b_opt_distribution),
+                      b_opt_mean = eval_design_field(
+                        "birth_optimum_mean",
+                        aliases = "b_opt_mean_treatment"
+                      ),
+                      b_opt_range = eval_design_field(
+                        "birth_optimum_range",
+                        aliases = "b_opt_range_treatment"
+                      ),
+                      b_opt_distribution = eval_design_field(
+                        "birth_optimum_distribution",
+                        aliases = "b_opt_distribution"
+                      ),
 
-                      sd_perf_distribution = eval(expt_def$sd_perf_distribution),
-                      sd_perf_mean=eval(expt_def$sd_perf_mean),
-                      sd_perf_range=eval(expt_def$sd_perf_range),
+                      sd_perf_distribution = eval_design_field(
+                        "birth_width_distribution",
+                        aliases = "sd_perf_distribution"
+                      ),
+                      sd_perf_mean = eval_design_field(
+                        "birth_width_mean",
+                        aliases = "sd_perf_mean"
+                      ),
+                      sd_perf_range = eval_design_field(
+                        "birth_width_range",
+                        aliases = "sd_perf_range"
+                      ),
 
                       lv_interaction_row = seq_len(nrow(lv_interaction_treatments)),
 
@@ -349,18 +497,30 @@ create_experiment_table <- function(experiment_folder,
                       one_over_f_gamma = eval(expt_def$one_over_f_gamma),
 
                       temperature_replicate = 1:eval(expt_def$number_of_environment_replicates),
+                      environment_sharing = environment_sharing_values,
 
-                      richness = eval(number_of_species)) |>
+                      richness = number_of_species) |>
     dplyr::left_join(
       lv_interaction_treatments |>
         dplyr::mutate(lv_interaction_row = dplyr::row_number()),
       by = "lv_interaction_row"
     ) |>
+    dplyr::mutate(case_id = paste0("case_id_", dplyr::row_number())) |>
     dplyr::mutate(
-      env_series_id = paste0("env_series_", temperature_mean, "_",
-                             temperature_sd, "_",
-                             one_over_f_gamma, "_",
-                             temperature_replicate),
+      env_series_id = dplyr::case_when(
+        .data$environment_sharing == "same_per_replicate" ~ paste0(
+          "env_series_",
+          .data$temperature_mean,
+          "_",
+          .data$temperature_sd,
+          "_",
+          .data$one_over_f_gamma,
+          "_",
+          .data$temperature_replicate
+        ),
+        .data$environment_sharing == "all_different" ~ paste0("env_series_", .data$case_id),
+        TRUE ~ NA_character_
+      ),
       community_id = paste0("community_", a_b_mean, "_",
                             a_b_range, "_",
                             a_b_distribution, "_",
@@ -372,9 +532,15 @@ create_experiment_table <- function(experiment_folder,
                             sd_perf_range, "_",
                             lv_interaction_label, "_",
                             community_replicate, "_",
-                            richness),
-      case_id = paste0("case_id_", dplyr::row_number())
+                            richness)
     )
+
+  if (any(is.na(expt$env_series_id))) {
+    stop(
+      "`environment_sharing` must be 'same_per_replicate' or 'all_different'.",
+      call. = FALSE
+    )
+  }
 
   community_seeds <- expt |>
     dplyr::select(community_id) |>
@@ -393,15 +559,16 @@ create_experiment_table <- function(experiment_folder,
 
   if (!is.null(expt_def$sd_perf_curve)) {
     stop(
-      "`sd_perf_curve` is deprecated. Use `sd_perf_mean` and `sd_perf_range` ",
+      "`sd_perf_curve` is deprecated. Use `birth_width_mean` and ",
+      "`birth_width_range` ",
       "to define standard-deviation performance-curve widths.",
       call. = FALSE
     )
   }
 
   #a_b <- eval(expt_def$a_b)
-  a_d <- eval(expt_def$a_d)
-  z <- eval(expt_def$z)
+  a_d <- eval_design_field("death_intercept", aliases = "a_d")
+  z <- eval_design_field("death_temperature_slope", aliases = "z")
 
   community_object <- expt |>
     dplyr::mutate(case_id = dplyr::row_number()) |>
