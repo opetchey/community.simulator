@@ -69,20 +69,20 @@ ggplot(environment, aes(x = time, y = temperature)) +
 ## Define One Community
 
 ```{r community}
-community <- make_a_community(
+community <- build_LV_community(
   S = 4,
-  a_b_mean = 0.34,
-  a_b_range = 0.00,
-  a_b_distribution = "regular",
-  b_opt_mean = 20,
-  b_opt_range = 8,
-  b_opt_distribution = "regular",
-  sd_perf_distribution = "regular",
-  sd_perf_mean = 7,
-  sd_perf_range = 2,
+  birth_maximum_mean = 0.34,
+  birth_maximum_range = 0.00,
+  birth_maximum_distribution = "regular",
+  birth_optimum_mean = 20,
+  birth_optimum_range = 8,
+  birth_optimum_distribution = "regular",
+  birth_width_distribution = "regular",
+  birth_width_mean = 7,
+  birth_width_range = 2,
   community_seed = 11,
-  a_d = 0.02,
-  z = 0.03,
+  death_intercept = 0.02,
+  death_temperature_slope = 0.03,
   lv_interaction_spec = list(
     label = "weak_asymmetric_competition",
     type = "competition",
@@ -99,11 +99,11 @@ community <- make_a_community(
 ```{r traits}
 species_traits <- tibble(
   species = paste0("Spp", seq_len(community$S)),
-  max_birth = community$a_b_i,
-  thermal_optimum = community$b_opt_i,
-  width = community$sd_perf_i,
-  death_intercept = community$a_d_i,
-  death_temperature_slope = community$z_i
+  max_birth = community$birth_maximum_i,
+  thermal_optimum = community$birth_optimum_i,
+  width = community$birth_width_i,
+  death_intercept = community$death_intercept_i,
+  death_temperature_slope = community$death_temperature_slope_i
 )
 
 species_traits

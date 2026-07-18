@@ -338,6 +338,11 @@ make_a_community <- function(S,
 
   ## create a list of all the parameters
   community_pars_object <- list(S = S,
+                                birth_maximum_i = a_b_i,
+                                birth_optimum_i = b_opt_i,
+                                birth_width_i = sd_perf_i,
+                                death_intercept_i = a_d_i,
+                                death_temperature_slope_i = z_i,
                                 a_b_i = a_b_i,
                                 b_opt_i = b_opt_i,
                                 sd_perf_i = sd_perf_i,

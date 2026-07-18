@@ -98,8 +98,9 @@ Start here in this order:
    want to build one community, inspect its structure, and simulate it
    interactively.
 5. View the provided YAML experiment templates in
-   [inst/experiment_templates](inst/experiment_templates), copy one into an
-   experiment folder, and run larger experiments with `run_experiment()`.
+   [inst/experiment_templates](inst/experiment_templates). The compact
+   templates are smoke tests; the `*_rich.yaml` templates show treatments,
+   replicates, output controls, and parallel settings for larger experiments.
 6. Use the
    [User Guide](https://opetchey.github.io/community.simulator/articles/User_guide.html)
    as a reference. Some sections still need polish, so treat it as the

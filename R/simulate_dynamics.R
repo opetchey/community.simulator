@@ -23,10 +23,10 @@ summarise_case_dynamics <- function(case_id,
   extinct_final <- final_abundances <= extinction_threshold
   extinct_ever <- apply(abundance_matrix <= extinction_threshold, 2, any, na.rm = TRUE)
 
-  mean_totab <- mean(total_abundance, na.rm = TRUE)
-  sd_totab <- stats::sd(total_abundance, na.rm = TRUE)
+  mean_total_abundance <- mean(total_abundance, na.rm = TRUE)
+  sd_total_abundance <- stats::sd(total_abundance, na.rm = TRUE)
   sum_population_sds <- sum(population_sds, na.rm = TRUE)
-  relative_abundances <- population_means / mean_totab
+  relative_abundances <- population_means / mean_total_abundance
 
   temperature_data <- temperature_series |>
     dplyr::filter(
@@ -48,13 +48,13 @@ summarise_case_dynamics <- function(case_id,
 
   case_summary <- tibble::tibble(
     case_id = case_id,
-    mean_totab = mean_totab,
-    sd_totab = sd_totab,
-    CV_totab = sd_totab / mean_totab,
+    mean_total_abundance = mean_total_abundance,
+    sd_total_abundance = sd_total_abundance,
+    cv_total_abundance = sd_total_abundance / mean_total_abundance,
     comm_temperature_sensitivity = temp_sensitivity,
-    sync_ab = sd_totab^2 / sum_population_sds^2,
-    pop_CV_ab = sum(relative_abundances * population_cvs, na.rm = TRUE),
-    final_totab = total_abundance[[length(total_abundance)]],
+    synchrony_abundance = sd_total_abundance^2 / sum_population_sds^2,
+    mean_population_cv_abundance = sum(relative_abundances * population_cvs, na.rm = TRUE),
+    final_total_abundance = total_abundance[[length(total_abundance)]],
     final_min_abundance = min(final_abundances, na.rm = TRUE),
     final_mean_abundance = mean(final_abundances, na.rm = TRUE),
     final_max_abundance = max(final_abundances, na.rm = TRUE),

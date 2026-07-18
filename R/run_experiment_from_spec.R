@@ -327,7 +327,10 @@ get_community_measures_from_spec <- function(experiment_folder,
   }
   comm_dynamic_measures <- readRDS(summaries_path) |>
     tibble::as_tibble()
-  comm_sum_rel_b_opt <- get_community_sum_rel_b_opt(temperatures, expt)
+  performance_optimum_measures <- get_community_performance_optimum_measures(
+    temperatures,
+    expt
+  )
   comm_cpc <- get_community_CPC_measures(
     temperatures,
     expt,
@@ -341,12 +344,50 @@ get_community_measures_from_spec <- function(experiment_folder,
 
   comm_measures <- expt |>
     dplyr::left_join(comm_dynamic_measures, by = "case_id") |>
-    dplyr::left_join(comm_sum_rel_b_opt, by = "case_id") |>
-    dplyr::left_join(comm_cpc, by = "case_id")
+    dplyr::left_join(performance_optimum_measures, by = "case_id") |>
+    dplyr::left_join(comm_cpc, by = "case_id") |>
+    standardize_community_measure_names()
 
   saveRDS(comm_measures, output_path)
   announce_output_written(output_path, verbose = verbose, label = "community-measures file")
   invisible(output_path)
+}
+
+standardize_community_measure_names <- function(x) {
+  rename_if_present <- function(data, old, new) {
+    if (old %in% names(data) && !new %in% names(data)) {
+      names(data)[names(data) == old] <- new
+    }
+    data
+  }
+
+  renames <- list(
+    mean_totab = "mean_total_abundance",
+    sd_totab = "sd_total_abundance",
+    CV_totab = "cv_total_abundance",
+    sync_ab = "synchrony_abundance",
+    pop_CV_ab = "mean_population_cv_abundance",
+    final_totab = "final_total_abundance",
+    sum_rel_b_opt = "sum_relative_performance_optimum",
+    min_rel_b_opt = "minimum_absolute_relative_performance_optimum",
+    real_mean_b_opt = "realized_mean_performance_optimum",
+    real_sd_b_opt = "realized_sd_performance_optimum",
+    CV_community_perf_info = "cv_community_performance_info",
+    CV_community_perf_naive = "cv_community_performance_naive",
+    CV_community_viability_binary_info = "cv_community_viability_binary_info",
+    CV_community_viability_binary_naive = "cv_community_viability_binary_naive",
+    CV_community_viability_soft_info = "cv_community_viability_soft_info",
+    CV_community_viability_soft_naive = "cv_community_viability_soft_naive",
+    synchrony_perf_info = "synchrony_performance_info",
+    synchrony_perf_naive = "synchrony_performance_naive",
+    avg_perf_CV_info = "mean_species_cv_performance_info",
+    avg_perf_CV_naive = "mean_species_cv_performance_naive"
+  )
+
+  for (old in names(renames)) {
+    x <- rename_if_present(x, old, renames[[old]])
+  }
+  x
 }
 
 # Internal convenience helper used during the rewrite. The public experiment

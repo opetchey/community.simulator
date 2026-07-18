@@ -11,9 +11,9 @@ test_that("LV case specs build LV community objects", {
   expect_equal(community_direct$S, 2)
   expect_equal(nrow(community$alpha_ij), 2)
   expect_equal(ncol(community$alpha_ij), 2)
-  expect_true(all(is.finite(community$a_b_i)))
-  expect_true(all(is.finite(community$b_opt_i)))
-  expect_true(all(community$sd_perf_i > 0))
+  expect_true(all(is.finite(community$birth_maximum_i)))
+  expect_true(all(is.finite(community$birth_optimum_i)))
+  expect_true(all(community$birth_width_i > 0))
 })
 
 test_that("consumer-resource case specs build consumer-resource community objects", {
@@ -31,8 +31,8 @@ test_that("consumer-resource case specs build consumer-resource community object
   expect_equal(community$R, 3)
   expect_equal(nrow(community$resource_use_ij), 2)
   expect_equal(ncol(community$resource_use_ij), 3)
-  expect_true(all(community$resource_specialization_i >= 0))
-  expect_true(all(community$resource_specialization_i <= 1))
+  expect_true(all(community$private_resource_use_i >= 0))
+  expect_true(all(community$private_resource_use_i <= 1))
 })
 
 test_that("rewrite-facing low-level constructors are available", {
@@ -47,31 +47,31 @@ test_that("rewrite-facing low-level constructors are available", {
 
   lv_community <- build_LV_community(
     S = 2,
-    a_b_mean = 0.3,
-    a_b_range = 0,
-    a_b_distribution = "random_uniform",
-    b_opt_mean = 20,
-    b_opt_range = 4,
-    b_opt_distribution = "random_uniform",
-    sd_perf_distribution = "random_uniform",
-    sd_perf_mean = 10,
-    sd_perf_range = 0,
+    birth_maximum_mean = 0.3,
+    birth_maximum_range = 0,
+    birth_maximum_distribution = "random_uniform",
+    birth_optimum_mean = 20,
+    birth_optimum_range = 4,
+    birth_optimum_distribution = "random_uniform",
+    birth_width_distribution = "random_uniform",
+    birth_width_mean = 10,
+    birth_width_range = 0,
     community_seed = 1,
-    a_d = 0,
-    z = 0.05,
+    death_intercept = 0,
+    death_temperature_slope = 0.05,
     lv_interaction_spec = lv_table$case_spec[[1]]$interactions$selected
   )
   cr_community <- build_CR_community(
     S = 2,
-    u_max_mean = 0.06,
-    u_max_range = 0,
-    u_max_distribution = "random_uniform",
-    u_opt_mean = 20,
-    u_opt_range = 4,
-    u_opt_distribution = "random_uniform",
-    sd_u_mean = 5,
-    sd_u_range = 0,
-    sd_u_distribution = "random_uniform",
+    uptake_maximum_mean = 0.06,
+    uptake_maximum_range = 0,
+    uptake_maximum_distribution = "random_uniform",
+    uptake_optimum_mean = 20,
+    uptake_optimum_range = 4,
+    uptake_optimum_distribution = "random_uniform",
+    uptake_width_mean = 5,
+    uptake_width_range = 0,
+    uptake_width_distribution = "random_uniform",
     half_saturation_mean = 100,
     half_saturation_range = 0,
     half_saturation_distribution = "random_uniform",
@@ -81,14 +81,16 @@ test_that("rewrite-facing low-level constructors are available", {
     conversion_efficiency = 1,
     resource_use_mode = "shared_to_private",
     active_resource = 1,
-    resource_specialization_distribution = "beta",
-    resource_specialization_mean = 0.7,
-    resource_specialization_precision = 10,
+    private_resource_use_distribution = "beta",
+    private_resource_use_mean = 0.7,
+    private_resource_use_precision = 10,
     community_seed = 1
   )
 
   expect_equal(lv_community$S, 2)
   expect_equal(cr_community$S, cr_table$case_spec[[1]]$community$richness)
+  expect_true("birth_maximum_i" %in% names(lv_community))
+  expect_true("uptake_maximum_i" %in% names(cr_community))
 })
 
 test_that("community objects are included in canonical experiment tables", {

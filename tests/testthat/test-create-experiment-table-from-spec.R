@@ -84,7 +84,8 @@ test_that("invalid treatment paths fail clearly", {
 
   expect_error(
     create_experiment_table_from_spec(spec),
-    "does not exist in the baseline specification"
+    "Did you mean `traits.birth_width.mean`",
+    fixed = TRUE
   )
 })
 
@@ -114,7 +115,28 @@ test_that("all YAML templates build valid community objects", {
   tables <- lapply(templates, create_experiment_table_from_spec)
   communities <- unlist(lapply(tables, `[[`, "community_object"), recursive = FALSE)
 
-  expect_equal(length(tables), 3)
-  expect_true(all(vapply(communities, function(x) is.list(x) && x$S == 2, logical(1))))
+  expect_gte(length(tables), 6)
+  expect_true(all(vapply(communities, function(x) is.list(x) && x$S >= 2, logical(1))))
   expect_true(any(vapply(communities, function(x) identical(x$model_type, "consumer_resource"), logical(1))))
+})
+
+test_that("rich YAML examples validate and expand to multi-case designs", {
+  templates <- c(
+    "lv_discrete_rich.yaml",
+    "lv_continuous_rich.yaml",
+    "consumer_resource_rich.yaml"
+  )
+
+  tables <- lapply(templates, function(template) {
+    create_experiment_table_from_spec(system.file(
+      file.path("experiment_templates", template),
+      package = "community.simulator"
+    ))
+  })
+
+  expect_true(all(vapply(tables, nrow, integer(1)) > 4))
+  expect_true(all(vapply(tables, function(x) {
+    "treatment_values" %in% names(x) &&
+      length(unique(x$treatment_label)) > 1
+  }, logical(1))))
 })

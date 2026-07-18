@@ -406,3 +406,29 @@ Keep this section updated as the rewrite proceeds.
 - Updated the README and vignettes so reviewers and users are directed to the
   YAML experiment templates and `run_experiment()` as the main experiment path.
 - Removed the unused JSON-specific preflight estimator from `R/run_experiment.R`.
+- Cleaned the rewrite-facing community constructor interfaces so
+  `build_LV_community()` and `build_CR_community()` use YAML-schema names
+  rather than legacy internal names.
+- Added canonical trait/resource aliases to LV and CR community objects while
+  retaining the legacy slots needed by the existing simulators.
+- Updated single-community walkthroughs to call the rewrite-facing constructors
+  and inspect canonical community-object fields.
+- Renamed YAML-workflow community-measure outputs to descriptive names such as
+  `cv_total_abundance`, `sum_relative_performance_optimum`,
+  `realized_mean_performance_optimum`, and `cv_community_performance_info`.
+  The `realized_*` prefix is retained to distinguish sampled community
+  statistics from design-specified trait-distribution settings.
+- Renamed the exported performance-optimum helper to
+  `get_community_performance_optimum_measures()` and retained
+  `get_community_sum_rel_b_opt()` only as a private legacy wrapper.
+- Added a community-measures output reference table to the user guide,
+  including the meaning of the renamed YAML-workflow measure columns.
+- Expanded YAML schema validation for required fields, allowed model/resource/
+  interaction/distribution values, numeric bounds, integer counts, runtime
+  controls, CR private-resource use, and LV interaction parameters.
+- Added treatment-path suggestions for misspelled dotted treatment paths and
+  tests covering common validation failures.
+- Added a common YAML errors table to the user guide.
+- Added richer YAML experiment templates for LV discrete, LV continuous, and
+  consumer-resource models. These examples include treatments, replicates,
+  interaction or resource-use options, output controls, and parallel settings.

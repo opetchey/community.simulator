@@ -1,0 +1,86 @@
+experiment:
+  name: lv_continuous_rich_example
+  random_seed: 1301
+
+model:
+  type: lv_continuous
+
+community:
+  richness: 4
+  replicates: 2
+
+traits:
+  birth_maximum:
+    mean: 0.3
+    range: 0.03
+    distribution: random_uniform
+  birth_optimum:
+    mean: 20
+    range: 7
+    distribution: random_uniform
+  birth_width:
+    mean: 8
+    range: 2
+    distribution: random_uniform
+  death:
+    intercept: 0.02
+    temperature_slope: 0.03
+
+interactions:
+  treatments:
+    - label: weak_competition
+      type: competition
+      symmetry: asymmetric
+      distribution: uniform
+      parameters:
+        min: 0.02
+        max: 0.12
+      diagonal: 1
+    - label: predator_prey_pairs
+      type: predator_prey
+      symmetry: antisymmetric
+      distribution: uniform
+      parameters:
+        min: 0.02
+        max: 0.10
+      diagonal: 1
+
+environment:
+  replicates: 2
+  sharing: same_per_replicate
+  temperature:
+    mean: 20
+    sd: 1
+    one_over_f_gamma: 0.8
+
+simulation:
+  burn_in_duration: 100
+  experiment_duration: 200
+  temperature_interpolation: linear
+  immigration_rate: 0.05
+  immigration_mode: continuous
+  ode:
+    method: lsoda
+    rtol: 1e-6
+    atol: 1e-8
+    max_step: 1
+  blowup_threshold: 1e12
+
+output:
+  save_dynamics: true
+  dynamics_save_every: 5
+  summary_checkpoint_every: 10
+  runtime_update_every: 10
+  simulation_progress: true
+  environment_progress: true
+
+parallel:
+  workers: 2
+  environments: true
+  simulations: true
+  community_measures: true
+
+treatments:
+  values:
+    traits.birth_optimum.range: [4, 8]
+    environment.temperature.one_over_f_gamma: [0.3, 1.0]

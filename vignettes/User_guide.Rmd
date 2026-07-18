@@ -461,16 +461,27 @@ consumers with positive expected growth.
 
 ## Bundled Example Designs
 
-The package includes compact example YAML templates under
-`inst/experiment_templates`:
+The package includes compact and richer example YAML templates under
+`inst/experiment_templates`.
+
+The compact templates are intentionally small, so they are useful as smoke
+tests and as starting points for the smallest possible experiment:
 
 - `lv_discrete.yaml`
 - `lv_continuous.yaml`
 - `consumer_resource.yaml`
 
+The richer templates show a more reviewer- or user-facing experiment
+specification, including treatments, replicate structure, interaction or
+resource-use options, output controls, and parallel settings:
+
+- `lv_discrete_rich.yaml`
+- `lv_continuous_rich.yaml`
+- `consumer_resource_rich.yaml`
+
 Copy one into an experiment folder, rename it if useful, and edit it before
-running `run_experiment()`. These templates are intentionally small, so they are
-useful as smoke tests and as starting points for larger experiments.
+running `run_experiment()`. The richer templates are still modest examples, but
+they are closer to the shape of an experiment a user would adapt for analysis.
 
 ## YAML File Conventions
 
@@ -513,6 +524,24 @@ treatments:
 
 Treatment paths must already exist in the baseline specification. This catches
 spelling errors before the experiment starts.
+
+### Common YAML Errors
+
+`read_experiment_spec()` validates an experiment before the workflow starts. The
+goal is to fail early, before environments or simulations are created.
+
+Common validation errors include:
+
+| Error type | Example message | How to fix it |
+| --- | --- | --- |
+| Missing section | `Experiment specification is missing required section(s): traits` | Add the missing top-level section to the YAML file. |
+| Invalid model name | `` `model.type` must be one of: lv_discrete, lv_continuous, consumer_resource_continuous. `` | Use one of the supported model names exactly. |
+| Wrong value type | `` `community.richness` must be an integer >= 1. `` | Use a single positive integer for counts and replicate numbers. |
+| Invalid distribution | `` `traits.birth_width.distribution` must be one of: regular, random_uniform. `` | Use one of the distributions supported for that trait. |
+| Invalid numeric range | `` `traits.birth_width.mean - 0.5 * traits.birth_width.range` must be positive. `` | Make the mean and range imply possible species-level values within the allowed range. |
+| Invalid interaction treatment | `predator-prey interactions cannot use symmetric symmetry` | Use `asymmetric` or `antisymmetric` symmetry for predator-prey interactions. |
+| Invalid private resource use | `` `resources.private_use.mean` must be greater than 0 and less than 1. `` | For beta-distributed private resource use, keep the mean strictly between 0 and 1. |
+| Misspelled treatment path | `` Treatment path `traits.birth_wdith.mean` does not exist... Did you mean `traits.birth_width.mean`? `` | Correct the dotted path so it matches a field already present in the baseline YAML specification. |
 
 ## YAML Parameter Reference
 
@@ -601,15 +630,74 @@ always reading full dynamics from SQLite.
 columns depend on the model type and available intermediate outputs, but common
 outputs include:
 
-- community stability, including `CV_totab`, the coefficient of variation of
-  total abundance through time
+- community stability, including `cv_total_abundance`, the coefficient of
+  variation of total abundance through time
 - mean and standard deviation of total abundance
 - environmental summaries, such as mean temperature
+- realized performance-optimum summaries, such as
+  `realized_mean_performance_optimum`; these are calculated from the sampled
+  species traits in the community, so they can differ from the design-specified
+  trait-distribution values
 - community performance or viability summaries used in response-diversity
-  analyses
+  analyses, such as `cv_community_performance_info` for LV models and
+  `cv_community_viability_binary_info` for consumer-resource models
 
 For most analyses, `community_measures.RDS` is the first file to inspect after
 a successful experiment.
+
+### Community-Measures Output Reference
+
+The table below describes the main columns produced in `community_measures.RDS`.
+Some columns are model-specific or depend on output settings, so not every
+experiment will contain every measure.
+
+| Column | Meaning |
+| --- | --- |
+| `case_id` | Unique simulation-case identifier. |
+| `model_type` | Population dynamic model used for the case. |
+| `treatment_id` | Identifier for the expanded YAML treatment combination. |
+| `treatment_label` | Readable label for the expanded YAML treatment combination. |
+| `interaction_treatment_label` | LV interaction-matrix treatment label; `NA` for CR models. |
+| `community_replicate` | Community replicate number. |
+| `environment_replicate` | Environment replicate number. |
+| `env_series_id` | Identifier for the generated environmental temperature series. |
+| `temperature_mean` | Design-specified mean temperature for the case. |
+| `temperature_sd` | Design-specified standard deviation of environmental temperature. |
+| `one_over_f_gamma` | Design-specified `1/f` environmental-noise slope. |
+| `richness` | Number of species or consumers in the community. |
+| `community_id` | Identifier for the realized community object. |
+| `mean_total_abundance` | Mean total abundance through the post-burn-in experiment period. |
+| `sd_total_abundance` | Standard deviation of total abundance through the post-burn-in experiment period. |
+| `cv_total_abundance` | Coefficient of variation of total abundance; the main community-stability measure. |
+| `comm_temperature_sensitivity` | Slope from a linear model of total abundance against temperature for the case. |
+| `synchrony_abundance` | Loreau-style synchrony of population abundances, calculated from total-abundance variance relative to summed population standard deviations. |
+| `mean_population_cv_abundance` | Mean population-level abundance CV, weighted by mean relative abundance. |
+| `final_total_abundance` | Total abundance at the final saved time point. |
+| `final_min_abundance` | Minimum species abundance at the final saved time point. |
+| `final_mean_abundance` | Mean species abundance at the final saved time point. |
+| `final_max_abundance` | Maximum species abundance at the final saved time point. |
+| `final_richness_above_extinction_threshold` | Number of species above the extinction threshold at the final saved time point. |
+| `n_extinct_final` | Number of species at or below the extinction threshold at the final saved time point. |
+| `any_extinct_final` | Whether any species is extinct at the final saved time point. |
+| `n_extinct_ever` | Number of species that crossed the extinction threshold at any saved time point. |
+| `any_extinct_ever` | Whether any species crossed the extinction threshold at any saved time point. |
+| `min_abundance_ever` | Minimum species abundance observed during the saved experiment period. |
+| `extinction_threshold` | Threshold used for extinction summaries. |
+| `performance_optimum_trait` | Trait used for performance-optimum summaries: `birth_optimum` for LV models and `uptake_optimum` for CR models. |
+| `sum_relative_performance_optimum` | Sum across species of realized performance optimum minus mean environmental temperature. |
+| `minimum_absolute_relative_performance_optimum` | Smallest absolute distance between a species' realized performance optimum and mean environmental temperature. |
+| `realized_mean_performance_optimum` | Mean realized performance optimum across the sampled species in the community. The `realized` prefix indicates that this is calculated from the actual sampled community, not copied from the design-specified trait distribution. |
+| `realized_sd_performance_optimum` | Standard deviation of realized performance optima across the sampled species in the community. |
+| `cv_community_performance_info` | CV of the LV community performance curve evaluated over the actual experienced temperature series. |
+| `cv_community_performance_naive` | CV of the LV community performance curve evaluated over an evenly spaced temperature sequence spanning the experienced range. |
+| `cv_community_viability_binary_info` | CV of CR binary community viability evaluated over the actual experienced temperature series. |
+| `cv_community_viability_binary_naive` | CV of CR binary community viability evaluated over an evenly spaced temperature sequence spanning the experienced range. |
+| `cv_community_viability_soft_info` | CV of CR soft community viability evaluated over the actual experienced temperature series. |
+| `cv_community_viability_soft_naive` | CV of CR soft community viability evaluated over an evenly spaced temperature sequence spanning the experienced range. |
+| `synchrony_performance_info` | Synchrony of species performance curves evaluated over the actual experienced temperature series. |
+| `synchrony_performance_naive` | Synchrony of species performance curves evaluated over an evenly spaced temperature sequence spanning the experienced range. |
+| `mean_species_cv_performance_info` | Mean species-level performance CV, weighted by mean performance, over the actual experienced temperature series. |
+| `mean_species_cv_performance_naive` | Mean species-level performance CV, weighted by mean performance, over an evenly spaced temperature sequence spanning the experienced range. |
 
 ## Parallel Processing and Runtime Reporting
 

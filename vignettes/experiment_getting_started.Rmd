@@ -77,7 +77,7 @@ outputs
 ```{r inspect-output}
 community_measures <- readRDS(outputs$community_measures)
 
-community_measures[, c("case_id", "richness", "temperature_mean", "CV_totab")]
+community_measures[, c("case_id", "richness", "temperature_mean", "cv_total_abundance")]
 ```
 
 ## Inspect the Experiment Log

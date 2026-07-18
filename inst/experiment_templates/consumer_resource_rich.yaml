@@ -1,0 +1,84 @@
+experiment:
+  name: consumer_resource_rich_example
+  random_seed: 1401
+
+model:
+  type: consumer_resource_continuous
+
+community:
+  richness: 4
+  replicates: 2
+
+traits:
+  uptake_maximum:
+    mean: 0.06
+    range: 0.02
+    distribution: random_uniform
+  uptake_optimum:
+    mean: 20
+    range: 8
+    distribution: random_uniform
+  uptake_width:
+    mean: 5
+    range: 1.5
+    distribution: random_uniform
+  half_saturation:
+    mean: 100
+    range: 20
+    distribution: random_uniform
+
+resources:
+  use_mode: shared_to_private
+  active_resource: 1
+  private_use:
+    distribution: beta
+    mean: 0.7
+    precision: 12
+  consumer_death_rate: 0.03
+  renewal_rate: 1
+  supply: 1000
+  conversion_efficiency: 1
+
+environment:
+  replicates: 2
+  sharing: same_per_replicate
+  temperature:
+    mean: 20
+    sd: 1
+    one_over_f_gamma: 0.8
+
+simulation:
+  burn_in_duration: 100
+  experiment_duration: 200
+  consumer_immigration_rate: 0.01
+  initial_consumer_total_abundance: 30
+  resource_initial_value: 1000
+  temperature_interpolation: linear
+  ode:
+    method: lsoda
+    rtol: 1e-6
+    atol: 1e-8
+    max_step: 1
+  blowup_threshold: 1e12
+  negative_tolerance: 1e-8
+
+output:
+  save_dynamics: true
+  save_resources: true
+  dynamics_save_every: 5
+  resources_save_every: 5
+  summary_checkpoint_every: 10
+  runtime_update_every: 10
+  simulation_progress: true
+  environment_progress: true
+
+parallel:
+  workers: 2
+  environments: true
+  simulations: true
+  community_measures: true
+
+treatments:
+  values:
+    resources.private_use.mean: [0.4, 0.8]
+    environment.temperature.sd: [0.5, 1.5]

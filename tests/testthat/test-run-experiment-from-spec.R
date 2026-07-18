@@ -31,7 +31,11 @@ test_that("YAML LV experiment runs end to end", {
   expect_equal(nrow(community_measures), 2)
   expect_true("case_spec" %in% names(experiment_table))
   expect_true("community_object" %in% names(experiment_table))
-  expect_true("CV_totab" %in% names(community_measures))
+  expect_true("cv_total_abundance" %in% names(community_measures))
+  expect_true("realized_mean_performance_optimum" %in% names(community_measures))
+  expect_true("performance_optimum_trait" %in% names(community_measures))
+  expect_false("CV_totab" %in% names(community_measures))
+  expect_false("real_mean_b_opt" %in% names(community_measures))
 })
 
 test_that("all YAML model templates run end to end", {

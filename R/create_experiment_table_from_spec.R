@@ -202,10 +202,17 @@ apply_treatment_overrides <- function(spec, overrides) {
   out <- spec
   for (path in names(overrides)) {
     if (!dotted_path_exists(out, path)) {
+      suggestion <- suggest_dotted_path(path, dotted_paths(out))
+      suggestion_message <- if (is.na(suggestion)) {
+        ""
+      } else {
+        paste0(" Did you mean `", suggestion, "`?")
+      }
       stop(
         "Treatment path `",
         path,
         "` does not exist in the baseline specification.",
+        suggestion_message,
         call. = FALSE
       )
     }
@@ -214,6 +221,36 @@ apply_treatment_overrides <- function(spec, overrides) {
   out <- normalize_experiment_spec(out)
   validate_experiment_spec(out)
   out
+}
+
+dotted_paths <- function(x, prefix = character()) {
+  if (!is.list(x) || is.null(names(x))) {
+    return(character())
+  }
+  paths <- character()
+  for (name in names(x)) {
+    if (identical(name, "") || is.na(name)) {
+      next
+    }
+    path <- paste(c(prefix, name), collapse = ".")
+    paths <- c(paths, path)
+    paths <- c(paths, dotted_paths(x[[name]], c(prefix, name)))
+  }
+  paths
+}
+
+suggest_dotted_path <- function(path, candidates) {
+  candidates <- candidates[nzchar(candidates)]
+  if (length(candidates) == 0) {
+    return(NA_character_)
+  }
+  distances <- utils::adist(path, candidates)
+  best <- which.min(distances)
+  threshold <- max(3, floor(nchar(path) * 0.25))
+  if (length(best) == 0 || distances[[best]] > threshold) {
+    return(NA_character_)
+  }
+  candidates[[best]]
 }
 
 dotted_path_exists <- function(x, path) {
