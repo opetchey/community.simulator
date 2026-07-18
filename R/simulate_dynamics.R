@@ -135,6 +135,34 @@ atomic_save_rds <- function(object, path) {
   invisible(path)
 }
 
+stable_integer_from_character <- function(x) {
+  x <- as.character(x)
+  code_points <- utf8ToInt(x)
+  if (length(code_points) == 0 || anyNA(code_points)) {
+    return(0L)
+  }
+  hash <- 0
+  modulus <- 1000000007
+  for (code_point in code_points) {
+    hash <- (hash * 131 + code_point) %% modulus
+  }
+  as.integer(hash)
+}
+
+initial_abundance_seed_for_case <- function(initial_abundance_seed_base,
+                                            expt,
+                                            i) {
+  if (is.null(initial_abundance_seed_base)) {
+    return(NULL)
+  }
+  seed_id <- if ("community_id" %in% names(expt) && !is.na(expt$community_id[[i]])) {
+    expt$community_id[[i]]
+  } else {
+    paste0("case_", i)
+  }
+  as.integer(initial_abundance_seed_base) + stable_integer_from_character(seed_id)
+}
+
 simulate_one_dynamics_case <- function(i,
                                        expt,
                                        temperatures_data,
@@ -190,7 +218,7 @@ simulate_one_dynamics_case <- function(i,
 
   S <- expt[i, ]$community_object[[1]]$S
   if (!is.null(initial_abundance_seed_base)) {
-    set.seed(initial_abundance_seed_base + i)
+    set.seed(initial_abundance_seed_for_case(initial_abundance_seed_base, expt, i))
   }
   initial_abundances <- (dirmult::rdirichlet(1, rep(1, S)) *
                            initial_consumer_total_abundance)[1, ]

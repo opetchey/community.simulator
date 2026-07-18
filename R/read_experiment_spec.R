@@ -403,7 +403,7 @@ validate_optional_runtime_sections <- function(spec) {
       stop("`parallel` must be a mapping.", call. = FALSE)
     }
     if (!is.null(spec$parallel$workers)) {
-      require_positive_integer(spec$parallel$workers, "parallel.workers")
+      validate_parallel_workers(spec$parallel$workers)
     }
     for (field in c("environments", "simulations", "community_measures")) {
       if (!is.null(spec$parallel[[field]])) {
@@ -438,6 +438,18 @@ validate_optional_runtime_sections <- function(spec) {
     }
   }
   invisible(TRUE)
+}
+
+validate_parallel_workers <- function(x) {
+  if (is.character(x) && length(x) == 1) {
+    require_one_of(
+      x,
+      "parallel.workers",
+      c("available_cores", "available_cores_minus_1", "auto")
+    )
+    return(invisible(TRUE))
+  }
+  require_positive_integer(x, "parallel.workers")
 }
 
 validate_lv_interaction_treatments <- function(treatments) {

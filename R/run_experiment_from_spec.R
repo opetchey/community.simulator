@@ -30,6 +30,26 @@ integer_spec_setting <- function(value, name) {
   value
 }
 
+worker_spec_setting <- function(value, name) {
+  if (is.character(value) && length(value) == 1) {
+    value <- switch(
+      value,
+      available_cores_minus_1 = max(1L, parallel::detectCores(logical = FALSE) - 1L),
+      available_cores = max(1L, parallel::detectCores(logical = FALSE)),
+      auto = max(1L, parallel::detectCores(logical = FALSE) - 1L),
+      stop(
+        "`",
+        name,
+        "` must be a positive integer, `available_cores`, ",
+        "`available_cores_minus_1`, or `auto`.",
+        call. = FALSE
+      )
+    )
+    return(as.integer(value))
+  }
+  integer_spec_setting(value, name)
+}
+
 flatten_spec_settings <- function(spec) {
   list(
     model_type = spec$model$type,
@@ -60,7 +80,7 @@ flatten_spec_settings <- function(spec) {
     runtime_update_every = integer_spec_setting(spec_setting(spec, "output", "runtime_update_every", 1), "output.runtime_update_every"),
     simulation_progress = isTRUE(spec_setting(spec, "output", "simulation_progress", FALSE)),
     environment_progress = isTRUE(spec_setting(spec, "output", "environment_progress", FALSE)),
-    parallel_workers = integer_spec_setting(spec_setting(spec, "parallel", "workers", 1), "parallel.workers"),
+    parallel_workers = worker_spec_setting(spec_setting(spec, "parallel", "workers", 1), "parallel.workers"),
     parallel_environments = isTRUE(spec_setting(spec, "parallel", "environments", FALSE)),
     parallel_simulations = isTRUE(spec_setting(spec, "parallel", "simulations", FALSE)),
     parallel_community_measures = isTRUE(spec_setting(spec, "parallel", "community_measures", FALSE)),

@@ -61,13 +61,6 @@ create_experiment_table_from_spec <- function(spec,
       row$interaction_treatment_row,
       row$community_replicate
     )
-    case_spec$environment$seed <- create_environment_seed(
-      case_spec$experiment$random_seed,
-      row$treatment_row,
-      row$environment_replicate,
-      i
-    )
-
     model_type <- case_spec$model$type
     treatment_label <- treatment$treatment_label
     interaction_label <- interaction$interaction_treatment_label
@@ -76,6 +69,10 @@ create_experiment_table_from_spec <- function(spec,
       case_spec,
       row$environment_replicate,
       i
+    )
+    case_spec$environment$seed <- create_environment_seed(
+      case_spec$experiment$random_seed,
+      env_series_id
     )
 
     data.frame(
@@ -372,12 +369,6 @@ create_case_seed <- function(random_seed,
     as.integer(community_replicate)
 }
 
-create_environment_seed <- function(random_seed,
-                                    treatment_row,
-                                    environment_replicate,
-                                    case_index) {
-  as.integer(random_seed) +
-    as.integer(treatment_row) * 200000L +
-    as.integer(environment_replicate) * 2000L +
-    as.integer(case_index)
+create_environment_seed <- function(random_seed, env_series_id) {
+  as.integer(random_seed) + stable_integer_from_character(env_series_id)
 }

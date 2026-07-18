@@ -451,3 +451,8 @@ Keep this section updated as the rewrite proceeds.
   updated stability/CPC report source for the new output names.
 - Fixed factorial treatment expansion so scalar values read from YAML sequences
   are unboxed before applying dotted-path overrides.
+- Fixed `environment.sharing: same_per_replicate` so cases with the same
+  temperature settings and environment replicate reuse the same temperature
+  seed and generated environment series.
+- Added declarative parallel worker settings: `available_cores`,
+  `available_cores_minus_1`, and `auto`.

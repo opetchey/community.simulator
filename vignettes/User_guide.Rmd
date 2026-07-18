@@ -615,7 +615,7 @@ the bundled example experiments.
 | `resources.renewal_rate` | CR | Chemostat resource renewal rate. |
 | `resources.supply` | CR | Resource supply concentration. |
 | `resources.conversion_efficiency` | CR | Conversion efficiency from resource uptake to consumer growth. |
-| `parallel.workers` | All | Number of worker processes for parallel steps. |
+| `parallel.workers` | All | Number of worker processes for parallel steps. Use a positive integer, `available_cores`, `available_cores_minus_1`, or `auto` (`auto` is equivalent to `available_cores_minus_1`). |
 | `parallel.environments` | All | Logical. If `TRUE`, generate environmental time series in parallel where supported. |
 | `parallel.simulations` | All | Logical. If `TRUE`, simulate cases in parallel where supported. |
 | `parallel.community_measures` | All | Logical. If `TRUE`, calculate community performance curve measures in parallel where supported. |

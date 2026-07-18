@@ -119,4 +119,14 @@ test_that("YAML validation rejects invalid runtime controls", {
     "`parallel.workers` must be an integer",
     fixed = TRUE
   )
+
+  spec$parallel$workers <- "available_cores_minus_1"
+  expect_no_error(validate_experiment_spec(spec))
+
+  spec$parallel$workers <- "many"
+  expect_error(
+    validate_experiment_spec(spec),
+    "`parallel.workers` must be one of",
+    fixed = TRUE
+  )
 })

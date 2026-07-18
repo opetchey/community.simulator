@@ -63,6 +63,72 @@ test_that("factorial YAML sequence values are unboxed to scalars", {
   )
 })
 
+test_that("same_per_replicate reuses environment series and seeds", {
+  spec <- read_experiment_spec(system.file(
+    "experiment_templates/lv_discrete.yaml",
+    package = "community.simulator"
+  ))
+  spec$community$replicates <- 2
+  spec$environment$replicates <- 2
+  spec$environment$sharing <- "same_per_replicate"
+  spec$treatments <- list(
+    values = list(
+      "community.richness" = c(2, 3),
+      "traits.birth_optimum.range" = c(0, 2)
+    )
+  )
+
+  table <- create_experiment_table_from_spec(spec)
+  environment_series <- unique(table[c("env_series_id", "temperature_seed")])
+
+  expect_equal(nrow(table), 32)
+  expect_equal(length(unique(table$env_series_id)), 2)
+  expect_equal(nrow(environment_series), 2)
+})
+
+test_that("community replicates reuse initial-abundance seeds across environments", {
+  spec <- read_experiment_spec(system.file(
+    "experiment_templates/lv_discrete.yaml",
+    package = "community.simulator"
+  ))
+  spec$community$replicates <- 2
+  spec$environment$replicates <- 2
+
+  table <- create_experiment_table_from_spec(spec)
+  initial_seeds <- vapply(
+    seq_len(nrow(table)),
+    function(i) community.simulator:::initial_abundance_seed_for_case(4242, table, i),
+    integer(1)
+  )
+  seed_summary <- stats::aggregate(
+    initial_seeds,
+    by = list(community_id = table$community_id),
+    FUN = function(x) length(unique(x))
+  )
+
+  expect_equal(length(unique(table$community_id)), 4)
+  expect_equal(unique(seed_summary$x), 1)
+  expect_equal(length(unique(initial_seeds)), length(unique(table$community_id)))
+})
+
+test_that("all_different creates one environment series per case", {
+  spec <- read_experiment_spec(system.file(
+    "experiment_templates/lv_discrete.yaml",
+    package = "community.simulator"
+  ))
+  spec$environment$sharing <- "all_different"
+  spec$treatments <- list(
+    values = list(
+      "traits.birth_optimum.range" = c(0, 2)
+    )
+  )
+
+  table <- create_experiment_table_from_spec(spec)
+
+  expect_equal(length(unique(table$env_series_id)), nrow(table))
+  expect_equal(length(unique(table$temperature_seed)), nrow(table))
+})
+
 test_that("paired treatments expand exactly supplied rows", {
   spec <- read_experiment_spec(system.file(
     "experiment_templates/consumer_resource.yaml",
