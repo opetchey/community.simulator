@@ -34,22 +34,17 @@ VignetteBuilder:
     knitr
 Imports: 
     DBI,
-    broom,
     dbplyr,
     deSolve,
     dirmult,
     dplyr,
     ggplot2,
-    gratia,
     jsonlite,
-    mgcv,
     parallel,
     primer,
-    purrr,
     RSQLite,
     rlang,
     tibble,
     tidyr,
-    yaml,
-    zoo
+    yaml
 Config/testthat/edition: 3

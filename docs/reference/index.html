@@ -15,8 +15,8 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/opetchey/community.simulator/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
@@ -30,9 +30,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="experiment-workflow">Experiment workflow<a class="anchor" aria-label="anchor" href="#experiment-workflow"></a></h2>
 
-
+      <div class="section-desc"><p>Read YAML specifications, expand designs, and run experiments.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -41,17 +41,17 @@
 
       <dl><dt>
 
-          <code><a href="build_single_community.html">build_single_community()</a></code>
+          <code><a href="read_experiment_spec.html">read_experiment_spec()</a></code>
 
         </dt>
-        <dd>Build a single exploratory community</dd>
+        <dd>Read an experiment specification</dd>
 
         <dt>
 
-          <code><a href="create_environments.html">create_environments()</a></code>
+          <code><a href="create_experiment_table_from_spec.html">create_experiment_table_from_spec()</a></code>
 
         </dt>
-        <dd>Create temperature time series.</dd>
+        <dd>Create a canonical experiment table from a YAML experiment specification</dd>
 
         <dt>
 
@@ -62,124 +62,86 @@
 
         <dt>
 
-          <code><a href="create_experiment_table.html">create_experiment_table()</a></code>
+          <code><a href="setup_example_experiment.html">setup_example_experiment()</a></code>
 
         </dt>
-        <dd>This function takes the experimental design from the specified JSON experiment design file and creates a table of all the simulations that will be run.</dd>
+        <dd>Set up an experiment folder from a bundled example</dd>
 
         <dt>
 
-          <code><a href="get_arbitrary_derivatives.html">get_arbitrary_derivatives()</a></code>
+          <code><a href="create_environments_from_spec.html">create_environments_from_spec()</a></code>
 
         </dt>
-        <dd>Get derivatives at arbitrary temperatures</dd>
+        <dd>Create environments from a YAML experiment specification</dd>
 
         <dt>
 
-          <code><a href="get_community_CPC_measures.html">get_community_CPC_measures()</a></code>
+          <code><a href="simulate_dynamics_from_spec.html">simulate_dynamics_from_spec()</a></code>
 
         </dt>
-        <dd>Get measures of community performance curves</dd>
+        <dd>Simulate dynamics from a YAML experiment specification</dd>
 
         <dt>
 
-          <code><a href="get_community_CV.html">get_community_CV()</a></code>
+          <code><a href="get_community_measures_from_spec.html">get_community_measures_from_spec()</a></code>
 
         </dt>
-        <dd>Get the stability of each case (community). Calculated CV of total biomass temporal variation. Also returns mean total biomass and standard deviation of total biomass</dd>
+        <dd>Calculate community measures from a YAML experiment specification</dd>
 
         <dt>
 
-          <code><a href="get_community_measures.html">get_community_measures()</a></code>
+          <code><a href="run_experiment.html">run_experiment()</a></code>
 
         </dt>
-        <dd>Get various community level measures, e.g., community stability, response diversity, position of optimal temperature, etc.</dd>
+        <dd>Run a complete experiment workflow</dd>
+      </dl></div><div class="section level2">
+      <h2 id="community-construction">Community construction<a class="anchor" aria-label="anchor" href="#community-construction"></a></h2>
+
+      <div class="section-desc"><p>Build LV and consumer-resource communities from YAML-style parameters.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="build_community_from_spec.html">build_community_from_spec()</a></code> <code><a href="build_community_from_spec.html">build_LV_community_from_spec()</a></code> <code><a href="build_community_from_spec.html">build_CR_community_from_spec()</a></code>
+
+        </dt>
+        <dd>Build a community object from a resolved case specification</dd>
 
         <dt>
 
-          <code><a href="get_community_popstab.html">get_community_popstab()</a></code>
+          <code><a href="build_community_constructors.html">build_LV_community()</a></code> <code><a href="build_community_constructors.html">build_CR_community()</a></code>
 
         </dt>
-        <dd>Get the stability of each case (community). Calculated CV of total biomass temporal variation. Also returns mean total biomass and standard deviation of total biomass</dd>
+        <dd>Build an LV community object</dd>
 
         <dt>
 
-          <code><a href="get_community_response_diversity.html">get_community_response_diversity()</a></code>
+          <code><a href="build_single_community.html">build_single_community()</a></code>
 
         </dt>
-        <dd>Get measures of community response diversity</dd>
+        <dd>Build a single exploratory community</dd>
 
         <dt>
 
-          <code><a href="get_community_sum_derivatives.html">get_community_sum_derivatives()</a></code>
+          <code><a href="simulate_single_community.html">simulate_single_community()</a></code>
 
         </dt>
-        <dd>Get the sum of the communities derivatives at arbitrary temperatures and at actual (temp = temporal) temperatures</dd>
+        <dd>Simulate one exploratory community</dd>
+      </dl></div><div class="section level2">
+      <h2 id="plotting-and-interactive-exploration">Plotting and interactive exploration<a class="anchor" aria-label="anchor" href="#plotting-and-interactive-exploration"></a></h2>
 
-        <dt>
+      <div class="section-desc"><p>Plot one-community outputs or launch the Shiny simulation explorer.</p></div>
 
-          <code><a href="get_community_sum_rel_b_opt.html">get_community_sum_rel_b_opt()</a></code>
+      <dl></dl></div><div class="section level2">
 
-        </dt>
-        <dd>Get the sum of the relative position of the temperature optimum of each species. Relative to the mean of the environmental temperatures experienced by the community.</dd>
 
-        <dt>
 
-          <code><a href="get_community_syn.html">get_community_syn()</a></code>
 
-        </dt>
-        <dd>Get the stability of each case (community). Calculated CV of total biomass temporal variation. Also returns mean total biomass and standard deviation of total biomass</dd>
-
-        <dt>
-
-          <code><a href="get_community_temp_sens.html">get_community_temp_sens()</a></code>
-
-        </dt>
-        <dd>Get the sensitivity of total biomass to temperature variation. Currently measured as the slope of a linear regression of total biomass on temperature.</dd>
-
-        <dt>
-
-          <code><a href="get_delta_igr.html">get_delta_igr()</a></code>
-
-        </dt>
-        <dd>Calculate the difference in growth rate from one time point to the next</dd>
-
-        <dt>
-
-          <code><a href="get_temporal_derivatives.html">get_temporal_derivatives()</a></code>
-
-        </dt>
-        <dd>Calculate the derivatives of the growth rate - temperature relationship at the temperatures in the temperature times series of each case in the experiment.</dd>
-
-        <dt>
-
-          <code><a href="intrinsic_growth_gaussian.html">intrinsic_growth_gaussian()</a></code>
-
-        </dt>
-        <dd>Calculate intrinsic growth rate from species parameters and a temperature, assuming a Gaussian birth rate - temperature response curve and an exponential death rate - temperature response curve.</dd>
-
-        <dt>
-
-          <code><a href="lm_with_inf_check.html">lm_with_inf_check()</a></code>
-
-        </dt>
-        <dd>Linear model with infinite value check</dd>
-
-        <dt>
-
-          <code><a href="make_a_community.html">make_a_community()</a></code>
-
-        </dt>
-        <dd>Make a community parameter object</dd>
-
-        <dt>
-
-          <code><a href="make_a_consumer_resource_community.html">make_a_consumer_resource_community()</a></code>
-
-        </dt>
-        <dd>Make a consumer-resource community parameter object</dd>
-
-        <dt>
+      <dl><dt>
 
           <code><a href="make_plots_for_one_community.html">make_plots_for_one_community()</a></code>
 
@@ -188,17 +150,17 @@
 
         <dt>
 
-          <code><a href="plot_case_abundances.html">plot_case_abundances()</a></code>
-
-        </dt>
-        <dd>Plot species abundances for one simulation case</dd>
-
-        <dt>
-
           <code><a href="plot_case_temperature.html">plot_case_temperature()</a></code>
 
         </dt>
         <dd>Plot the temperature time series for one simulation case</dd>
+
+        <dt>
+
+          <code><a href="plot_case_abundances.html">plot_case_abundances()</a></code>
+
+        </dt>
+        <dd>Plot species abundances for one simulation case</dd>
 
         <dt>
 
@@ -223,54 +185,21 @@
 
         <dt>
 
-          <code><a href="read_experiment_design_json.html">read_experiment_design_json()</a></code>
-
-        </dt>
-        <dd>Read in the JSON formatted text file that contains the experiment design. Most scalar values in the JSON file are expressions that can be evaluated with <code><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval()</a></code> to get the values of the experiment design. Structured values, such as list-based interaction specifications, are returned as-is.</dd>
-
-        <dt>
-
-          <code><a href="run_experiment.html">run_experiment()</a></code>
-
-        </dt>
-        <dd>Run a complete experiment workflow</dd>
-
-        <dt>
-
           <code><a href="run_simulation_explorer.html">run_simulation_explorer()</a></code>
 
         </dt>
         <dd>Run the simulation explorer Shiny app</dd>
+      </dl></div><div class="section level2">
+      <h2 id="model-engines">Model engines<a class="anchor" aria-label="anchor" href="#model-engines"></a></h2>
 
-        <dt>
+      <div class="section-desc"><p>Direct low-level simulators for advanced use.</p></div>
 
-          <code><a href="setup_example_experiment.html">setup_example_experiment()</a></code>
+      <dl></dl></div><div class="section level2">
 
-        </dt>
-        <dd>Set up an experiment folder from a bundled example</dd>
 
-        <dt>
 
-          <code><a href="simulate_dynamics.html">simulate_dynamics()</a></code>
 
-        </dt>
-        <dd>Simulate the dynamics of all the cases in an experiment Unfortunately at the moment has features of temperature series hard coded in</dd>
-
-        <dt>
-
-          <code><a href="simulate_single_community.html">simulate_single_community()</a></code>
-
-        </dt>
-        <dd>Simulate one exploratory community</dd>
-
-        <dt>
-
-          <code><a href="simulator_consumer_resource_continuous.html">simulator_consumer_resource_continuous()</a></code>
-
-        </dt>
-        <dd>Simulate consumer-resource dynamics in continuous time</dd>
-
-        <dt>
+      <dl><dt>
 
           <code><a href="simulator_lv.html">simulator_lv()</a></code>
 
@@ -283,8 +212,23 @@
 
         </dt>
         <dd>Simulate Lotka-Volterra community dynamics in continuous time</dd>
+
+        <dt>
+
+          <code><a href="simulator_consumer_resource_continuous.html">simulator_consumer_resource_continuous()</a></code>
+
+        </dt>
+        <dd>Simulate consumer-resource dynamics in continuous time</dd>
+
+        <dt>
+
+          <code><a href="intrinsic_growth_gaussian.html">intrinsic_growth_gaussian()</a></code>
+
+        </dt>
+        <dd>Calculate intrinsic growth rate from species parameters and a temperature, assuming a Gaussian birth rate - temperature response curve and an exponential death rate - temperature response curve.</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

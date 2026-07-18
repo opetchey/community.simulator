@@ -39,6 +39,8 @@ and consumer-resource model families.
 For a fuller description of the model structure and terminology, see the
 [User
 Guide](https://opetchey.github.io/community.simulator/articles/User_guide.html).
+For runnable experiment specifications, see the [YAML templates
+article](https://opetchey.github.io/community.simulator/articles/yaml_templates.html).
 
 ## Current Status
 
@@ -52,7 +54,7 @@ Different readers usually need different entry points.
 
 ### If You Are Reviewing The Package
 
-We suggest reviewing the package in two passes.
+We suggest reviewing the package in three passes.
 
 1.  First, inspect and run the single-community walkthroughs. These show
     how each model is parameterised directly in R, how one temperature
@@ -71,8 +73,15 @@ We suggest reviewing the package in two passes.
     Guide](https://opetchey.github.io/community.simulator/articles/User_guide.html).
     It provides a reference for the model families, parameters, and
     functions. It is a work in progress.
-4.  Optionally, launch the Shiny simulation explorer with
-    [`run_simulation_explorer()`](https://opetchey.github.io/community.simulator/reference/run_simulation_explorer.md).
+4.  Use the [YAML templates
+    article](https://opetchey.github.io/community.simulator/articles/yaml_templates.html)
+    to compare compact examples with fuller experiment specifications.
+    The rich templates are:
+    - [lv_discrete_rich.yaml](https://github.com/opetchey/community.simulator/blob/main/inst/experiment_templates/lv_discrete_rich.yaml)
+    - [lv_continuous_rich.yaml](https://github.com/opetchey/community.simulator/blob/main/inst/experiment_templates/lv_continuous_rich.yaml)
+    - [consumer_resource_rich.yaml](https://github.com/opetchey/community.simulator/blob/main/inst/experiment_templates/consumer_resource_rich.yaml)
+5.  Optionally, use the [Shiny simulation
+    explorer](https://opetchey.github.io/community.simulator/articles/shiny_simulation_explorer.html).
     It lets you choose one model, build one community, inspect its
     structure and performance curves, and simulate only when you press
     the simulation button.
@@ -103,19 +112,31 @@ Start here in this order:
 3.  View the [Experiment Getting
     Started](https://opetchey.github.io/community.simulator/articles/experiment_getting_started.html)
     guide to learn the experiment-folder workflow.
-4.  Try the Shiny simulation explorer with
+4.  Read the [YAML templates
+    article](https://opetchey.github.io/community.simulator/articles/yaml_templates.html).
+    The compact templates are smoke tests; the `*_rich.yaml` templates
+    show treatments, replicates, output controls, and parallel settings
+    for larger experiments.
+5.  Try the [Shiny simulation
+    explorer](https://opetchey.github.io/community.simulator/articles/shiny_simulation_explorer.html)
+    with
     [`run_simulation_explorer()`](https://opetchey.github.io/community.simulator/reference/run_simulation_explorer.md)
     if you want to build one community, inspect its structure, and
     simulate it interactively.
-5.  View the provided JSON experiment definitions in
-    [inst/test_experiments](https://opetchey.github.io/community.simulator/inst/test_experiments)
-    and run larger experiments.
 6.  Use the [User
     Guide](https://opetchey.github.io/community.simulator/articles/User_guide.html)
     as a reference. Some sections still need polish, so treat it as the
     developing reference rather than a finished manual.
 
 ### If You Are A Prospective Developer
+
+Start with the [User
+Guide](https://opetchey.github.io/community.simulator/articles/User_guide.html),
+then inspect the pkgdown [reference
+index](https://opetchey.github.io/community.simulator/reference/index.html)
+to see the intended public API surface. The main user-facing path is the
+YAML workflow; legacy internals are deliberately kept out of the
+reference index where possible.
 
 Please feel free to get in touch with Owen. Or if you just want to get
 on with it, please fork the repository and submit a pull request.
@@ -163,12 +184,13 @@ browseVignettes("community.simulator")
 
 ## Developer Note
 
-Some user-facing JSON parameter names have been renamed to be clearer
-for reviewers and users. These changes preserve backwards compatibility
-through aliases, so older experiment-definition files should continue to
-work.
+The main experiment path is now the YAML specification read by
+[`run_experiment()`](https://opetchey.github.io/community.simulator/reference/run_experiment.md).
+The 0.8.0 release preserved backwards compatibility for older names and
+JSON-era workflows; this rewrite intentionally makes the clearer YAML
+schema the user-facing interface and removes obsolete JSON-era helpers
+where they are no longer needed.
 
-As a result, internal parameter names, function arguments, and
-output-column names may differ from the preferred user-facing JSON
-names. When changing the experiment schema, please preserve existing
-aliases unless there is a deliberate reason to make a breaking change.
+Some internal parameter names, function arguments, and output-column
+names may still differ from the preferred YAML names while the
+implementation is being cleaned up.

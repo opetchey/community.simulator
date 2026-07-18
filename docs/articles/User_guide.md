@@ -14,10 +14,13 @@ species traits, environmental variability, and response diversity
 influence community dynamics and stability.
 
 This guide is the package-level reference for users and reviewers. It
-explains the model families, the experiment workflow, the JSON
+explains the model families, the experiment workflow, the YAML
 experiment specification, and the main outputs. For executable,
 one-community examples, start with the single-community walkthroughs.
-For a small end-to-end experiment, see the getting-started vignette.
+For a small end-to-end experiment, see the getting-started vignette. For
+bundled experiment specifications, see the YAML templates article,
+especially the richer `*_rich.yaml` examples when designing
+multi-treatment experiments.
 
 ## Main Ideas
 
@@ -31,22 +34,47 @@ The package separates a simulation study into four layers:
 - **Workflow execution**: creating the experiment table, generating
   environments, simulating dynamics, and calculating summary measures.
 
-The central workflow is controlled by a JSON experiment-definition file.
+The central workflow is controlled by a YAML experiment-definition file.
 The package reads that file, expands treatment values into an experiment
 table, and runs one simulation case for each row of that table.
+
+## Current API
+
+Most users only need the YAML workflow:
+
+| Task | Function |
+|----|----|
+| Read and validate a YAML specification | [`read_experiment_spec()`](https://opetchey.github.io/community.simulator/reference/read_experiment_spec.md) |
+| Expand a YAML specification into cases | [`create_experiment_table_from_spec()`](https://opetchey.github.io/community.simulator/reference/create_experiment_table_from_spec.md) |
+| Run the full experiment workflow | [`run_experiment()`](https://opetchey.github.io/community.simulator/reference/run_experiment.md) |
+| Run workflow stages manually | [`create_environments_from_spec()`](https://opetchey.github.io/community.simulator/reference/create_environments_from_spec.md), [`simulate_dynamics_from_spec()`](https://opetchey.github.io/community.simulator/reference/simulate_dynamics_from_spec.md), [`get_community_measures_from_spec()`](https://opetchey.github.io/community.simulator/reference/get_community_measures_from_spec.md) |
+| Build one community from explicit parameters | [`build_LV_community()`](https://opetchey.github.io/community.simulator/reference/build_community_constructors.md), [`build_CR_community()`](https://opetchey.github.io/community.simulator/reference/build_community_constructors.md) |
+| Build one community from a resolved specification | [`build_community_from_spec()`](https://opetchey.github.io/community.simulator/reference/build_community_from_spec.md), [`build_LV_community_from_spec()`](https://opetchey.github.io/community.simulator/reference/build_community_from_spec.md), [`build_CR_community_from_spec()`](https://opetchey.github.io/community.simulator/reference/build_community_from_spec.md) |
+| Explore one simulation interactively | [`run_simulation_explorer()`](https://opetchey.github.io/community.simulator/reference/run_simulation_explorer.md) |
+| Make standard diagnostic plots | [`plot_case_temperature()`](https://opetchey.github.io/community.simulator/reference/plot_case_temperature.md), [`plot_case_abundances()`](https://opetchey.github.io/community.simulator/reference/plot_case_abundances.md), [`plot_case_total_abundance()`](https://opetchey.github.io/community.simulator/reference/plot_case_total_abundance.md), [`plot_community_matrix()`](https://opetchey.github.io/community.simulator/reference/plot_community_matrix.md), [`plot_resource_dynamics()`](https://opetchey.github.io/community.simulator/reference/plot_resource_dynamics.md) |
+
+The direct simulator functions remain available for advanced use, but
+the recommended experiment interface is the YAML specification plus
+[`run_experiment()`](https://opetchey.github.io/community.simulator/reference/run_experiment.md).
+
+For interactive exploration of one community, launch the Shiny app with
+[`run_simulation_explorer()`](https://opetchey.github.io/community.simulator/reference/run_simulation_explorer.md).
+The app is documented in the Shiny simulation explorer article on the
+pkgdown site.
 
 ## Supported Model Families
 
 The package currently supports three model families.
 
-| Model family | `model_type` | Main use |
+| Model family | `model.type` | Main use |
 |----|----|----|
 | Discrete-time Lotka-Volterra | `"lv_discrete"` | Fast experiments with temperature-dependent intrinsic growth and LV interaction matrices |
 | Continuous-time Lotka-Volterra | `"lv_continuous"` | ODE-based LV dynamics with temperature interpolation and immigration controls |
 | Continuous-time consumer-resource | `"consumer_resource_continuous"` | Resource-mediated consumer dynamics with temperature-dependent uptake |
 
-If `model_type` is omitted from the JSON file, the package uses the
-discrete-time Lotka-Volterra model.
+Set `model.type` in the YAML file to choose the model family. If
+`model.type` is omitted, the package uses the discrete-time
+Lotka-Volterra model.
 
 ## Population Dynamic Models
 
@@ -71,8 +99,9 @@ adequate.
 
 Select it with:
 
-``` json
-"model_type": "\"lv_discrete\""
+``` yaml
+model:
+  type: lv_discrete
 ```
 
 ### Continuous-Time LV
@@ -86,8 +115,9 @@ model.
 
 Select it with:
 
-``` json
-"model_type": "\"lv_continuous\""
+``` yaml
+model:
+  type: lv_continuous
 ```
 
 ### Continuous-Time Consumer-Resource
@@ -100,8 +130,9 @@ species-specific resources, or a mix of shared and private resources.
 
 Select it with:
 
-``` json
-"model_type": "\"consumer_resource_continuous\""
+``` yaml
+model:
+  type: consumer_resource_continuous
 ```
 
 ## How Species Traits Are Specified
@@ -162,16 +193,16 @@ The intrinsic growth rate is:
 r_i(T) = b_i(T) - d_i(T)
 ```
 
-The width parameter `sd_perf_i` is the standard-deviation scale of the
-Gaussian performance curve. In experiment JSON files, the distribution
-of these widths is controlled by:
+The width parameter is the standard-deviation scale of the Gaussian
+performance curve. In YAML experiment files, the distribution of LV
+birth-curve widths is controlled by:
 
 - `birth_width_distribution`
 - `birth_width_mean`
 - `birth_width_range`
 
 The consumer-resource model uses the same Gaussian width convention for
-uptake curves. The corresponding JSON fields are:
+uptake curves. The corresponding YAML fields are:
 
 - `uptake_width_distribution`
 - `uptake_width_mean`
@@ -181,8 +212,8 @@ uptake curves. The corresponding JSON fields are:
 
 ### Community Traits
 
-LV communities are created by
-[`make_a_community()`](https://opetchey.github.io/community.simulator/reference/make_a_community.md).
+LV communities are created from YAML experiment specifications by
+[`build_LV_community_from_spec()`](https://opetchey.github.io/community.simulator/reference/build_community_from_spec.md).
 At the experiment level, the main trait treatments are:
 
 - `richness`: number of species in each community.
@@ -207,9 +238,8 @@ generated from the experiment-level `random_seed`.
 
 ### Interaction Matrices
 
-LV interactions are specified with the preferred
-`interaction_treatments` field. This is a list of named interaction
-treatments. Each treatment can include:
+LV interactions are specified with `interactions.treatments`. This is a
+list of named interaction treatments. Each treatment can include:
 
 - `label`: readable treatment name used in the experiment table.
 - `type`: `"none"`, `"competition"`, `"any"`, or `"predator_prey"`.
@@ -221,34 +251,22 @@ treatments. Each treatment can include:
 
 For example:
 
-``` json
-"interaction_treatments": [
-  {
-    "label": "weak_asymmetric_competition",
-    "type": "competition",
-    "symmetry": "asymmetric",
-    "distribution": "uniform",
-    "parameters": {
-      "min": 0,
-      "max": 0.2
-    },
-    "diagonal": 1
-  }
-]
+``` yaml
+interactions:
+  treatments:
+    - label: weak_asymmetric_competition
+      type: competition
+      symmetry: asymmetric
+      distribution: uniform
+      parameters:
+        min: 0
+        max: 0.2
+      diagonal: 1
 ```
 
 For `type = "competition"`, off-diagonal effects are positive. This is
 the recommended way to ensure that all pairwise LV interactions are
-competitive. The older `lv_interactions` and `alpha_ij_*` fields are
-still supported for backwards compatibility, but new experiments should
-use `interaction_treatments`.
-
-Older LV trait-field names are also still accepted for backwards
-compatibility. New experiment JSON files should use the clearer
-`birth_maximum_*`, `birth_optimum_*`, `birth_width_*`,
-`death_intercept`, and `death_temperature_slope` names. The older
-`number_of_species_treatment` field is also accepted as an alias for
-`richness`.
+competitive.
 
 ### Discrete-Time LV Dynamics
 
@@ -257,7 +275,7 @@ The discrete-time LV simulator is
 It updates species abundances through time using temperature-dependent
 intrinsic growth and the LV interaction matrix.
 
-This model is the default when `model_type` is absent or set to
+This model is the default when `model.type` is absent or set to
 `"lv_discrete"`.
 
 ### Continuous-Time LV Dynamics
@@ -276,13 +294,12 @@ adds ODE-specific controls:
 - `ode_max_step`: maximum solver step.
 - `blowup_threshold`: abundance threshold above which the run stops.
 
-Use `model_type = "\"lv_continuous\""` in the JSON file to select this
-model.
+Use `model.type: lv_continuous` in the YAML file to select this model.
 
 ## Consumer-Resource Model
 
 The consumer-resource model is created by
-[`make_a_consumer_resource_community()`](https://opetchey.github.io/community.simulator/reference/make_a_consumer_resource_community.md)
+[`build_CR_community_from_spec()`](https://opetchey.github.io/community.simulator/reference/build_community_from_spec.md)
 and simulated by
 [`simulator_consumer_resource_continuous()`](https://opetchey.github.io/community.simulator/reference/simulator_consumer_resource_continuous.md).
 
@@ -309,13 +326,8 @@ The main consumer-resource trait treatments are:
 - `resource_supply`: resource supply concentration.
 - `conversion_efficiency`: conversion from uptake to consumer growth.
 
-Use `model_type = "\"consumer_resource_continuous\""` in the JSON file
-to select this model.
-
-Older consumer-resource trait-field names are still accepted for
-backwards compatibility. New experiment JSON files should use the
-clearer `uptake_maximum_*`, `uptake_optimum_*`, and `uptake_width_*`
-names.
+Use `model.type: consumer_resource_continuous` in the YAML file to
+select this model.
 
 ### Resource-Use Modes
 
@@ -349,8 +361,7 @@ Supported distributions are:
   `private_resource_use_precision`.
 
 Higher beta precision gives less among-species variation around the
-mean. The older `resource_specialization_*` JSON fields are still
-accepted as aliases.
+mean.
 
 ## Environment Specification
 
@@ -372,9 +383,6 @@ The main `environment_sharing` options are:
 - `"all_different"`: each simulation case gets its own environmental
   time series.
 
-The older `temperature_series_control` field is still accepted as an
-alias for `environment_sharing`.
-
 The duration of each run is controlled by:
 
 - `burn_in_duration`
@@ -390,9 +398,9 @@ The usual workflow is:
 1.  Create a project folder that can contain multiple experiment
     folders.
 2.  Create an experiment folder.
-3.  Create or copy an experiment-definition JSON file into the
+3.  Create or copy an experiment-definition YAML file into the
     experiment folder.
-4.  Edit the JSON file to define model, community, environment, and
+4.  Edit the YAML file to define model, community, environment, and
     replicate treatments.
 5.  Create an R script in the experiment folder. Use it to run the
     experiment with
@@ -405,29 +413,35 @@ A compact example is:
 
 project_folder_location <- file.path("~/Desktop", "community_simulator_projects")
 experiment_name <- "discrete_lv_example"
-experiment_design_filename <- "experiment_definition.json"
+experiment_design_filename <- "experiment.yaml"
+experiment_folder <- file.path(project_folder_location, experiment_name)
 
-setup <- setup_example_experiment(
-  experiment_folder_location = project_folder_location,
-  experiment_name = experiment_name,
-  example_experiment_name = "discrete_lv",
-  experiment_design_filename = experiment_design_filename
+dir.create(experiment_folder, recursive = TRUE, showWarnings = FALSE)
+file.copy(
+  system.file(
+    "experiment_templates/lv_discrete.yaml",
+    package = "community.simulator"
+  ),
+  file.path(experiment_folder, experiment_design_filename),
+  overwrite = TRUE
 )
 
 outputs <- run_experiment(
   experiment_folder_location = project_folder_location,
   experiment_name = experiment_name,
   experiment_design_filename = experiment_design_filename,
-  overwrite = FALSE
+  overwrite = FALSE,
+  confirm_run = TRUE
 )
 ```
 
 The high-level wrapper runs the main steps in order:
 
-- [`create_experiment_table()`](https://opetchey.github.io/community.simulator/reference/create_experiment_table.md)
-- [`create_environments()`](https://opetchey.github.io/community.simulator/reference/create_environments.md)
-- [`simulate_dynamics()`](https://opetchey.github.io/community.simulator/reference/simulate_dynamics.md)
-- [`get_community_measures()`](https://opetchey.github.io/community.simulator/reference/get_community_measures.md)
+- [`read_experiment_spec()`](https://opetchey.github.io/community.simulator/reference/read_experiment_spec.md)
+- [`create_experiment_table_from_spec()`](https://opetchey.github.io/community.simulator/reference/create_experiment_table_from_spec.md)
+- [`create_environments_from_spec()`](https://opetchey.github.io/community.simulator/reference/create_environments_from_spec.md)
+- [`simulate_dynamics_from_spec()`](https://opetchey.github.io/community.simulator/reference/simulate_dynamics_from_spec.md)
+- [`get_community_measures_from_spec()`](https://opetchey.github.io/community.simulator/reference/get_community_measures_from_spec.md)
 
 These functions can also be run individually when debugging or
 developing a new workflow. By default, workflow functions stop if an
@@ -438,7 +452,7 @@ deliberately want to replace existing outputs.
 
 The package includes a small Shiny app for interactively exploring one
 community at a time. It is intended as a learning and reviewer aid
-rather than a replacement for the JSON experiment workflow.
+rather than a replacement for the YAML experiment workflow.
 
 Launch the app from an installed package with:
 
@@ -482,138 +496,150 @@ fraction of consumers with positive expected growth.
 
 ## Bundled Example Designs
 
-The package includes compact example JSON files under
-`inst/test_experiments`:
+The package includes compact and richer example YAML templates under
+`inst/experiment_templates`.
 
-- `discrete_lv/experiment_definition.json`
-- `continuous_lv/experiment_definition.json`
-- `consumer_resource/experiment_definition.json`
+The compact templates are intentionally small, so they are useful as
+smoke tests and as starting points for the smallest possible experiment:
 
-Use
-[`setup_example_experiment()`](https://opetchey.github.io/community.simulator/reference/setup_example_experiment.md)
-to copy one into an experiment folder. These examples are intentionally
-small, so they are useful as smoke tests and as templates for larger
-experiments.
+- `lv_discrete.yaml`
+- `lv_continuous.yaml`
+- `consumer_resource.yaml`
 
-## JSON File Conventions
+The richer templates show a more reviewer- or user-facing experiment
+specification, including treatments, replicate structure, interaction or
+resource-use options, output controls, and parallel settings:
 
-The JSON file is read by
-[`read_experiment_design_json()`](https://opetchey.github.io/community.simulator/reference/read_experiment_design_json.md).
-Most scalar and vector treatment values are stored as R expressions and
-evaluated when the experiment table is created.
+- `lv_discrete_rich.yaml`
+- `lv_continuous_rich.yaml`
+- `consumer_resource_rich.yaml`
 
-Single numeric values can be written directly:
+Copy one into an experiment folder, rename it if useful, and edit it
+before running
+[`run_experiment()`](https://opetchey.github.io/community.simulator/reference/run_experiment.md).
+The richer templates are still modest examples, but they are closer to
+the shape of an experiment a user would adapt for analysis.
 
-``` json
-"temperature_mean": 20
+## YAML File Conventions
+
+Experiment YAML files are read by
+[`read_experiment_spec()`](https://opetchey.github.io/community.simulator/reference/read_experiment_spec.md).
+They are declarative: values are written directly as YAML scalars,
+lists, and mappings. The package does not evaluate R expressions from
+the experiment specification.
+
+Single numeric and character values are written directly:
+
+``` yaml
+model:
+  type: lv_continuous
+
+environment:
+  temperature:
+    mean: 20
 ```
 
-Vectors are usually written as strings containing R expressions:
+Treatment vectors are written as YAML lists. If `treatments.mode` is
+omitted, the package uses full factorial expansion.
 
-``` json
-"richness": "c(2, 4, 8)"
+``` yaml
+treatments:
+  values:
+    traits.birth_width.mean: [5, 10, 15]
+    environment.temperature.sd: [0.5, 1, 2]
 ```
 
-Character values that need to evaluate to strings must include escaped
-quotes:
+Paired treatments are written as explicit rows:
 
-``` json
-"model_type": "\"lv_continuous\""
+``` yaml
+treatments:
+  mode: paired
+  values:
+    - traits.birth_width.mean: 5
+      environment.temperature.sd: 0.5
+    - traits.birth_width.mean: 10
+      environment.temperature.sd: 1
 ```
 
-Character vectors follow the same pattern:
+Treatment paths must already exist in the baseline specification. This
+catches spelling errors before the experiment starts.
 
-``` json
-"birth_optimum_distribution": "c(\"regular\", \"random_uniform\")"
-```
+### Common YAML Errors
 
-Structured fields, such as `interaction_treatments`, can be written as
-JSON lists and objects rather than R expression strings.
+[`read_experiment_spec()`](https://opetchey.github.io/community.simulator/reference/read_experiment_spec.md)
+validates an experiment before the workflow starts. The goal is to fail
+early, before environments or simulations are created.
 
-## JSON Parameter Reference
+Common validation errors include:
 
-This table describes the main public-facing JSON parameters used by the
-bundled example experiments. Many entries can be a single value or a
-vector of values; vectors expand the experiment table across treatment
-combinations.
+| Error type | Example message | How to fix it |
+|----|----|----|
+| Missing section | `Experiment specification is missing required section(s): traits` | Add the missing top-level section to the YAML file. |
+| Invalid model name | `` `model.type` must be one of: lv_discrete, lv_continuous, consumer_resource_continuous. `` | Use one of the supported model names exactly. |
+| Wrong value type | `` `community.richness` must be an integer >= 1. `` | Use a single positive integer for counts and replicate numbers. |
+| Invalid distribution | `` `traits.birth_width.distribution` must be one of: regular, random_uniform. `` | Use one of the distributions supported for that trait. |
+| Invalid numeric range | `` `traits.birth_width.mean - 0.5 * traits.birth_width.range` must be positive. `` | Make the mean and range imply possible species-level values within the allowed range. |
+| Invalid interaction treatment | `predator-prey interactions cannot use symmetric symmetry` | Use `asymmetric` or `antisymmetric` symmetry for predator-prey interactions. |
+| Invalid private resource use | `` `resources.private_use.mean` must be greater than 0 and less than 1. `` | For beta-distributed private resource use, keep the mean strictly between 0 and 1. |
+| Misspelled treatment path | `` Treatment path `traits.birth_wdith.mean` does not exist... Did you mean `traits.birth_width.mean`? `` | Correct the dotted path so it matches a field already present in the baseline YAML specification. |
+
+## YAML Parameter Reference
+
+This table describes the main public-facing YAML sections and fields
+used by the bundled example experiments.
 
 | Parameter | Models | Meaning and options |
 |----|----|----|
-| `random_seed` | All | Experiment-level random seed used to make generated communities and environments reproducible. |
-| `model_type` | All | Population dynamic model. Options are `"lv_discrete"`, `"lv_continuous"`, and `"consumer_resource_continuous"`. If omitted, the default is `"lv_discrete"`. |
-| `richness` | All | Number of species or consumers in each community. |
-| `number_of_community_replicates` | All | Number of replicate communities for each community-treatment combination. |
-| `temperature_mean` | All | Mean of the generated environmental temperature time series. |
-| `temperature_sd` | All | Standard deviation of the generated environmental temperature time series. |
-| `one_over_f_gamma` | All | Slope parameter for the `1/f` environmental noise process. |
-| `number_of_environment_replicates` | All | Number of replicate temperature series for each environmental treatment. |
-| `environment_sharing` | All | How generated environments are shared among simulation cases. Options are `"same_per_replicate"` and `"all_different"`. |
-| `burn_in_duration` | All | Number of initial time steps or time units treated as burn-in. |
-| `experiment_duration` | All | Number of post-burn-in time steps or time units used for the experiment. |
-| `parallel_environments` | All | Logical. If `TRUE`, generate environmental time series in parallel where supported. |
-| `parallel_simulations` | All | Logical. If `TRUE`, simulate cases in parallel where supported. |
-| `parallel_community_measures` | All | Logical. If `TRUE`, calculate community performance curve measures in parallel where supported. Defaults to `parallel_simulations` when omitted. |
-| `parallel_workers` | All | Number of worker processes for parallel environment generation, simulation, or community-measure calculation. |
-| `runtime_update_every` | All | Number of cases between printed runtime/progress updates. |
-| `environment_progress` | All | Logical. If `TRUE`, print progress, elapsed time, and estimated remaining time during environment creation. |
-| `birth_maximum_mean` | LV | Mean maximum height of the species birth-rate performance curve. |
-| `birth_maximum_range` | LV | Total spread of maximum birth-rate values around `birth_maximum_mean`. |
-| `birth_maximum_distribution` | LV | Distribution used to assign species maximum birth rates. Options include `"regular"` and `"random_uniform"`. |
-| `birth_optimum_mean` | LV | Mean thermal optimum of the birth-rate performance curve. |
-| `birth_optimum_range` | LV | Total spread of birth thermal optima around `birth_optimum_mean`. |
-| `birth_optimum_distribution` | LV | Distribution used to assign species birth thermal optima. Options include `"regular"` and `"random_uniform"`. |
-| `birth_width_mean` | LV | Mean standard-deviation width of the Gaussian birth-rate performance curve. |
-| `birth_width_range` | LV | Total spread of birth-rate performance-curve widths around `birth_width_mean`. |
-| `birth_width_distribution` | LV | Distribution used to assign species birth-rate performance-curve widths. Options include `"regular"` and `"random_uniform"`. |
-| `death_intercept` | LV | Intercept of the exponential death-rate curve, shared across species. |
-| `death_temperature_slope` | LV | Temperature sensitivity of the exponential death-rate curve, shared across species. |
-| `interaction_treatments` | LV | List of LV interaction-matrix treatments. Each treatment can include `label`, `type`, `symmetry`, `distribution`, `parameters`, and `diagonal`. |
-| `interaction_treatments[].label` | LV | Human-readable name for an interaction treatment. |
-| `interaction_treatments[].type` | LV | Interaction type. Options are `"none"`, `"competition"`, `"any"`, and `"predator_prey"`. |
-| `interaction_treatments[].symmetry` | LV | Off-diagonal symmetry. Options are `"asymmetric"`, `"symmetric"`, and `"antisymmetric"`. |
-| `interaction_treatments[].distribution` | LV | Distribution for off-diagonal interaction strengths. Options include `"constant"`, `"uniform"`, `"normal"`, `"lognormal"`, and `"gamma"`. |
-| `interaction_treatments[].parameters` | LV | Named numeric parameters for the selected interaction-strength distribution. |
-| `interaction_treatments[].diagonal` | LV | Diagonal interaction value, usually `1`. |
-| `temperature_interpolation` | Continuous LV, CR | How the continuous-time simulator interpolates temperature between generated values. Options are `"linear"` and `"constant"`. |
-| `immigration_rate` | Continuous LV | Immigration rate per species. |
-| `immigration_mode` | Continuous LV | How immigration is applied. Options are `"continuous"` and `"pulse"`. |
-| `ode_method` | Continuous LV, CR | ODE solver method passed to [`deSolve::ode()`](https://rdrr.io/pkg/deSolve/man/ode.html), commonly `"lsoda"`. |
-| `ode_rtol` | Continuous LV, CR | Relative tolerance for the ODE solver. |
-| `ode_atol` | Continuous LV, CR | Absolute tolerance for the ODE solver. |
-| `ode_max_step` | Continuous LV, CR | Maximum ODE solver step size. |
-| `blowup_threshold` | Continuous LV, CR | Abundance threshold above which a simulation is treated as having blown up. |
-| `uptake_maximum_mean` | CR | Mean maximum height of the consumer uptake curve. |
-| `uptake_maximum_range` | CR | Total spread of maximum uptake values around `uptake_maximum_mean`. |
-| `uptake_maximum_distribution` | CR | Distribution used to assign species maximum uptake values. Options include `"regular"` and `"random_uniform"`. |
-| `uptake_optimum_mean` | CR | Mean thermal optimum of the consumer uptake curve. |
-| `uptake_optimum_range` | CR | Total spread of uptake thermal optima around `uptake_optimum_mean`. |
-| `uptake_optimum_distribution` | CR | Distribution used to assign species uptake thermal optima. Options include `"regular"` and `"random_uniform"`. |
-| `uptake_width_mean` | CR | Mean standard-deviation width of the Gaussian uptake curve. |
-| `uptake_width_range` | CR | Total spread of uptake-curve widths around `uptake_width_mean`. |
-| `uptake_width_distribution` | CR | Distribution used to assign species uptake-curve widths. Options include `"regular"` and `"random_uniform"`. |
-| `half_saturation_mean` | CR | Mean Monod half-saturation constant. |
-| `half_saturation_range` | CR | Total spread of half-saturation constants around `half_saturation_mean`. |
-| `half_saturation_distribution` | CR | Distribution used to assign half-saturation constants. Options include `"regular"` and `"random_uniform"`. |
-| `consumer_death_rate` | CR | Consumer death rate, shared across consumers. |
-| `resource_renewal_rate` | CR | Chemostat resource renewal rate. |
-| `resource_supply` | CR | Resource supply concentration. |
-| `conversion_efficiency` | CR | Conversion efficiency from resource uptake to consumer growth. |
-| `resource_use_mode` | CR | Resource-use structure. Options are `"one_resource_all_consumers"`, `"diagonal"`, and `"shared_to_private"`. |
-| `active_resource` | CR | Resource index used as the common active or shared resource. |
-| `private_resource_use_distribution` | CR | Distribution for species-level private-resource use in `"shared_to_private"` mode. Options are `"constant"`, `"regular"`, `"random_uniform"`, and `"beta"`. |
-| `private_resource_use_mean` | CR | Mean private-resource use fraction. Shared-resource use is `1 - private_resource_use`. |
-| `private_resource_use_range` | CR | Total spread of private-resource use fractions for `"regular"` and `"random_uniform"` distributions. |
-| `private_resource_use_precision` | CR | Precision of the beta distribution around `private_resource_use_mean`; higher values give less among-species variation. |
-| `consumer_immigration_rate` | CR | Immigration rate for consumers. |
-| `initial_consumer_total_abundance` | CR | Initial total consumer abundance distributed across consumers. |
-| `resource_initial_value` | CR | Initial concentration for each resource. |
-| `negative_tolerance` | CR | Small numerical tolerance used when checking negative values in ODE output. |
-
-Legacy field names such as `dynamics_type`,
-`number_of_species_treatment`, `temperature_series_control`, `a_b_*`,
-`b_opt_*`, `sd_perf_*`, `u_max_*`, `u_opt_*`, `sd_u_*`, and
-`resource_specialization_*` are still accepted as aliases for backwards
-compatibility. New experiments should use the names in the table above.
+| `experiment.name` | All | Human-readable experiment name. |
+| `experiment.random_seed` | All | Experiment-level random seed used to make generated communities and environments reproducible. |
+| `model.type` | All | Population dynamic model. Options are `lv_discrete`, `lv_continuous`, and `consumer_resource_continuous`. |
+| `community.richness` | All | Number of species or consumers in each community. |
+| `community.replicates` | All | Number of replicate communities for each community-treatment combination. |
+| `environment.replicates` | All | Number of replicate temperature series for each environmental treatment. |
+| `environment.sharing` | All | How generated environments are shared among simulation cases. Options are `same_per_replicate` and `all_different`. |
+| `environment.temperature.mean` | All | Mean of the generated environmental temperature time series. |
+| `environment.temperature.sd` | All | Standard deviation of the generated environmental temperature time series. |
+| `environment.temperature.one_over_f_gamma` | All | Slope parameter for the `1/f` environmental noise process. |
+| `simulation.burn_in_duration` | All | Number of initial time steps or time units treated as burn-in. |
+| `simulation.experiment_duration` | All | Number of post-burn-in time steps or time units used for the experiment. |
+| `simulation.temperature_interpolation` | Continuous LV, CR | How the continuous-time simulator interpolates temperature between generated values. Options are `linear` and `constant`. |
+| `simulation.immigration_rate` | Continuous LV | Immigration rate per species. |
+| `simulation.immigration_mode` | Continuous LV | How immigration is applied. Options are `continuous` and `pulse`. |
+| `simulation.consumer_immigration_rate` | CR | Immigration rate for consumers. |
+| `simulation.initial_consumer_total_abundance` | CR | Initial total consumer abundance distributed across consumers. |
+| `simulation.resource_initial_value` | CR | Initial concentration for each resource. |
+| `simulation.ode.method` | Continuous LV, CR | ODE solver method passed to [`deSolve::ode()`](https://rdrr.io/pkg/deSolve/man/ode.html), commonly `lsoda`. |
+| `simulation.ode.rtol` | Continuous LV, CR | Relative tolerance for the ODE solver. |
+| `simulation.ode.atol` | Continuous LV, CR | Absolute tolerance for the ODE solver. |
+| `simulation.ode.max_step` | Continuous LV, CR | Maximum ODE solver step size. |
+| `simulation.blowup_threshold` | Continuous LV, CR | Abundance threshold above which a simulation is treated as having blown up. |
+| `simulation.negative_tolerance` | CR | Small numerical tolerance used when checking negative values in ODE output. |
+| `traits.birth_maximum.*` | LV | Mean, range, and distribution for maximum birth-rate performance. |
+| `traits.birth_optimum.*` | LV | Mean, range, and distribution for birth-rate thermal optima. |
+| `traits.birth_width.*` | LV | Mean, range, and distribution for Gaussian birth-rate performance-curve widths. |
+| `traits.death.intercept` | LV | Intercept of the death-rate curve, shared across species. |
+| `traits.death.temperature_slope` | LV | Temperature sensitivity of the death-rate curve, shared across species. |
+| `interactions.treatments` | LV | List of LV interaction-matrix treatments. Each treatment can include `label`, `type`, `symmetry`, `distribution`, `parameters`, and `diagonal`. |
+| `traits.uptake_maximum.*` | CR | Mean, range, and distribution for maximum consumer uptake. |
+| `traits.uptake_optimum.*` | CR | Mean, range, and distribution for uptake thermal optima. |
+| `traits.uptake_width.*` | CR | Mean, range, and distribution for Gaussian uptake-curve widths. |
+| `traits.half_saturation.*` | CR | Mean, range, and distribution for Monod half-saturation constants. |
+| `resources.use_mode` | CR | Resource-use structure. Options are `one_resource_all_consumers`, `diagonal`, and `shared_to_private`. |
+| `resources.private_use.*` | CR | Distribution, mean, range or precision for species-level private-resource use. |
+| `resources.consumer_death_rate` | CR | Consumer death rate, shared across consumers. |
+| `resources.renewal_rate` | CR | Chemostat resource renewal rate. |
+| `resources.supply` | CR | Resource supply concentration. |
+| `resources.conversion_efficiency` | CR | Conversion efficiency from resource uptake to consumer growth. |
+| `parallel.workers` | All | Number of worker processes for parallel steps. |
+| `parallel.environments` | All | Logical. If `TRUE`, generate environmental time series in parallel where supported. |
+| `parallel.simulations` | All | Logical. If `TRUE`, simulate cases in parallel where supported. |
+| `parallel.community_measures` | All | Logical. If `TRUE`, calculate community performance curve measures in parallel where supported. |
+| `output.dynamics_save_every` | All | Interval between saved population-dynamics output time points. |
+| `output.resources_save_every` | CR | Interval between saved resource output time points. |
+| `output.save_dynamics` | All | Logical. If `TRUE`, write `dynamics.db`. |
+| `output.save_resources` | CR | Logical. If `TRUE`, write `resources.db`. |
+| `treatments.mode` | All | Treatment expansion mode. Defaults to `factorial`; use `paired` for explicit treatment rows. |
+| `treatments.values` | All | Named dotted paths and treatment values to apply to the baseline specification. |
 
 ## Outputs
 
@@ -641,34 +667,94 @@ without always reading full dynamics from SQLite.
 
 ## Community Measures
 
-[`get_community_measures()`](https://opetchey.github.io/community.simulator/reference/get_community_measures.md)
-calculates case-level summary measures. The exact columns depend on the
-model type and available intermediate outputs, but common outputs
-include:
+[`get_community_measures_from_spec()`](https://opetchey.github.io/community.simulator/reference/get_community_measures_from_spec.md)
+calculates case-level summary measures as part of the YAML workflow. The
+exact columns depend on the model type and available intermediate
+outputs, but common outputs include:
 
-- community stability, including `CV_totab`, the coefficient of
-  variation of total abundance through time
+- community stability, including `cv_total_abundance`, the coefficient
+  of variation of total abundance through time
 - mean and standard deviation of total abundance
 - environmental summaries, such as mean temperature
+- realized performance-optimum summaries, such as
+  `realized_mean_performance_optimum`; these are calculated from the
+  sampled species traits in the community, so they can differ from the
+  design-specified trait-distribution values
 - community performance or viability summaries used in
-  response-diversity analyses
+  response-diversity analyses, such as `cv_community_performance_info`
+  for LV models and `cv_community_viability_binary_info` for
+  consumer-resource models
 
 For most analyses, `community_measures.RDS` is the first file to inspect
 after a successful experiment.
 
+### Community-Measures Output Reference
+
+The table below describes the main columns produced in
+`community_measures.RDS`. Some columns are model-specific or depend on
+output settings, so not every experiment will contain every measure.
+
+| Column | Meaning |
+|----|----|
+| `case_id` | Unique simulation-case identifier. |
+| `model_type` | Population dynamic model used for the case. |
+| `treatment_id` | Identifier for the expanded YAML treatment combination. |
+| `treatment_label` | Readable label for the expanded YAML treatment combination. |
+| `interaction_treatment_label` | LV interaction-matrix treatment label; `NA` for CR models. |
+| `community_replicate` | Community replicate number. |
+| `environment_replicate` | Environment replicate number. |
+| `env_series_id` | Identifier for the generated environmental temperature series. |
+| `temperature_mean` | Design-specified mean temperature for the case. |
+| `temperature_sd` | Design-specified standard deviation of environmental temperature. |
+| `one_over_f_gamma` | Design-specified `1/f` environmental-noise slope. |
+| `richness` | Number of species or consumers in the community. |
+| `community_id` | Identifier for the realized community object. |
+| `mean_total_abundance` | Mean total abundance through the post-burn-in experiment period. |
+| `sd_total_abundance` | Standard deviation of total abundance through the post-burn-in experiment period. |
+| `cv_total_abundance` | Coefficient of variation of total abundance; the main community-stability measure. |
+| `comm_temperature_sensitivity` | Slope from a linear model of total abundance against temperature for the case. |
+| `synchrony_abundance` | Loreau-style synchrony of population abundances, calculated from total-abundance variance relative to summed population standard deviations. |
+| `mean_population_cv_abundance` | Mean population-level abundance CV, weighted by mean relative abundance. |
+| `final_total_abundance` | Total abundance at the final saved time point. |
+| `final_min_abundance` | Minimum species abundance at the final saved time point. |
+| `final_mean_abundance` | Mean species abundance at the final saved time point. |
+| `final_max_abundance` | Maximum species abundance at the final saved time point. |
+| `final_richness_above_extinction_threshold` | Number of species above the extinction threshold at the final saved time point. |
+| `n_extinct_final` | Number of species at or below the extinction threshold at the final saved time point. |
+| `any_extinct_final` | Whether any species is extinct at the final saved time point. |
+| `n_extinct_ever` | Number of species that crossed the extinction threshold at any saved time point. |
+| `any_extinct_ever` | Whether any species crossed the extinction threshold at any saved time point. |
+| `min_abundance_ever` | Minimum species abundance observed during the saved experiment period. |
+| `extinction_threshold` | Threshold used for extinction summaries. |
+| `performance_optimum_trait` | Trait used for performance-optimum summaries: `birth_optimum` for LV models and `uptake_optimum` for CR models. |
+| `sum_relative_performance_optimum` | Sum across species of realized performance optimum minus mean environmental temperature. |
+| `minimum_absolute_relative_performance_optimum` | Smallest absolute distance between a species’ realized performance optimum and mean environmental temperature. |
+| `realized_mean_performance_optimum` | Mean realized performance optimum across the sampled species in the community. The `realized` prefix indicates that this is calculated from the actual sampled community, not copied from the design-specified trait distribution. |
+| `realized_sd_performance_optimum` | Standard deviation of realized performance optima across the sampled species in the community. |
+| `cv_community_performance_info` | CV of the LV community performance curve evaluated over the actual experienced temperature series. |
+| `cv_community_performance_naive` | CV of the LV community performance curve evaluated over an evenly spaced temperature sequence spanning the experienced range. |
+| `cv_community_viability_binary_info` | CV of CR binary community viability evaluated over the actual experienced temperature series. |
+| `cv_community_viability_binary_naive` | CV of CR binary community viability evaluated over an evenly spaced temperature sequence spanning the experienced range. |
+| `cv_community_viability_soft_info` | CV of CR soft community viability evaluated over the actual experienced temperature series. |
+| `cv_community_viability_soft_naive` | CV of CR soft community viability evaluated over an evenly spaced temperature sequence spanning the experienced range. |
+| `synchrony_performance_info` | Synchrony of species performance curves evaluated over the actual experienced temperature series. |
+| `synchrony_performance_naive` | Synchrony of species performance curves evaluated over an evenly spaced temperature sequence spanning the experienced range. |
+| `mean_species_cv_performance_info` | Mean species-level performance CV, weighted by mean performance, over the actual experienced temperature series. |
+| `mean_species_cv_performance_naive` | Mean species-level performance CV, weighted by mean performance, over an evenly spaced temperature sequence spanning the experienced range. |
+
 ## Parallel Processing and Runtime Reporting
 
-Experiment JSON files can include runtime controls for larger runs:
+Experiment YAML files can include runtime controls for larger runs:
 
-- `parallel_environments`: generate environmental time series in
+- `parallel.environments`: generate environmental time series in
   parallel.
-- `parallel_simulations`: simulate cases in parallel.
-- `parallel_community_measures`: calculate community performance curve
+- `parallel.simulations`: simulate cases in parallel.
+- `parallel.community_measures`: calculate community performance curve
   measures in parallel.
-- `parallel_workers`: number of worker processes.
-- `runtime_update_every`: how often progress updates are printed.
-- `environment_progress`: whether environment-generation progress is
-  printed.
+- `parallel.workers`: number of worker processes.
+- `runtime.update_every`: how often progress updates are printed.
+- `runtime.environment_progress`: whether environment-generation
+  progress is printed.
 
 When parallel generation or simulation is enabled, database writing is
 still handled by the parent process. Parallel processing is intended for

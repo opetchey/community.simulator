@@ -31,7 +31,9 @@ This guide is the package-level reference for users and reviewers. It explains
 the model families, the experiment workflow, the YAML experiment specification,
 and the main outputs. For executable, one-community examples, start with the
 single-community walkthroughs. For a small end-to-end experiment, see the
-getting-started vignette.
+getting-started vignette. For bundled experiment specifications, see the YAML
+templates article, especially the richer `*_rich.yaml` examples when designing
+multi-treatment experiments.
 
 ## Main Ideas
 
@@ -48,6 +50,29 @@ The package separates a simulation study into four layers:
 The central workflow is controlled by a YAML experiment-definition file. The
 package reads that file, expands treatment values into an experiment table, and
 runs one simulation case for each row of that table.
+
+## Current API
+
+Most users only need the YAML workflow:
+
+| Task | Function |
+| --- | --- |
+| Read and validate a YAML specification | `read_experiment_spec()` |
+| Expand a YAML specification into cases | `create_experiment_table_from_spec()` |
+| Run the full experiment workflow | `run_experiment()` |
+| Run workflow stages manually | `create_environments_from_spec()`, `simulate_dynamics_from_spec()`, `get_community_measures_from_spec()` |
+| Build one community from explicit parameters | `build_LV_community()`, `build_CR_community()` |
+| Build one community from a resolved specification | `build_community_from_spec()`, `build_LV_community_from_spec()`, `build_CR_community_from_spec()` |
+| Explore one simulation interactively | `run_simulation_explorer()` |
+| Make standard diagnostic plots | `plot_case_temperature()`, `plot_case_abundances()`, `plot_case_total_abundance()`, `plot_community_matrix()`, `plot_resource_dynamics()` |
+
+The direct simulator functions remain available for advanced use, but the
+recommended experiment interface is the YAML specification plus
+`run_experiment()`.
+
+For interactive exploration of one community, launch the Shiny app with
+`run_simulation_explorer()`. The app is documented in the Shiny simulation
+explorer article on the pkgdown site.
 
 ## Supported Model Families
 
@@ -626,9 +651,9 @@ always reading full dynamics from SQLite.
 
 ## Community Measures
 
-`get_community_measures()` calculates case-level summary measures. The exact
-columns depend on the model type and available intermediate outputs, but common
-outputs include:
+`get_community_measures_from_spec()` calculates case-level summary measures as
+part of the YAML workflow. The exact columns depend on the model type and
+available intermediate outputs, but common outputs include:
 
 - community stability, including `cv_total_abundance`, the coefficient of
   variation of total abundance through time

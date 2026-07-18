@@ -1,7 +1,7 @@
 # Set up an experiment folder from a bundled example
 
 This convenience helper creates an experiment folder and copies a
-bundled example experiment-definition JSON file into it.
+bundled YAML experiment template into it.
 
 ## Usage
 
@@ -9,8 +9,8 @@ bundled example experiment-definition JSON file into it.
 setup_example_experiment(
   experiment_folder_location,
   experiment_name,
-  example_experiment_name = "discrete_lv",
-  experiment_design_filename,
+  example_experiment_name = "lv_discrete",
+  experiment_design_filename = NULL,
   verbose = TRUE
 )
 ```
@@ -28,12 +28,14 @@ setup_example_experiment(
 - example_experiment_name:
 
   Name of the bundled example experiment to copy from. Defaults to
-  `"discrete_lv"`.
+  `"lv_discrete"`. Available templates include `"lv_discrete"`,
+  `"lv_continuous"`, `"consumer_resource"`, and their `"_rich"`
+  variants.
 
 - experiment_design_filename:
 
-  Name of the bundled JSON design file to copy into the experiment
-  folder.
+  Name for the copied YAML specification. Defaults to
+  `paste0(example_experiment_name, ".yaml")`.
 
 - verbose:
 

@@ -61,17 +61,17 @@ environment.](consumer_resource_single_community_files/figure-html/environment-1
 
 ``` r
 
-community <- make_a_consumer_resource_community(
+community <- build_CR_community(
   S = 4,
-  u_max_mean = 0.08,
-  u_max_range = 0.00,
-  u_max_distribution = "regular",
-  u_opt_mean = 20,
-  u_opt_range = 7,
-  u_opt_distribution = "regular",
-  sd_u_mean = 6,
-  sd_u_range = 1.5,
-  sd_u_distribution = "regular",
+  uptake_maximum_mean = 0.08,
+  uptake_maximum_range = 0.00,
+  uptake_maximum_distribution = "regular",
+  uptake_optimum_mean = 20,
+  uptake_optimum_range = 7,
+  uptake_optimum_distribution = "regular",
+  uptake_width_mean = 6,
+  uptake_width_range = 1.5,
+  uptake_width_distribution = "regular",
   half_saturation_mean = 80,
   half_saturation_range = 10,
   half_saturation_distribution = "regular",
@@ -81,9 +81,9 @@ community <- make_a_consumer_resource_community(
   conversion_efficiency = 1,
   resource_use_mode = "shared_to_private",
   active_resource = 1,
-  resource_specialization_distribution = "beta",
-  resource_specialization_mean = 0.7,
-  resource_specialization_precision = 18,
+  private_resource_use_distribution = "beta",
+  private_resource_use_mean = 0.7,
+  private_resource_use_precision = 18,
   community_seed = 13
 )
 ```
@@ -94,12 +94,12 @@ community <- make_a_consumer_resource_community(
 
 consumer_traits <- tibble(
   species = paste0("Spp", seq_len(community$S)),
-  max_uptake = community$u_max_i,
-  uptake_optimum = community$u_opt_i,
-  uptake_width = community$sd_u_i,
+  max_uptake = community$uptake_maximum_i,
+  uptake_optimum = community$uptake_optimum_i,
+  uptake_width = community$uptake_width_i,
   death_rate = community$d_i,
-  private_resource_fraction = community$resource_specialization_i,
-  shared_resource_fraction = 1 - community$resource_specialization_i
+  private_resource_fraction = community$private_resource_use_i,
+  shared_resource_fraction = 1 - community$private_resource_use_i
 )
 
 consumer_traits

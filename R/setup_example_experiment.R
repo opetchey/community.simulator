@@ -1,15 +1,17 @@
 #' Set up an experiment folder from a bundled example
 #'
 #' This convenience helper creates an experiment folder and copies a bundled
-#' example experiment-definition JSON file into it.
+#' YAML experiment template into it.
 #'
 #' @param experiment_folder_location Location where the experiment folder should
 #'   be created.
 #' @param experiment_name Name of the experiment folder.
 #' @param example_experiment_name Name of the bundled example experiment to copy
-#'   from. Defaults to `"discrete_lv"`.
-#' @param experiment_design_filename Name of the bundled JSON design file to
-#'   copy into the experiment folder.
+#'   from. Defaults to `"lv_discrete"`. Available templates include
+#'   `"lv_discrete"`, `"lv_continuous"`, `"consumer_resource"`, and their
+#'   `"_rich"` variants.
+#' @param experiment_design_filename Name for the copied YAML specification.
+#'   Defaults to `paste0(example_experiment_name, ".yaml")`.
 #' @param verbose Logical. If `TRUE`, print setup messages.
 #'
 #' @return Invisibly returns a named list containing the experiment folder, the
@@ -19,8 +21,8 @@
 #' @examples NULL
 setup_example_experiment <- function(experiment_folder_location,
                                      experiment_name,
-                                     example_experiment_name = "discrete_lv",
-                                     experiment_design_filename,
+                                     example_experiment_name = "lv_discrete",
+                                     experiment_design_filename = NULL,
                                      verbose = TRUE) {
 
   experiment_folder <- create_experiment_folder(
@@ -29,10 +31,14 @@ setup_example_experiment <- function(experiment_folder_location,
     verbose = verbose
   )
 
+  if (is.null(experiment_design_filename)) {
+    experiment_design_filename <- paste0(example_experiment_name, ".yaml")
+  }
+
+  template_filename <- paste0(example_experiment_name, ".yaml")
   design_source <- system.file(
-    "test_experiments",
-    example_experiment_name,
-    experiment_design_filename,
+    "experiment_templates",
+    template_filename,
     package = "community.simulator"
   )
 
@@ -40,7 +46,7 @@ setup_example_experiment <- function(experiment_folder_location,
     stop(
       paste0(
         "Bundled example design file not found: ",
-        file.path("test_experiments", example_experiment_name, experiment_design_filename),
+        file.path("experiment_templates", template_filename),
         "\nCheck the example experiment name and design filename."
       ),
       call. = FALSE

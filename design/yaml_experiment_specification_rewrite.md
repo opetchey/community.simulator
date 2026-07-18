@@ -432,3 +432,16 @@ Keep this section updated as the rewrite proceeds.
 - Added richer YAML experiment templates for LV discrete, LV continuous, and
   consumer-resource models. These examples include treatments, replicates,
   interaction or resource-use options, output controls, and parallel settings.
+- Removed obsolete JSON-era helper files and bundled JSON test specifications
+  that are no longer used by the rewritten workflow or current tests.
+- Reduced the exported API surface by making legacy constructors and low-level
+  measure helpers internal, while keeping current YAML workflow functions,
+  modern community builders, plotting helpers, Shiny helpers, and model engines
+  visible to users.
+- Updated documentation so users are directed to one coherent API centred on
+  YAML experiment specifications and `run_experiment()`.
+- Improved pkgdown navigation by grouping articles around start-here resources,
+  single-community walkthroughs, YAML templates, and the Shiny explorer, and by
+  grouping reference topics around the current public API.
+- Added dedicated pkgdown articles for YAML experiment templates and the Shiny
+  simulation explorer, including links to the rich YAML examples.

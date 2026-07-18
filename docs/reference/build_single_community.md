@@ -186,6 +186,21 @@ build_single_community(model_type = "lv_discrete", richness = 3)
 #> $community$S
 #> [1] 3
 #> 
+#> $community$birth_maximum_i
+#> [1] 0.3 0.3 0.3
+#> 
+#> $community$birth_optimum_i
+#> [1] 17 20 23
+#> 
+#> $community$birth_width_i
+#> [1] 8 8 8
+#> 
+#> $community$death_intercept_i
+#> [1] 0 0 0
+#> 
+#> $community$death_temperature_slope_i
+#> [1] 0.05 0.05 0.05
+#> 
 #> $community$a_b_i
 #> [1] 0.3 0.3 0.3
 #> 

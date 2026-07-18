@@ -1,4 +1,5 @@
 #' @keywords internal
+#' @importFrom rlang .data
 utils::globalVariables(
   c(
     ".",

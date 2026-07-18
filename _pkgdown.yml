@@ -5,18 +5,56 @@ template:
 
 navbar:
   structure:
-    left: [intro, reference, articles]
+    left: [intro, articles, reference]
     right: [github]
 
 articles:
-  - title: Getting started
+  - title: Start here
     contents:
+      - User_guide
       - experiment_getting_started
+      - yaml_templates
+      - shiny_simulation_explorer
   - title: Single-community walkthroughs
     contents:
       - lv_discrete_single_community
       - lv_continuous_single_community
       - consumer_resource_single_community
-  - title: Reference guide
+
+reference:
+  - title: Experiment workflow
+    desc: Read YAML specifications, expand designs, and run experiments.
     contents:
-      - User_guide
+      - read_experiment_spec
+      - create_experiment_table_from_spec
+      - create_experiment_folder
+      - setup_example_experiment
+      - create_environments_from_spec
+      - simulate_dynamics_from_spec
+      - get_community_measures_from_spec
+      - run_experiment
+  - title: Community construction
+    desc: Build LV and consumer-resource communities from YAML-style parameters.
+    contents:
+      - build_community_from_spec
+      - build_LV_community
+      - build_CR_community
+      - build_single_community
+      - simulate_single_community
+  - title: Plotting and interactive exploration
+    desc: Plot one-community outputs or launch the Shiny simulation explorer.
+    contents:
+      - make_plots_for_one_community
+      - plot_case_temperature
+      - plot_case_abundances
+      - plot_case_total_abundance
+      - plot_community_matrix
+      - plot_resource_dynamics
+      - run_simulation_explorer
+  - title: Model engines
+    desc: Direct low-level simulators for advanced use.
+    contents:
+      - simulator_lv
+      - simulator_lv_continuous
+      - simulator_consumer_resource_continuous
+      - intrinsic_growth_gaussian

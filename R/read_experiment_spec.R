@@ -1,8 +1,8 @@
 #' Read an experiment specification
 #'
 #' Reads a YAML experiment specification that uses the new nested, declarative
-#' experiment format. Unlike [read_experiment_design_json()], this reader does
-#' not parse or evaluate R expressions from the specification file.
+#' experiment format. The specification is data only: it does not parse or
+#' evaluate R expressions from the specification file.
 #'
 #' @param path Path to a `.yaml` or `.yml` experiment specification.
 #'

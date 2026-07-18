@@ -15,8 +15,8 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="articles/index.html">Articles</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="articles/index.html">Articles</a></li>
+<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/opetchey/community.simulator/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
@@ -34,7 +34,7 @@
 
 <div class="section level2">
 <h2 id="priority-1-highest-impact-for-new-users">Priority 1: Highest Impact for New Users<a class="anchor" aria-label="anchor" href="#priority-1-highest-impact-for-new-users"></a></h2>
-<ol style="list-style-type: decimal"><li>DONE: Add a single high-level <code><a href="reference/run_experiment.html">run_experiment()</a></code> wrapper that performs the main workflow in order: <code><a href="reference/create_experiment_table.html">create_experiment_table()</a></code>, <code><a href="reference/create_environments.html">create_environments()</a></code>, <code><a href="reference/simulate_dynamics.html">simulate_dynamics()</a></code>, and <code><a href="reference/get_community_measures.html">get_community_measures()</a></code>.</li>
+<ol style="list-style-type: decimal"><li>DONE: Add a single high-level <code><a href="reference/run_experiment.html">run_experiment()</a></code> wrapper that performs the main workflow in order: <code>create_experiment_table()</code>, <code>create_environments()</code>, <code>simulate_dynamics()</code>, and <code>get_community_measures()</code>.</li>
 <li>DONE: Add safer file handling across the workflow: <code>overwrite = FALSE</code> by default, warnings before deleting existing outputs, and clearer progress messages about what files were written.</li>
 <li>DONE: Create a minimal “Getting Started” vignette that runs one very small experiment end-to-end in a few seconds.</li>
 <li>Add explicit missing-value handling checks for workflow outputs and summaries, so unexpected <code>NA</code> values are detected early and either trigger a clear error or are handled according to a documented policy.</li>
@@ -52,7 +52,7 @@
 <div class="section level2">
 <h2 id="priority-3-helpful-refinements">Priority 3: Helpful Refinements<a class="anchor" aria-label="anchor" href="#priority-3-helpful-refinements"></a></h2>
 <ol start="12" style="list-style-type: decimal"><li>Add a <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> or <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method for the generated community object so users can inspect species traits and interaction parameters more easily.</li>
-<li>Review function names from the perspective of new users and add clearer aliases or expanded documentation for project-specific terminology such as <code><a href="reference/get_delta_igr.html">get_delta_igr()</a></code>.</li>
+<li>Review function names from the perspective of new users and add clearer aliases or expanded documentation for project-specific terminology such as <code>get_delta_igr()</code>.</li>
 <li>Improve user-facing messages during long-running steps so users know what case is running and where outputs will appear.</li>
 <li>Review the package help pages and vignette text for project-internal language, and rewrite sections that assume prior knowledge of the original project.</li>
 </ol></div>

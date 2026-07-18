@@ -1,9 +1,10 @@
 # Run a complete experiment workflow
 
-This is a convenience wrapper for the standard experiment workflow. It
-creates the experiment folder, builds the experiment table, generates
-environmental time series, simulates dynamics, and calculates
-community-level summary measures.
+This is the standard YAML experiment workflow. It creates or locates the
+experiment folder, reads the YAML experiment specification from that
+folder, builds the canonical experiment table, generates environmental
+time series, simulates dynamics, and calculates community-level summary
+measures.
 
 ## Usage
 
@@ -30,8 +31,8 @@ run_experiment(
 
 - experiment_design_filename:
 
-  Name of the experiment definition file. This file must already be
-  present inside the experiment folder.
+  Name of the experiment definition file. This must be a `.yaml` or
+  `.yml` file already present inside the experiment folder.
 
 - overwrite:
 
@@ -55,17 +56,11 @@ main output file paths.
 
 ## Details
 
-The preflight summary estimates output rows, database sizes, and runtime
-from the experiment table and design settings, including output controls
-such as `save_dynamics`, `save_resources`, `dynamics_save_every`,
-`resources_save_every`, `summary_checkpoint_every`, and
-`runtime_update_every`. Confirmation happens before environment
-generation, dynamics simulation, and analysis. These estimates are
-intended as rough guidance before launching large experiments. Compact
-simulation summaries are checkpointed during simulation and are used to
-calculate `community_measures.RDS` even when `save_dynamics = FALSE`.
-Each run also writes `experiment_log.txt`, a plain-text
-newline-delimited JSON log containing the experiment specification,
+The preflight summary estimates output rows, database sizes, and total
+runtime from the canonical experiment table and YAML settings.
+Confirmation happens before environment generation, dynamics simulation,
+and analysis. Each run also writes `experiment_log.txt`, a plain-text
+newline-delimited JSON log containing the parsed YAML specification,
 preflight summary, output paths, workflow status, and elapsed time for
 each workflow step.
 

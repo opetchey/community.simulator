@@ -5,11 +5,8 @@
 1.  DONE: Add a single high-level
     [`run_experiment()`](https://opetchey.github.io/community.simulator/reference/run_experiment.md)
     wrapper that performs the main workflow in order:
-    [`create_experiment_table()`](https://opetchey.github.io/community.simulator/reference/create_experiment_table.md),
-    [`create_environments()`](https://opetchey.github.io/community.simulator/reference/create_environments.md),
-    [`simulate_dynamics()`](https://opetchey.github.io/community.simulator/reference/simulate_dynamics.md),
-    and
-    [`get_community_measures()`](https://opetchey.github.io/community.simulator/reference/get_community_measures.md).
+    `create_experiment_table()`, `create_environments()`,
+    `simulate_dynamics()`, and `get_community_measures()`.
 2.  DONE: Add safer file handling across the workflow:
     `overwrite = FALSE` by default, warnings before deleting existing
     outputs, and clearer progress messages about what files were
@@ -50,8 +47,7 @@
     interaction parameters more easily.
 13. Review function names from the perspective of new users and add
     clearer aliases or expanded documentation for project-specific
-    terminology such as
-    [`get_delta_igr()`](https://opetchey.github.io/community.simulator/reference/get_delta_igr.md).
+    terminology such as `get_delta_igr()`.
 14. Improve user-facing messages during long-running steps so users know
     what case is running and where outputs will appear.
 15. Review the package help pages and vignette text for project-internal

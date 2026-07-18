@@ -1,21 +1,21 @@
-#' Get measures of community performance curves
-#'
-#' @param temperatures - temperature time series used in the simulations
-#' @param expt - experiment table with community parameters
-#' @param expt_def - experiment design information
-#' @param every_t - how often to sample the temperature time series (e.g., every 1 time step, every 10 time steps, etc.)
-#' @param soft_viability_scale Positive scale parameter for the soft viability
-#'   transform `plogis(g_i(T) / soft_viability_scale)`.
-#' @param parallel_community_measures Logical. If `TRUE`, calculate per-case
-#'   community performance curve measures in parallel where supported.
-#' @param parallel_workers Number of worker processes to use when
-#'   `parallel_community_measures` is `TRUE`.
-#' @param verbose Logical. If `TRUE`, print progress messages.
-#'
-#' @returns A dataset containing measures of community performance curves, including CV of community performance, synchrony of performance curves, and average CV of species performance curves weighted by their mean contribution to community performance.
-#' @export
-#'
-#' @examples NULL
+# Get measures of community performance curves
+#
+# @param temperatures - temperature time series used in the simulations
+# @param expt - experiment table with community parameters
+# @param expt_def - experiment design information
+# @param every_t - how often to sample the temperature time series (e.g., every 1 time step, every 10 time steps, etc.)
+# @param soft_viability_scale Positive scale parameter for the soft viability
+#   transform `plogis(g_i(T) / soft_viability_scale)`.
+# @param parallel_community_measures Logical. If `TRUE`, calculate per-case
+#   community performance curve measures in parallel where supported.
+# @param parallel_workers Number of worker processes to use when
+#   `parallel_community_measures` is `TRUE`.
+# @param verbose Logical. If `TRUE`, print progress messages.
+#
+# @returns A dataset containing measures of community performance curves, including CV of community performance, synchrony of performance curves, and average CV of species performance curves weighted by their mean contribution to community performance.
+# @keywords internal
+#
+# @examples NULL
 get_community_CPC_measures <- function(temperatures,
                                  expt,
                                  expt_def,
@@ -31,8 +31,6 @@ get_community_CPC_measures <- function(temperatures,
   #conn_temperatures <- DBI::dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "temperatures.db"))
   #temperatures <- dplyr::tbl(conn_temperatures, "temperatures")
   #expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))
-  #expt_def <- jsonlite::fromJSON(paste0(experiment_folder, experiment_design_filename))
-
   # Remove previous database if it exists
   #file.remove(paste0(experiment_folder, "imbalance.db"))
   #conn_imbalance <- DBI::dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "imbalance.db"))

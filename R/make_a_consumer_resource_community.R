@@ -1,50 +1,50 @@
-#' Make a consumer-resource community parameter object
-#'
-#' @param S Number of consumer species. The number of resources is set equal to
-#'   `S`, except when `resource_use_mode = "shared_to_private"`, where the
-#'   number of resources is `S + 1`.
-#' @param u_max_mean Mean maximum uptake height.
-#' @param u_max_range Range of maximum uptake heights.
-#' @param u_max_distribution Distribution for maximum uptake heights.
-#' @param u_opt_mean Mean thermal optimum for maximum uptake.
-#' @param u_opt_range Range of thermal optima.
-#' @param u_opt_distribution Distribution for thermal optima.
-#' @param sd_u_mean Mean standard-deviation width of the Gaussian uptake curve.
-#' @param sd_u_range Range of standard-deviation widths for Gaussian uptake
-#'   curves.
-#' @param sd_u_distribution Distribution for Gaussian uptake-curve widths.
-#' @param half_saturation_mean Mean Monod half-saturation constant.
-#' @param half_saturation_range Range of half-saturation constants.
-#' @param half_saturation_distribution Distribution for half-saturation constants.
-#' @param consumer_death_rate Consumer death rate.
-#' @param resource_renewal_rate Chemostat resource renewal rate.
-#' @param resource_supply Resource supply concentration.
-#' @param conversion_efficiency Conversion efficiency from uptake to consumer
-#'   growth.
-#' @param resource_use_mode Resource-use mode. One of
-#'   `"one_resource_all_consumers"`, `"diagonal"`, or `"shared_to_private"`.
-#' @param active_resource Active resource index for
-#'   `"one_resource_all_consumers"` or shared resource index for
-#'   `"shared_to_private"`.
-#' @param resource_specialization Backwards-compatible scalar value between 0
-#'   and 1 controlling the transition from shared-resource use to private-
-#'   resource use when `resource_use_mode = "shared_to_private"`.
-#' @param resource_specialization_distribution Distribution used to generate
-#'   species-level shared-private partition values. One of `"constant"`,
-#'   `"regular"`, `"random_uniform"`, or `"beta"`.
-#' @param resource_specialization_mean Mean species-level private-resource
-#'   specialization.
-#' @param resource_specialization_range Range for `"regular"` and
-#'   `"random_uniform"` species-level private-resource specialization.
-#' @param resource_specialization_precision Precision for beta-distributed
-#'   species-level private-resource specialization. Larger values produce less
-#'   among-species variation around `resource_specialization_mean`.
-#' @param community_seed Random seed used when generating community traits.
-#'
-#' @return A consumer-resource community parameter object.
-#' @export
-#'
-#' @examples NULL
+# Make a consumer-resource community parameter object
+#
+# @param S Number of consumer species. The number of resources is set equal to
+#   `S`, except when `resource_use_mode = "shared_to_private"`, where the
+#   number of resources is `S + 1`.
+# @param u_max_mean Mean maximum uptake height.
+# @param u_max_range Range of maximum uptake heights.
+# @param u_max_distribution Distribution for maximum uptake heights.
+# @param u_opt_mean Mean thermal optimum for maximum uptake.
+# @param u_opt_range Range of thermal optima.
+# @param u_opt_distribution Distribution for thermal optima.
+# @param sd_u_mean Mean standard-deviation width of the Gaussian uptake curve.
+# @param sd_u_range Range of standard-deviation widths for Gaussian uptake
+#   curves.
+# @param sd_u_distribution Distribution for Gaussian uptake-curve widths.
+# @param half_saturation_mean Mean Monod half-saturation constant.
+# @param half_saturation_range Range of half-saturation constants.
+# @param half_saturation_distribution Distribution for half-saturation constants.
+# @param consumer_death_rate Consumer death rate.
+# @param resource_renewal_rate Chemostat resource renewal rate.
+# @param resource_supply Resource supply concentration.
+# @param conversion_efficiency Conversion efficiency from uptake to consumer
+#   growth.
+# @param resource_use_mode Resource-use mode. One of
+#   `"one_resource_all_consumers"`, `"diagonal"`, or `"shared_to_private"`.
+# @param active_resource Active resource index for
+#   `"one_resource_all_consumers"` or shared resource index for
+#   `"shared_to_private"`.
+# @param resource_specialization Backwards-compatible scalar value between 0
+#   and 1 controlling the transition from shared-resource use to private-
+#   resource use when `resource_use_mode = "shared_to_private"`.
+# @param resource_specialization_distribution Distribution used to generate
+#   species-level shared-private partition values. One of `"constant"`,
+#   `"regular"`, `"random_uniform"`, or `"beta"`.
+# @param resource_specialization_mean Mean species-level private-resource
+#   specialization.
+# @param resource_specialization_range Range for `"regular"` and
+#   `"random_uniform"` species-level private-resource specialization.
+# @param resource_specialization_precision Precision for beta-distributed
+#   species-level private-resource specialization. Larger values produce less
+#   among-species variation around `resource_specialization_mean`.
+# @param community_seed Random seed used when generating community traits.
+#
+# @return A consumer-resource community parameter object.
+# @keywords internal
+#
+# @examples NULL
 make_a_consumer_resource_community <- function(S,
                                                u_max_mean,
                                                u_max_range,

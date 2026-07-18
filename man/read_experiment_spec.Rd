@@ -15,8 +15,8 @@ A validated experiment specification list with class
 }
 \description{
 Reads a YAML experiment specification that uses the new nested, declarative
-experiment format. Unlike \code{\link[=read_experiment_design_json]{read_experiment_design_json()}}, this reader does
-not parse or evaluate R expressions from the specification file.
+experiment format. The specification is data only: it does not parse or
+evaluate R expressions from the specification file.
 }
 \examples{
 template <- system.file(

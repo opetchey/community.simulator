@@ -202,47 +202,47 @@ make_legacy_lv_interaction_spec <- function(alpha_ij_mean,
   stop("Unsupported legacy interaction distribution: ", alpha_ij_distribution, call. = FALSE)
 }
 
-#' Make a community parameter object
-#'
-#' This function makes a community object containing the parameters for all
-#' species in the community. At the moment, only the temperature optima
-#' `b_opt_i` vary among species; the remaining parameters are shared or are
-#' generated from common distributions.
-#'
-#' @param S Number of species in the community
-#' @param a_b_mean Mean of the distribution from which a_b values are drawn.
-#' @param a_b_range Range of the distribution from which a_b values are drawn.
-#' @param a_b_distribution Distribution used to generate `a_b_i` values.
-#' @param b_opt_mean Mean of the distribution from which `b_opt_i` values are drawn.
-#' @param b_opt_range Range of the distribution from which `b_opt_i` values are drawn.
-#' @param b_opt_distribution Distribution used to generate `b_opt_i` values.
-#' @param sd_perf_distribution Distribution used to generate Gaussian
-#'   performance-curve widths.
-#' @param sd_perf_mean Mean of the distribution from which Gaussian
-#'   performance-curve widths are drawn.
-#' @param sd_perf_range Range of the distribution from which Gaussian
-#'   performance-curve widths are drawn.
-#' @param community_seed Random seed used when generating community traits.
-#' @param a_d Death rate when temperature is equal to 0; same for all species.
-#' @param z Exponential rate of increase in death rate with temperature; same for all species.
-#' @param alpha_ij_mean Deprecated. Mean used by the legacy interaction
-#'   generator.
-#' @param alpha_ij_sd Deprecated. Spread used by the legacy interaction
-#'   generator.
-#' @param alpha_jj Value of the diagonal of the community matrix, shared across species.
-#' @param alpha_ij_distribution Deprecated. Distribution used by the legacy
-#'   interaction generator.
-#' @param lv_interaction_spec Optional named list specifying LV interactions.
-#'   Preferred over legacy `alpha_ij_*` arguments. Fields include `type`
-#'   (`"none"`, `"competition"`, `"any"`, or `"predator_prey"`), `symmetry`
-#'   (`"asymmetric"`, `"symmetric"`, or `"antisymmetric"`), `distribution`
-#'   (`"constant"`, `"uniform"`, `"normal"`, `"lognormal"`, or `"gamma"`),
-#'   `parameters`, and `diagonal`.
-#'
-#' @return Returns a list containing the community object.
-#' @export
-#'
-#' @examples NULL
+# Make a community parameter object
+#
+# This function makes a community object containing the parameters for all
+# species in the community. At the moment, only the temperature optima
+# `b_opt_i` vary among species; the remaining parameters are shared or are
+# generated from common distributions.
+#
+# @param S Number of species in the community
+# @param a_b_mean Mean of the distribution from which a_b values are drawn.
+# @param a_b_range Range of the distribution from which a_b values are drawn.
+# @param a_b_distribution Distribution used to generate `a_b_i` values.
+# @param b_opt_mean Mean of the distribution from which `b_opt_i` values are drawn.
+# @param b_opt_range Range of the distribution from which `b_opt_i` values are drawn.
+# @param b_opt_distribution Distribution used to generate `b_opt_i` values.
+# @param sd_perf_distribution Distribution used to generate Gaussian
+#   performance-curve widths.
+# @param sd_perf_mean Mean of the distribution from which Gaussian
+#   performance-curve widths are drawn.
+# @param sd_perf_range Range of the distribution from which Gaussian
+#   performance-curve widths are drawn.
+# @param community_seed Random seed used when generating community traits.
+# @param a_d Death rate when temperature is equal to 0; same for all species.
+# @param z Exponential rate of increase in death rate with temperature; same for all species.
+# @param alpha_ij_mean Deprecated. Mean used by the legacy interaction
+#   generator.
+# @param alpha_ij_sd Deprecated. Spread used by the legacy interaction
+#   generator.
+# @param alpha_jj Value of the diagonal of the community matrix, shared across species.
+# @param alpha_ij_distribution Deprecated. Distribution used by the legacy
+#   interaction generator.
+# @param lv_interaction_spec Optional named list specifying LV interactions.
+#   Preferred over legacy `alpha_ij_*` arguments. Fields include `type`
+#   (`"none"`, `"competition"`, `"any"`, or `"predator_prey"`), `symmetry`
+#   (`"asymmetric"`, `"symmetric"`, or `"antisymmetric"`), `distribution`
+#   (`"constant"`, `"uniform"`, `"normal"`, `"lognormal"`, or `"gamma"`),
+#   `parameters`, and `diagonal`.
+#
+# @return Returns a list containing the community object.
+# @keywords internal
+#
+# @examples NULL
 make_a_community <- function(S,
 
                              a_b_mean,
