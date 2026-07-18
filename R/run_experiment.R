@@ -46,6 +46,36 @@ get_json_design_value <- function(expt_def, name, default, aliases = character()
   value
 }
 
+runtime_estimator_rates <- function(dynamics_type) {
+  switch(
+    dynamics_type,
+    discrete = list(
+      simulation_seconds_per_case_step = 1.877731e-05,
+      community_measure_seconds_per_case = 0.01863,
+      experiment_table_seconds_per_case = 0.00280,
+      experiment_table_fixed_seconds = 0.25
+    ),
+    continuous = list(
+      simulation_seconds_per_case_step = 5.0e-05,
+      community_measure_seconds_per_case = 0.01863,
+      experiment_table_seconds_per_case = 0.00280,
+      experiment_table_fixed_seconds = 0.25
+    ),
+    consumer_resource_continuous = list(
+      simulation_seconds_per_case_step = 4.295812e-05,
+      community_measure_seconds_per_case = 0.13278,
+      experiment_table_seconds_per_case = 0.00710,
+      experiment_table_fixed_seconds = 0.05
+    ),
+    list(
+      simulation_seconds_per_case_step = 5.0e-05,
+      community_measure_seconds_per_case = 0.05,
+      experiment_table_seconds_per_case = 0.003,
+      experiment_table_fixed_seconds = 0.25
+    )
+  )
+}
+
 estimate_experiment_outputs <- function(experiment_folder, experiment_design_filename) {
   expt <- readRDS(file.path(experiment_folder, "experiment_table.RDS"))
   expt_def <- jsonlite::fromJSON(file.path(experiment_folder, experiment_design_filename))
@@ -95,6 +125,11 @@ estimate_experiment_outputs <- function(experiment_folder, experiment_design_fil
     parallel_workers <- 1L
   }
   parallel_workers <- max(1L, min(parallel_workers, nrow(expt)))
+  parallel_community_measures <- isTRUE(get_json_design_value(
+    expt_def,
+    "parallel_community_measures",
+    parallel_simulations
+  ))
 
   integration_steps <- burn_in_duration + experiment_duration + 1L
   output_times <- seq_len(integration_steps)
@@ -140,19 +175,41 @@ estimate_experiment_outputs <- function(experiment_folder, experiment_design_fil
     estimated_resources_db_bytes +
     estimated_temperatures_db_bytes
 
-  seconds_per_case_step <- switch(
-    dynamics_type,
-    discrete = 0.000015,
-    continuous = 0.00005,
-    consumer_resource_continuous = 0.00008,
-    0.00005
-  )
+  rates <- runtime_estimator_rates(dynamics_type)
+  reference_parallel_workers <- 29
   effective_workers <- if (parallel_simulations) parallel_workers else 1L
+  estimated_experiment_table_seconds <- max(
+    rates$experiment_table_fixed_seconds,
+    nrow(expt) * rates$experiment_table_seconds_per_case
+  )
+  effective_environment_workers <- if (parallel_environments) {
+    max(1L, min(parallel_workers, env_series_count))
+  } else {
+    1L
+  }
+  estimated_environment_seconds <- 0.5 +
+    temperature_rows * 0.00029 / effective_environment_workers
   estimated_simulation_seconds <- (
-    nrow(expt) * integration_steps * seconds_per_case_step
+    nrow(expt) *
+      integration_steps *
+      rates$simulation_seconds_per_case_step *
+      reference_parallel_workers
   ) / effective_workers
+  community_measure_parallel_efficiency <- 0.5
+  effective_community_measure_workers <- if (parallel_community_measures) {
+    max(1, min(parallel_workers, nrow(expt)) * community_measure_parallel_efficiency)
+  } else {
+    1
+  }
+  estimated_community_measure_seconds <- (
+    nrow(expt) * rates$community_measure_seconds_per_case
+  ) / effective_community_measure_workers
   estimated_io_seconds <- (dynamics_rows + resource_rows) * 0.00001
-  estimated_total_seconds <- estimated_simulation_seconds + estimated_io_seconds
+  estimated_total_seconds <- estimated_experiment_table_seconds +
+    estimated_environment_seconds +
+    estimated_simulation_seconds +
+    estimated_community_measure_seconds +
+    estimated_io_seconds
 
   list(
     n_cases = nrow(expt),
@@ -171,6 +228,7 @@ estimate_experiment_outputs <- function(experiment_folder, experiment_design_fil
     temperature_rows = temperature_rows,
     parallel_environments = parallel_environments,
     parallel_simulations = parallel_simulations,
+    parallel_community_measures = parallel_community_measures,
     parallel_workers = parallel_workers,
     estimated_dynamics_db_bytes = estimated_dynamics_db_bytes,
     estimated_resources_db_bytes = estimated_resources_db_bytes,
@@ -215,10 +273,11 @@ confirm_experiment_run <- function(summary) {
   message("Estimated temperatures.db size: ", format_bytes(summary$estimated_temperatures_db_bytes))
   message("Estimated total DB size: ", format_bytes(summary$estimated_total_db_bytes))
   message("Estimated runtime: ", format_duration(summary$estimated_total_seconds))
-  if (summary$parallel_environments || summary$parallel_simulations) {
+  if (summary$parallel_environments || summary$parallel_simulations || summary$parallel_community_measures) {
     message("Parallel workers: ", summary$parallel_workers)
     message("Parallel environment generation: ", summary$parallel_environments)
     message("Parallel simulations: ", summary$parallel_simulations)
+    message("Parallel community measures: ", summary$parallel_community_measures)
   } else {
     message("Parallel workers: not enabled")
   }

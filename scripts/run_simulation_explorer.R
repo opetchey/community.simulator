@@ -14,4 +14,5 @@ if (!requireNamespace("callr", quietly = TRUE)) {
 }
 
 devtools::load_all(".", quiet = TRUE)
+library(community.simulator)
 run_simulation_explorer()
