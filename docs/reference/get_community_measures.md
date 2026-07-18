@@ -40,7 +40,10 @@ Nothing. Saves data to a file.
 
 If `simulation_summaries.RDS` is present, dynamic abundance summaries
 are read from that compact file. Otherwise, the function falls back to
-calculating those summaries from `dynamics.db`.
+calculating those summaries from `dynamics.db`. Experiment JSON files
+can include `parallel_community_measures` and `parallel_workers` to
+calculate community performance curve measures in parallel where
+supported.
 
 ## Examples
 

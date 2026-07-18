@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">community.simulator</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -781,89 +781,96 @@ parallel where supported.</td>
 supported.</td>
 </tr>
 <tr class="even">
-<td><code>parallel_workers</code></td>
+<td><code>parallel_community_measures</code></td>
 <td>All</td>
-<td>Number of worker processes for parallel environment generation or
-simulation.</td>
+<td>Logical. If <code>TRUE</code>, calculate community performance curve
+measures in parallel where supported. Defaults to
+<code>parallel_simulations</code> when omitted.</td>
 </tr>
 <tr class="odd">
+<td><code>parallel_workers</code></td>
+<td>All</td>
+<td>Number of worker processes for parallel environment generation,
+simulation, or community-measure calculation.</td>
+</tr>
+<tr class="even">
 <td><code>runtime_update_every</code></td>
 <td>All</td>
 <td>Number of cases between printed runtime/progress updates.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>environment_progress</code></td>
 <td>All</td>
 <td>Logical. If <code>TRUE</code>, print progress, elapsed time, and
 estimated remaining time during environment creation.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>birth_maximum_mean</code></td>
 <td>LV</td>
 <td>Mean maximum height of the species birth-rate performance
 curve.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>birth_maximum_range</code></td>
 <td>LV</td>
 <td>Total spread of maximum birth-rate values around
 <code>birth_maximum_mean</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>birth_maximum_distribution</code></td>
 <td>LV</td>
 <td>Distribution used to assign species maximum birth rates. Options
 include <code>"regular"</code> and <code>"random_uniform"</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>birth_optimum_mean</code></td>
 <td>LV</td>
 <td>Mean thermal optimum of the birth-rate performance curve.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>birth_optimum_range</code></td>
 <td>LV</td>
 <td>Total spread of birth thermal optima around
 <code>birth_optimum_mean</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>birth_optimum_distribution</code></td>
 <td>LV</td>
 <td>Distribution used to assign species birth thermal optima. Options
 include <code>"regular"</code> and <code>"random_uniform"</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>birth_width_mean</code></td>
 <td>LV</td>
 <td>Mean standard-deviation width of the Gaussian birth-rate performance
 curve.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>birth_width_range</code></td>
 <td>LV</td>
 <td>Total spread of birth-rate performance-curve widths around
 <code>birth_width_mean</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>birth_width_distribution</code></td>
 <td>LV</td>
 <td>Distribution used to assign species birth-rate performance-curve
 widths. Options include <code>"regular"</code> and
 <code>"random_uniform"</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>death_intercept</code></td>
 <td>LV</td>
 <td>Intercept of the exponential death-rate curve, shared across
 species.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>death_temperature_slope</code></td>
 <td>LV</td>
 <td>Temperature sensitivity of the exponential death-rate curve, shared
 across species.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>interaction_treatments</code></td>
 <td>LV</td>
 <td>List of LV interaction-matrix treatments. Each treatment can include
@@ -871,188 +878,188 @@ across species.</td>
 <code>distribution</code>, <code>parameters</code>, and
 <code>diagonal</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>interaction_treatments[].label</code></td>
 <td>LV</td>
 <td>Human-readable name for an interaction treatment.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>interaction_treatments[].type</code></td>
 <td>LV</td>
 <td>Interaction type. Options are <code>"none"</code>,
 <code>"competition"</code>, <code>"any"</code>, and
 <code>"predator_prey"</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>interaction_treatments[].symmetry</code></td>
 <td>LV</td>
 <td>Off-diagonal symmetry. Options are <code>"asymmetric"</code>,
 <code>"symmetric"</code>, and <code>"antisymmetric"</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>interaction_treatments[].distribution</code></td>
 <td>LV</td>
 <td>Distribution for off-diagonal interaction strengths. Options include
 <code>"constant"</code>, <code>"uniform"</code>, <code>"normal"</code>,
 <code>"lognormal"</code>, and <code>"gamma"</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>interaction_treatments[].parameters</code></td>
 <td>LV</td>
 <td>Named numeric parameters for the selected interaction-strength
 distribution.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>interaction_treatments[].diagonal</code></td>
 <td>LV</td>
 <td>Diagonal interaction value, usually <code>1</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>temperature_interpolation</code></td>
 <td>Continuous LV, CR</td>
 <td>How the continuous-time simulator interpolates temperature between
 generated values. Options are <code>"linear"</code> and
 <code>"constant"</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>immigration_rate</code></td>
 <td>Continuous LV</td>
 <td>Immigration rate per species.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>immigration_mode</code></td>
 <td>Continuous LV</td>
 <td>How immigration is applied. Options are <code>"continuous"</code>
 and <code>"pulse"</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>ode_method</code></td>
 <td>Continuous LV, CR</td>
 <td>ODE solver method passed to <code><a href="https://rdrr.io/pkg/deSolve/man/ode.html" class="external-link">deSolve::ode()</a></code>, commonly
 <code>"lsoda"</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>ode_rtol</code></td>
 <td>Continuous LV, CR</td>
 <td>Relative tolerance for the ODE solver.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>ode_atol</code></td>
 <td>Continuous LV, CR</td>
 <td>Absolute tolerance for the ODE solver.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>ode_max_step</code></td>
 <td>Continuous LV, CR</td>
 <td>Maximum ODE solver step size.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>blowup_threshold</code></td>
 <td>Continuous LV, CR</td>
 <td>Abundance threshold above which a simulation is treated as having
 blown up.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>uptake_maximum_mean</code></td>
 <td>CR</td>
 <td>Mean maximum height of the consumer uptake curve.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>uptake_maximum_range</code></td>
 <td>CR</td>
 <td>Total spread of maximum uptake values around
 <code>uptake_maximum_mean</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>uptake_maximum_distribution</code></td>
 <td>CR</td>
 <td>Distribution used to assign species maximum uptake values. Options
 include <code>"regular"</code> and <code>"random_uniform"</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>uptake_optimum_mean</code></td>
 <td>CR</td>
 <td>Mean thermal optimum of the consumer uptake curve.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>uptake_optimum_range</code></td>
 <td>CR</td>
 <td>Total spread of uptake thermal optima around
 <code>uptake_optimum_mean</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>uptake_optimum_distribution</code></td>
 <td>CR</td>
 <td>Distribution used to assign species uptake thermal optima. Options
 include <code>"regular"</code> and <code>"random_uniform"</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>uptake_width_mean</code></td>
 <td>CR</td>
 <td>Mean standard-deviation width of the Gaussian uptake curve.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>uptake_width_range</code></td>
 <td>CR</td>
 <td>Total spread of uptake-curve widths around
 <code>uptake_width_mean</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>uptake_width_distribution</code></td>
 <td>CR</td>
 <td>Distribution used to assign species uptake-curve widths. Options
 include <code>"regular"</code> and <code>"random_uniform"</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>half_saturation_mean</code></td>
 <td>CR</td>
 <td>Mean Monod half-saturation constant.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>half_saturation_range</code></td>
 <td>CR</td>
 <td>Total spread of half-saturation constants around
 <code>half_saturation_mean</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>half_saturation_distribution</code></td>
 <td>CR</td>
 <td>Distribution used to assign half-saturation constants. Options
 include <code>"regular"</code> and <code>"random_uniform"</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>consumer_death_rate</code></td>
 <td>CR</td>
 <td>Consumer death rate, shared across consumers.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>resource_renewal_rate</code></td>
 <td>CR</td>
 <td>Chemostat resource renewal rate.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>resource_supply</code></td>
 <td>CR</td>
 <td>Resource supply concentration.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>conversion_efficiency</code></td>
 <td>CR</td>
 <td>Conversion efficiency from resource uptake to consumer growth.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>resource_use_mode</code></td>
 <td>CR</td>
 <td>Resource-use structure. Options are
 <code>"one_resource_all_consumers"</code>, <code>"diagonal"</code>, and
 <code>"shared_to_private"</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>active_resource</code></td>
 <td>CR</td>
 <td>Resource index used as the common active or shared resource.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>private_resource_use_distribution</code></td>
 <td>CR</td>
 <td>Distribution for species-level private-resource use in
@@ -1060,42 +1067,42 @@ include <code>"regular"</code> and <code>"random_uniform"</code>.</td>
 <code>"constant"</code>, <code>"regular"</code>,
 <code>"random_uniform"</code>, and <code>"beta"</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>private_resource_use_mean</code></td>
 <td>CR</td>
 <td>Mean private-resource use fraction. Shared-resource use is
 <code>1 - private_resource_use</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>private_resource_use_range</code></td>
 <td>CR</td>
 <td>Total spread of private-resource use fractions for
 <code>"regular"</code> and <code>"random_uniform"</code>
 distributions.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>private_resource_use_precision</code></td>
 <td>CR</td>
 <td>Precision of the beta distribution around
 <code>private_resource_use_mean</code>; higher values give less
 among-species variation.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>consumer_immigration_rate</code></td>
 <td>CR</td>
 <td>Immigration rate for consumers.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>initial_consumer_total_abundance</code></td>
 <td>CR</td>
 <td>Initial total consumer abundance distributed across consumers.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>resource_initial_value</code></td>
 <td>CR</td>
 <td>Initial concentration for each resource.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>negative_tolerance</code></td>
 <td>CR</td>
 <td>Small numerical tolerance used when checking negative values in ODE
@@ -1172,6 +1179,9 @@ runs:</p>
 series in parallel.</li>
 <li>
 <code>parallel_simulations</code>: simulate cases in parallel.</li>
+<li>
+<code>parallel_community_measures</code>: calculate community
+performance curve measures in parallel.</li>
 <li>
 <code>parallel_workers</code>: number of worker processes.</li>
 <li>

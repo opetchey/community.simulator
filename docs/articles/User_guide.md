@@ -552,7 +552,8 @@ combinations.
 | `experiment_duration` | All | Number of post-burn-in time steps or time units used for the experiment. |
 | `parallel_environments` | All | Logical. If `TRUE`, generate environmental time series in parallel where supported. |
 | `parallel_simulations` | All | Logical. If `TRUE`, simulate cases in parallel where supported. |
-| `parallel_workers` | All | Number of worker processes for parallel environment generation or simulation. |
+| `parallel_community_measures` | All | Logical. If `TRUE`, calculate community performance curve measures in parallel where supported. Defaults to `parallel_simulations` when omitted. |
+| `parallel_workers` | All | Number of worker processes for parallel environment generation, simulation, or community-measure calculation. |
 | `runtime_update_every` | All | Number of cases between printed runtime/progress updates. |
 | `environment_progress` | All | Logical. If `TRUE`, print progress, elapsed time, and estimated remaining time during environment creation. |
 | `birth_maximum_mean` | LV | Mean maximum height of the species birth-rate performance curve. |
@@ -662,6 +663,8 @@ Experiment JSON files can include runtime controls for larger runs:
 - `parallel_environments`: generate environmental time series in
   parallel.
 - `parallel_simulations`: simulate cases in parallel.
+- `parallel_community_measures`: calculate community performance curve
+  measures in parallel.
 - `parallel_workers`: number of worker processes.
 - `runtime_update_every`: how often progress updates are printed.
 - `environment_progress`: whether environment-generation progress is

@@ -10,7 +10,10 @@ get_community_CPC_measures(
   expt,
   expt_def,
   every_t = 1,
-  soft_viability_scale = 0.01
+  soft_viability_scale = 0.01,
+  parallel_community_measures = FALSE,
+  parallel_workers = 1,
+  verbose = TRUE
 )
 ```
 
@@ -37,6 +40,20 @@ get_community_CPC_measures(
 
   Positive scale parameter for the soft viability transform
   `plogis(g_i(T) / soft_viability_scale)`.
+
+- parallel_community_measures:
+
+  Logical. If `TRUE`, calculate per-case community performance curve
+  measures in parallel where supported.
+
+- parallel_workers:
+
+  Number of worker processes to use when `parallel_community_measures`
+  is `TRUE`.
+
+- verbose:
+
+  Logical. If `TRUE`, print progress messages.
 
 ## Value
 

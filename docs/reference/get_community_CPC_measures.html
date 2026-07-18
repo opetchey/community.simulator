@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">community.simulator</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,7 +42,10 @@
 <span>  <span class="va">expt</span>,</span>
 <span>  <span class="va">expt_def</span>,</span>
 <span>  every_t <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  soft_viability_scale <span class="op">=</span> <span class="fl">0.01</span></span>
+<span>  soft_viability_scale <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  parallel_community_measures <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  parallel_workers <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -73,6 +76,20 @@
 <dt id="arg-soft-viability-scale">soft_viability_scale<a class="anchor" aria-label="anchor" href="#arg-soft-viability-scale"></a></dt>
 <dd><p>Positive scale parameter for the soft viability
 transform <code>plogis(g_i(T) / soft_viability_scale)</code>.</p></dd>
+
+
+<dt id="arg-parallel-community-measures">parallel_community_measures<a class="anchor" aria-label="anchor" href="#arg-parallel-community-measures"></a></dt>
+<dd><p>Logical. If <code>TRUE</code>, calculate per-case
+community performance curve measures in parallel where supported.</p></dd>
+
+
+<dt id="arg-parallel-workers">parallel_workers<a class="anchor" aria-label="anchor" href="#arg-parallel-workers"></a></dt>
+<dd><p>Number of worker processes to use when
+<code>parallel_community_measures</code> is <code>TRUE</code>.</p></dd>
+
+
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
+<dd><p>Logical. If <code>TRUE</code>, print progress messages.</p></dd>
 
 </dl></div>
     <div class="section level2">

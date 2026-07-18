@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">community.simulator</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,9 @@
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>If <code>simulation_summaries.RDS</code> is present, dynamic abundance
 summaries are read from that compact file. Otherwise, the function falls
-back to calculating those summaries from <code>dynamics.db</code>.</p>
+back to calculating those summaries from <code>dynamics.db</code>. Experiment JSON
+files can include <code>parallel_community_measures</code> and <code>parallel_workers</code> to
+calculate community performance curve measures in parallel where supported.</p>
     </div>
 
     <div class="section level2">
