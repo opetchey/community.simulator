@@ -20,7 +20,8 @@ be created.}
 \item{experiment_name}{Name of the experiment folder.}
 
 \item{experiment_design_filename}{Name of the experiment definition file.
-This file must already be present inside the experiment folder.}
+This must be a \code{.yaml} or \code{.yml} file already present inside the experiment
+folder.}
 
 \item{overwrite}{Logical. If \code{TRUE}, overwrite existing workflow outputs.}
 
@@ -36,25 +37,19 @@ Invisibly returns a named list containing the experiment folder and
 the main output file paths.
 }
 \description{
-This is a convenience wrapper for the standard experiment workflow. It
-creates the experiment folder, builds the experiment table, generates
-environmental time series, simulates dynamics, and calculates community-level
-summary measures.
+This is the standard YAML experiment workflow. It creates or locates the
+experiment folder, reads the YAML experiment specification from that folder,
+builds the canonical experiment table, generates environmental time series,
+simulates dynamics, and calculates community-level summary measures.
 }
 \details{
 The preflight summary estimates output rows, database sizes, and
-runtime from the experiment table and design settings, including output
-controls such as \code{save_dynamics}, \code{save_resources},
-\code{dynamics_save_every}, \code{resources_save_every},
-\code{summary_checkpoint_every}, and \code{runtime_update_every}. Confirmation
-happens before environment generation, dynamics simulation, and analysis.
-These estimates are intended as rough guidance before launching large
-experiments. Compact simulation summaries are checkpointed during
-simulation and are used to calculate \code{community_measures.RDS} even when
-\code{save_dynamics = FALSE}. Each run also writes \code{experiment_log.txt}, a
-plain-text newline-delimited JSON log containing the experiment
-specification, preflight summary, output paths, workflow status, and elapsed
-time for each workflow step.
+total runtime from the canonical experiment table and YAML settings.
+Confirmation happens before environment generation, dynamics simulation,
+and analysis. Each run also writes \code{experiment_log.txt}, a plain-text
+newline-delimited JSON log containing the parsed YAML specification,
+preflight summary, output paths, workflow status, and elapsed time for each
+workflow step.
 }
 \examples{
 NULL

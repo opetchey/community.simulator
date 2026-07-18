@@ -50,5 +50,6 @@ Imports:
     rlang,
     tibble,
     tidyr,
+    yaml,
     zoo
 Config/testthat/edition: 3

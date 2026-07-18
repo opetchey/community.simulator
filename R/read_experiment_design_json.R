@@ -1,4 +1,6 @@
-#' Read in the JSON formatted text file that contains the experiment design.
+#' Legacy JSON experiment-design reader
+#'
+#' This internal helper reads the old JSON formatted experiment design.
 #' Most scalar values in the JSON file are expressions that can be evaluated
 #' with `eval()` to get the values of the experiment design. Structured values,
 #' such as list-based interaction specifications, are returned as-is.
@@ -7,7 +9,7 @@
 #' @param experiment_design_filename The name of the file that contains the experiment design. This file should be in the experiment_folder and should be a JSON file. The JSON file should contain a list of expressions that can be evaluated to get the values of the experiment design.
 #'
 #' @return Returns a named list of expressions or structured values.
-#' @export
+#' @keywords internal
 #'
 #' @examples NULL
 read_experiment_design_json <- function(experiment_folder, experiment_design_filename){

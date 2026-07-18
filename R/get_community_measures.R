@@ -1,4 +1,8 @@
-#' Get various community level measures, e.g., community stability, response diversity, position of optimal temperature, etc.
+#' Legacy JSON community-measures calculator
+#'
+#' This internal helper calculates community measures for the old JSON
+#' experiment format. New user-facing workflows should use
+#' [get_community_measures_from_spec()] through [run_experiment()].
 #'
 #' @param experiment_folder The folder containing the experiment data
 #' @param experiment_design_filename The name of the experiment design file
@@ -7,12 +11,13 @@
 #'
 #' @details If `simulation_summaries.RDS` is present, dynamic abundance
 #'   summaries are read from that compact file. Otherwise, the function falls
-#'   back to calculating those summaries from `dynamics.db`. Experiment JSON
-#'   files can include `parallel_community_measures` and `parallel_workers` to
-#'   calculate community performance curve measures in parallel where supported.
+#'   back to calculating those summaries from `dynamics.db`. Old experiment
+#'   JSON files can include `parallel_community_measures` and `parallel_workers`
+#'   to calculate community performance curve measures in parallel where
+#'   supported.
 #'
 #' @return Nothing. Saves data to a file.
-#' @export
+#' @keywords internal
 #'
 #' @examples NULL
 get_community_measures <- function(experiment_folder,

@@ -13,14 +13,14 @@ get_community_sum_rel_b_opt <- function(temperatures, expt) {
   ## relative to mean environmental temperature each simulation
   mean_temps <- temperatures |>
     dplyr::group_by(env_series_id) |>
-    dplyr::summarise(mean_temperature = mean(temperature)) |>
+    dplyr::summarise(mean_temperature = mean(temperature, na.rm = TRUE), .groups = "drop") |>
     dplyr::collect()
   expt_long <- tidyr::unnest_longer(expt, col = c(community_object)) |>
     dplyr::filter(community_object_id == "b_opt_i") |>
     tidyr::unnest(cols = c(community_object)) |>
     dplyr::group_by(case_id) |>
     dplyr::mutate(species_id = rep(paste0("Spp-", seq_along(case_id))))
-  rel_b_opt <- dplyr::full_join(mean_temps, expt_long) |>
+  rel_b_opt <- dplyr::full_join(mean_temps, expt_long, by = "env_series_id") |>
     dplyr::mutate(relative_b_opt = community_object - mean_temperature)
   comm_sum_rel_b_opt <- rel_b_opt |>
     dplyr::group_by(case_id) |>

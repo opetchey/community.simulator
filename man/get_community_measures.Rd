@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_community_measures.R
 \name{get_community_measures}
 \alias{get_community_measures}
-\title{Get various community level measures, e.g., community stability, response diversity, position of optimal temperature, etc.}
+\title{Legacy JSON community-measures calculator}
 \usage{
 get_community_measures(
   experiment_folder,
@@ -24,15 +24,19 @@ get_community_measures(
 Nothing. Saves data to a file.
 }
 \description{
-Get various community level measures, e.g., community stability, response diversity, position of optimal temperature, etc.
+This internal helper calculates community measures for the old JSON
+experiment format. New user-facing workflows should use
+\code{\link[=get_community_measures_from_spec]{get_community_measures_from_spec()}} through \code{\link[=run_experiment]{run_experiment()}}.
 }
 \details{
 If \code{simulation_summaries.RDS} is present, dynamic abundance
 summaries are read from that compact file. Otherwise, the function falls
-back to calculating those summaries from \code{dynamics.db}. Experiment JSON
-files can include \code{parallel_community_measures} and \code{parallel_workers} to
-calculate community performance curve measures in parallel where supported.
+back to calculating those summaries from \code{dynamics.db}. Old experiment
+JSON files can include \code{parallel_community_measures} and \code{parallel_workers}
+to calculate community performance curve measures in parallel where
+supported.
 }
 \examples{
 NULL
 }
+\keyword{internal}

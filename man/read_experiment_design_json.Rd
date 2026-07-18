@@ -2,10 +2,7 @@
 % Please edit documentation in R/read_experiment_design_json.R
 \name{read_experiment_design_json}
 \alias{read_experiment_design_json}
-\title{Read in the JSON formatted text file that contains the experiment design.
-Most scalar values in the JSON file are expressions that can be evaluated
-with \code{eval()} to get the values of the experiment design. Structured values,
-such as list-based interaction specifications, are returned as-is.}
+\title{Legacy JSON experiment-design reader}
 \usage{
 read_experiment_design_json(experiment_folder, experiment_design_filename)
 }
@@ -18,7 +15,7 @@ read_experiment_design_json(experiment_folder, experiment_design_filename)
 Returns a named list of expressions or structured values.
 }
 \description{
-Read in the JSON formatted text file that contains the experiment design.
+This internal helper reads the old JSON formatted experiment design.
 Most scalar values in the JSON file are expressions that can be evaluated
 with \code{eval()} to get the values of the experiment design. Structured values,
 such as list-based interaction specifications, are returned as-is.
@@ -26,3 +23,4 @@ such as list-based interaction specifications, are returned as-is.
 \examples{
 NULL
 }
+\keyword{internal}

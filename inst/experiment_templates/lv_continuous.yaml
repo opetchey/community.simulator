@@ -1,0 +1,68 @@
+experiment:
+  name: lv_continuous_example
+  random_seed: 456
+
+model:
+  type: lv_continuous
+
+community:
+  richness: 2
+  replicates: 1
+
+traits:
+  birth_maximum:
+    mean: 0.3
+    range: 0
+    distribution: random_uniform
+  birth_optimum:
+    mean: 20
+    range: 4
+    distribution: random_uniform
+  birth_width:
+    mean: 10
+    range: 0
+    distribution: random_uniform
+  death:
+    intercept: 0
+    temperature_slope: 0.05
+
+interactions:
+  treatments:
+    - label: no_interactions
+      type: none
+      diagonal: 1
+    - label: weak_asymmetric_competition
+      type: competition
+      symmetry: asymmetric
+      distribution: uniform
+      parameters:
+        min: 0
+        max: 0.2
+      diagonal: 1
+
+environment:
+  replicates: 1
+  sharing: same_per_replicate
+  temperature:
+    mean: 20
+    sd: 1
+    one_over_f_gamma: 0.8
+
+simulation:
+  burn_in_duration: 10
+  experiment_duration: 20
+  temperature_interpolation: linear
+  immigration_rate: 0.1
+  immigration_mode: continuous
+  ode:
+    method: lsoda
+    rtol: 1e-6
+    atol: 1e-8
+    max_step: 1
+  blowup_threshold: 1e12
+
+parallel:
+  workers: 1
+  environments: false
+  simulations: false
+  community_measures: false

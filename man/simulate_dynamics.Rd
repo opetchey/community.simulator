@@ -2,8 +2,7 @@
 % Please edit documentation in R/simulate_dynamics.R
 \name{simulate_dynamics}
 \alias{simulate_dynamics}
-\title{Simulate the dynamics of all the cases in an experiment
-Unfortunately at the moment has features of temperature series hard coded in}
+\title{Legacy JSON dynamics simulator}
 \usage{
 simulate_dynamics(
   experiment_folder,
@@ -27,14 +26,14 @@ Returns nothing. Always saves compact \code{simulation_summaries.RDS} and
 databases depending on output-control settings.
 }
 \description{
-Simulate the dynamics of all the cases in an experiment
-Unfortunately at the moment has features of temperature series hard coded in
+This internal helper simulates cases for the old JSON experiment format. New
+user-facing workflows should use \code{\link[=simulate_dynamics_from_spec]{simulate_dynamics_from_spec()}} through
+\code{\link[=run_experiment]{run_experiment()}}.
 }
 \details{
-Experiment JSON files can set \code{model_type} to \code{"lv_discrete"},
-\code{"lv_continuous"}, or \code{"consumer_resource_continuous"}. Legacy
-\code{dynamics_type} values are still accepted as aliases. Experiment JSON files
-can also optionally include
+Old experiment JSON files can set \code{model_type} to \code{"lv_discrete"},
+\code{"lv_continuous"}, or \code{"consumer_resource_continuous"}. They can also
+optionally include
 \code{parallel_simulations}, \code{parallel_workers}, and
 \code{initial_abundance_seed_base}. They can also include output-control options:
 \code{save_dynamics}, \code{save_resources}, \code{dynamics_save_every}, and
@@ -54,3 +53,4 @@ intended for macOS/Linux.
 \examples{
 NULL
 }
+\keyword{internal}

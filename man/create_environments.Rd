@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_environments.R
 \name{create_environments}
 \alias{create_environments}
-\title{Create temperature time series.}
+\title{Legacy JSON temperature time-series creator}
 \usage{
 create_environments(
   experiment_folder,
@@ -24,15 +24,12 @@ create_environments(
 Returns nothing. Saves to SQLite databases the temperature time series.
 }
 \description{
-Environmental series sharing is controlled in the experiment table by the
-JSON field \code{environment_sharing}. With \code{"same_per_replicate"}, cases with
-the same environment treatment and replicate number share an environmental
-time series. With \code{"all_different"}, each simulation case gets its own
-environmental time series. The legacy field \code{temperature_series_control} is
-still accepted as an alias.
+This internal helper creates temperature time series for the old JSON
+experiment format. New user-facing workflows should use
+\code{\link[=create_environments_from_spec]{create_environments_from_spec()}} through \code{\link[=run_experiment]{run_experiment()}}.
 }
 \details{
-Experiment JSON files can optionally include
+Old experiment JSON files can optionally include
 \code{parallel_environments}, \code{parallel_simulations}, \code{parallel_workers},
 \code{environment_progress}, and \code{runtime_update_every}. When
 \code{parallel_environments} evaluates to \code{TRUE}, or when it is absent and
@@ -43,3 +40,4 @@ parent process. Parallel processing is intended for macOS/Linux.
 \examples{
 NULL
 }
+\keyword{internal}

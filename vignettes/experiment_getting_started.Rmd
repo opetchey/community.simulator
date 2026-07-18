@@ -27,7 +27,7 @@ The example:
 
 - creates a project folder and an experiment subfolder
 - copies a bundled experiment-definition file into the experiment folder
-- highlights the point where a user would normally edit the JSON design
+- highlights the point where a user would normally edit the YAML design
 - runs the standard workflow with `run_experiment()`
 - inspects the saved summary output
 
@@ -40,18 +40,21 @@ library(community.simulator)
 ```{r run-example}
 project_folder_location <- tempdir()
 experiment_name <- "getting_started_example"
-experiment_design_filename <- "experiment_definition.json"
+experiment_design_filename <- "experiment.yaml"
+experiment_folder <- file.path(project_folder_location, experiment_name)
 
-setup <- setup_example_experiment(
-  experiment_folder_location = project_folder_location,
-  experiment_name = experiment_name,
-  example_experiment_name = "discrete_lv",
-  experiment_design_filename = experiment_design_filename,
-  verbose = FALSE
+dir.create(experiment_folder, recursive = TRUE, showWarnings = FALSE)
+file.copy(
+  system.file(
+    "experiment_templates/lv_discrete.yaml",
+    package = "community.simulator"
+  ),
+  file.path(experiment_folder, experiment_design_filename),
+  overwrite = TRUE
 )
 
-## In a real project, this is the point where you would edit the JSON file
-## inside `setup$experiment_folder` before running the workflow.
+## In a real project, this is the point where you would edit the YAML file
+## inside `experiment_folder` before running the workflow.
 
 outputs <- suppressWarnings(
   suppressMessages(
@@ -105,7 +108,7 @@ The most important outputs are:
 Once this small example works, the usual next steps are:
 
 - create a project folder that contains multiple experiment subfolders
-- copy an example JSON file into each experiment folder, then edit it to change
+- copy an example YAML file into each experiment folder, then edit it to change
   species, temperature, or replicate settings
 - rerun the workflow for a new experiment name
 - inspect `community_measures.RDS`, `experiment_log.txt`, `dynamics.db`, and

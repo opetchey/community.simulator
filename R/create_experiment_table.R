@@ -1,20 +1,24 @@
-#' This function takes the experimental design from the specified JSON experiment design file and creates a table of all the simulations that will be run.
+#' Legacy JSON experiment-table builder
+#'
+#' This internal helper creates an experiment table from the old JSON
+#' experiment format. New user-facing workflows should use
+#' [create_experiment_table_from_spec()] through [run_experiment()].
 #'
 #' @param experiment_folder Folder where the experiment data will be saved
 #' @param experiment_design_filename Name of the experiment definition file
 #' @param overwrite Logical. If `TRUE`, overwrite an existing experiment table.
 #' @param verbose Logical. If `TRUE`, print messages about written outputs.
 #'
-#' @details LV experiment definitions can use the preferred
+#' @details LV experiment definitions can use the
 #'   `interaction_treatments`
 #'   field to specify one or more named interaction treatments. Each treatment
 #'   can set `type`, `symmetry`, `distribution`, `parameters`, and `diagonal`.
-#'   Legacy `lv_interactions` and `alpha_ij_*` fields are still supported and
-#'   are converted to interaction specifications internally.
+#'   Older `lv_interactions` and `alpha_ij_*` fields are converted to
+#'   interaction specifications internally.
 #'
 #' @return Returns the number of cases in the experiment. Also saves to RDS the experiment design, for later use.
 #' @importFrom rlang .data
-#' @export
+#' @keywords internal
 #'
 #' @examples NULL
 create_experiment_table <- function(experiment_folder,

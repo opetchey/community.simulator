@@ -167,7 +167,10 @@ simulate_one_dynamics_case <- function(i,
   burn_in_temps <- tibble::tibble(
     phase = rep("burn_in", expt_def$burn_in_duration),
     time = 1:expt_def$burn_in_duration,
-    temperature = rep(expt_def$temperature_mean, expt_def$burn_in_duration),
+    temperature = rep(
+      expt$temperature_mean[i] %||% expt_def$temperature_mean,
+      expt_def$burn_in_duration
+    ),
     env_series_id = rep(env_series_oi, expt_def$burn_in_duration)
   )
   temperature_series <- dplyr::bind_rows(burn_in_temps, temperatures_oi)
@@ -302,18 +305,20 @@ simulate_one_dynamics_case <- function(i,
   )
 }
 
-#' Simulate the dynamics of all the cases in an experiment
-#' Unfortunately at the moment has features of temperature series hard coded in
+#' Legacy JSON dynamics simulator
+#'
+#' This internal helper simulates cases for the old JSON experiment format. New
+#' user-facing workflows should use [simulate_dynamics_from_spec()] through
+#' [run_experiment()].
 #'
 #' @param experiment_folder The folder where all information about the experiment is stored
 #' @param experiment_design_filename The filename of the experiment design file
 #' @param overwrite Logical. If `TRUE`, overwrite an existing dynamics database.
 #' @param verbose Logical. If `TRUE`, print progress and output messages.
 #'
-#' @details Experiment JSON files can set `model_type` to `"lv_discrete"`,
-#'   `"lv_continuous"`, or `"consumer_resource_continuous"`. Legacy
-#'   `dynamics_type` values are still accepted as aliases. Experiment JSON files
-#'   can also optionally include
+#' @details Old experiment JSON files can set `model_type` to `"lv_discrete"`,
+#'   `"lv_continuous"`, or `"consumer_resource_continuous"`. They can also
+#'   optionally include
 #'   `parallel_simulations`, `parallel_workers`, and
 #'   `initial_abundance_seed_base`. They can also include output-control options:
 #'   `save_dynamics`, `save_resources`, `dynamics_save_every`, and
@@ -333,7 +338,7 @@ simulate_one_dynamics_case <- function(i,
 #' @return Returns nothing. Always saves compact `simulation_summaries.RDS` and
 #'   `population_summaries.RDS`; optionally saves SQLite dynamics/resources
 #'   databases depending on output-control settings.
-#' @export
+#' @keywords internal
 #'
 #' @examples NULL
 simulate_dynamics <- function(experiment_folder,

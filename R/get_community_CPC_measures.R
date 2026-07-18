@@ -135,7 +135,12 @@ get_community_CPC_measures <- function(temperatures,
       dplyr::select(c("case_id", "species_id", "igr_info", "time"))
 
     suppressMessages(
-      dplyr::full_join(species_pars2_naive, species_pars2_info)
+      dplyr::full_join(
+        species_pars2_naive,
+        species_pars2_info,
+        by = c("case_id", "species_id", "time"),
+        relationship = "many-to-many"
+      )
     )
   }
 
@@ -186,7 +191,12 @@ get_community_CPC_measures <- function(temperatures,
       dplyr::select("case_id", "species_id", "temperatures", "time", "igr_naive", "temp")
 
     suppressMessages(
-      dplyr::full_join(naive_performance, info_performance)
+      dplyr::full_join(
+        naive_performance,
+        info_performance,
+        by = c("case_id", "species_id", "time"),
+        relationship = "many-to-many"
+      )
     )
   }
 

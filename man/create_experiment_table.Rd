@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_experiment_table.R
 \name{create_experiment_table}
 \alias{create_experiment_table}
-\title{This function takes the experimental design from the specified JSON experiment design file and creates a table of all the simulations that will be run.}
+\title{Legacy JSON experiment-table builder}
 \usage{
 create_experiment_table(
   experiment_folder,
@@ -24,16 +24,19 @@ create_experiment_table(
 Returns the number of cases in the experiment. Also saves to RDS the experiment design, for later use.
 }
 \description{
-This function takes the experimental design from the specified JSON experiment design file and creates a table of all the simulations that will be run.
+This internal helper creates an experiment table from the old JSON
+experiment format. New user-facing workflows should use
+\code{\link[=create_experiment_table_from_spec]{create_experiment_table_from_spec()}} through \code{\link[=run_experiment]{run_experiment()}}.
 }
 \details{
-LV experiment definitions can use the preferred
+LV experiment definitions can use the
 \code{interaction_treatments}
 field to specify one or more named interaction treatments. Each treatment
 can set \code{type}, \code{symmetry}, \code{distribution}, \code{parameters}, and \code{diagonal}.
-Legacy \code{lv_interactions} and \verb{alpha_ij_*} fields are still supported and
-are converted to interaction specifications internally.
+Older \code{lv_interactions} and \verb{alpha_ij_*} fields are converted to
+interaction specifications internally.
 }
 \examples{
 NULL
 }
+\keyword{internal}

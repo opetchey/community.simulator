@@ -23,29 +23,6 @@ format_duration <- function(seconds) {
   paste0(round(seconds / 3600, 1), " hr")
 }
 
-get_json_design_value <- function(expt_def, name, default, aliases = character()) {
-  candidates <- c(name, aliases)
-  selected <- candidates[vapply(candidates, function(candidate) {
-    !is.null(expt_def[[candidate]]) && length(expt_def[[candidate]]) > 0
-  }, logical(1))]
-  if (length(selected) == 0) {
-    return(default)
-  }
-
-  value <- expt_def[[selected[[1]]]]
-  if (is.null(value) || length(value) == 0) {
-    return(default)
-  }
-  value <- value[[1]]
-  if (is.character(value)) {
-    parsed_value <- try(eval(parse(text = value)), silent = TRUE)
-    if (!inherits(parsed_value, "try-error")) {
-      return(parsed_value)
-    }
-  }
-  value
-}
-
 runtime_estimator_rates <- function(dynamics_type) {
   switch(
     dynamics_type,
@@ -73,168 +50,6 @@ runtime_estimator_rates <- function(dynamics_type) {
       experiment_table_seconds_per_case = 0.003,
       experiment_table_fixed_seconds = 0.25
     )
-  )
-}
-
-estimate_experiment_outputs <- function(experiment_folder, experiment_design_filename) {
-  expt <- readRDS(file.path(experiment_folder, "experiment_table.RDS"))
-  expt_def <- jsonlite::fromJSON(file.path(experiment_folder, experiment_design_filename))
-
-  burn_in_duration <- as.integer(get_json_design_value(expt_def, "burn_in_duration", 0))
-  experiment_duration <- as.integer(get_json_design_value(expt_def, "experiment_duration", 0))
-  dynamics_save_every <- as.integer(get_json_design_value(expt_def, "dynamics_save_every", 1))
-  if (is.na(dynamics_save_every) || dynamics_save_every < 1) {
-    dynamics_save_every <- 1L
-  }
-  resources_save_every <- as.integer(get_json_design_value(expt_def, "resources_save_every", dynamics_save_every))
-  if (is.na(resources_save_every) || resources_save_every < 1) {
-    resources_save_every <- dynamics_save_every
-  }
-  save_dynamics <- isTRUE(get_json_design_value(expt_def, "save_dynamics", TRUE))
-  save_resources <- isTRUE(get_json_design_value(expt_def, "save_resources", TRUE))
-  summary_checkpoint_every <- as.integer(get_json_design_value(expt_def, "summary_checkpoint_every", 1))
-  if (is.na(summary_checkpoint_every) || summary_checkpoint_every < 1) {
-    summary_checkpoint_every <- 1L
-  }
-  runtime_update_every <- as.integer(get_json_design_value(
-    expt_def,
-    "runtime_update_every",
-    max(1L, floor(nrow(expt) / 100))
-  ))
-  if (is.na(runtime_update_every) || runtime_update_every < 1) {
-    runtime_update_every <- 1L
-  }
-  dynamics_type <- normalize_model_type(get_json_design_value(
-    expt_def,
-    "model_type",
-    "lv_discrete",
-    aliases = "dynamics_type"
-  ))
-  parallel_simulations <- isTRUE(get_json_design_value(expt_def, "parallel_simulations", FALSE))
-  parallel_environments <- isTRUE(get_json_design_value(
-    expt_def,
-    "parallel_environments",
-    parallel_simulations
-  ))
-  parallel_workers <- as.integer(get_json_design_value(
-    expt_def,
-    "parallel_workers",
-    max(1, parallel::detectCores(logical = FALSE) - 1)
-  ))
-  if (is.na(parallel_workers)) {
-    parallel_workers <- 1L
-  }
-  parallel_workers <- max(1L, min(parallel_workers, nrow(expt)))
-  parallel_community_measures <- isTRUE(get_json_design_value(
-    expt_def,
-    "parallel_community_measures",
-    parallel_simulations
-  ))
-
-  integration_steps <- burn_in_duration + experiment_duration + 1L
-  output_times <- seq_len(integration_steps)
-  output_times <- output_times[
-    ((output_times - 1L) %% dynamics_save_every) == 0L |
-      output_times == max(output_times)
-  ]
-  saved_time_points <- sum(output_times > burn_in_duration)
-
-  species_per_case <- vapply(expt$community_object, function(x) x$S, numeric(1))
-  resource_per_case <- vapply(expt$community_object, function(x) {
-    if (is.null(x$R)) {
-      return(0)
-    }
-    x$R
-  }, numeric(1))
-
-  resource_output_times <- seq_len(integration_steps)
-  resource_output_times <- resource_output_times[
-    ((resource_output_times - 1L) %% resources_save_every) == 0L |
-      resource_output_times == max(resource_output_times)
-  ]
-  saved_resource_time_points <- sum(resource_output_times > burn_in_duration)
-
-  dynamics_rows <- if (save_dynamics) {
-    saved_time_points * sum(species_per_case)
-  } else {
-    0
-  }
-  resource_rows <- if (save_resources && dynamics_type == "consumer_resource_continuous") {
-    saved_resource_time_points * sum(resource_per_case)
-  } else {
-    0
-  }
-
-  env_series_count <- dplyr::n_distinct(expt$env_series_id)
-  temperature_rows <- env_series_count * (experiment_duration + 1L)
-
-  estimated_dynamics_db_bytes <- dynamics_rows * 45
-  estimated_resources_db_bytes <- resource_rows * 45
-  estimated_temperatures_db_bytes <- temperature_rows * 55
-  estimated_total_db_bytes <- estimated_dynamics_db_bytes +
-    estimated_resources_db_bytes +
-    estimated_temperatures_db_bytes
-
-  rates <- runtime_estimator_rates(dynamics_type)
-  reference_parallel_workers <- 29
-  effective_workers <- if (parallel_simulations) parallel_workers else 1L
-  estimated_experiment_table_seconds <- max(
-    rates$experiment_table_fixed_seconds,
-    nrow(expt) * rates$experiment_table_seconds_per_case
-  )
-  effective_environment_workers <- if (parallel_environments) {
-    max(1L, min(parallel_workers, env_series_count))
-  } else {
-    1L
-  }
-  estimated_environment_seconds <- 0.5 +
-    temperature_rows * 0.00029 / effective_environment_workers
-  estimated_simulation_seconds <- (
-    nrow(expt) *
-      integration_steps *
-      rates$simulation_seconds_per_case_step *
-      reference_parallel_workers
-  ) / effective_workers
-  community_measure_parallel_efficiency <- 0.5
-  effective_community_measure_workers <- if (parallel_community_measures) {
-    max(1, min(parallel_workers, nrow(expt)) * community_measure_parallel_efficiency)
-  } else {
-    1
-  }
-  estimated_community_measure_seconds <- (
-    nrow(expt) * rates$community_measure_seconds_per_case
-  ) / effective_community_measure_workers
-  estimated_io_seconds <- (dynamics_rows + resource_rows) * 0.00001
-  estimated_total_seconds <- estimated_experiment_table_seconds +
-    estimated_environment_seconds +
-    estimated_simulation_seconds +
-    estimated_community_measure_seconds +
-    estimated_io_seconds
-
-  list(
-    n_cases = nrow(expt),
-    dynamics_type = dynamics_type,
-    integration_steps = integration_steps,
-    saved_time_points = saved_time_points,
-    saved_resource_time_points = saved_resource_time_points,
-    dynamics_save_every = dynamics_save_every,
-    resources_save_every = resources_save_every,
-    summary_checkpoint_every = summary_checkpoint_every,
-    runtime_update_every = runtime_update_every,
-    save_dynamics = save_dynamics,
-    save_resources = save_resources && dynamics_type == "consumer_resource_continuous",
-    dynamics_rows = dynamics_rows,
-    resource_rows = resource_rows,
-    temperature_rows = temperature_rows,
-    parallel_environments = parallel_environments,
-    parallel_simulations = parallel_simulations,
-    parallel_community_measures = parallel_community_measures,
-    parallel_workers = parallel_workers,
-    estimated_dynamics_db_bytes = estimated_dynamics_db_bytes,
-    estimated_resources_db_bytes = estimated_resources_db_bytes,
-    estimated_temperatures_db_bytes = estimated_temperatures_db_bytes,
-    estimated_total_db_bytes = estimated_total_db_bytes,
-    estimated_total_seconds = estimated_total_seconds
   )
 }
 
@@ -307,7 +122,7 @@ append_experiment_log_entry <- function(log_path, event, fields = list()) {
 
 read_experiment_specification_for_log <- function(design_path) {
   parsed <- try(
-    jsonlite::fromJSON(design_path, simplifyVector = FALSE),
+    yaml::read_yaml(design_path),
     silent = TRUE
   )
   if (!inherits(parsed, "try-error")) {
@@ -355,7 +170,7 @@ initialise_experiment_log <- function(log_path,
     "experiment_specification",
     c(
       list(
-        message = "Experiment specification read from the design JSON file.",
+        message = "Experiment specification read from the design YAML file.",
         experiment_design_filename = experiment_design_filename
       ),
       read_experiment_specification_for_log(design_path)
@@ -415,18 +230,131 @@ run_logged_experiment_step <- function(step_name, log_path, code) {
   stop(conditionMessage(error), call. = FALSE)
 }
 
+estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
+  expt <- readRDS(file.path(experiment_folder, "experiment_table.RDS"))
+  settings <- flatten_spec_settings(spec)
+
+  integration_steps <- settings$burn_in_duration + settings$experiment_duration + 1L
+  output_times <- seq_len(integration_steps)
+  output_times <- output_times[
+    ((output_times - 1L) %% settings$dynamics_save_every) == 0L |
+      output_times == max(output_times)
+  ]
+  saved_time_points <- sum(output_times > settings$burn_in_duration)
+
+  species_per_case <- vapply(expt$community_object, function(x) x$S, numeric(1))
+  resource_per_case <- vapply(expt$community_object, function(x) {
+    if (is.null(x$R)) {
+      return(0)
+    }
+    x$R
+  }, numeric(1))
+
+  resource_output_times <- seq_len(integration_steps)
+  resource_output_times <- resource_output_times[
+    ((resource_output_times - 1L) %% settings$resources_save_every) == 0L |
+      resource_output_times == max(resource_output_times)
+  ]
+  saved_resource_time_points <- sum(resource_output_times > settings$burn_in_duration)
+
+  save_resources <- settings$save_resources &&
+    settings$dynamics_type == "consumer_resource_continuous"
+  dynamics_rows <- if (settings$save_dynamics) {
+    saved_time_points * sum(species_per_case)
+  } else {
+    0
+  }
+  resource_rows <- if (save_resources) {
+    saved_resource_time_points * sum(resource_per_case)
+  } else {
+    0
+  }
+
+  env_series_count <- dplyr::n_distinct(expt$env_series_id)
+  temperature_rows <- env_series_count * (settings$experiment_duration + 1L)
+
+  estimated_dynamics_db_bytes <- dynamics_rows * 45
+  estimated_resources_db_bytes <- resource_rows * 45
+  estimated_temperatures_db_bytes <- temperature_rows * 55
+  estimated_total_db_bytes <- estimated_dynamics_db_bytes +
+    estimated_resources_db_bytes +
+    estimated_temperatures_db_bytes
+
+  rates <- runtime_estimator_rates(settings$dynamics_type)
+  effective_workers <- if (settings$parallel_simulations) settings$parallel_workers else 1L
+  estimated_experiment_table_seconds <- max(
+    rates$experiment_table_fixed_seconds,
+    nrow(expt) * rates$experiment_table_seconds_per_case
+  )
+  effective_environment_workers <- if (settings$parallel_environments) {
+    max(1L, min(settings$parallel_workers, env_series_count))
+  } else {
+    1L
+  }
+  estimated_environment_seconds <- 0.5 +
+    temperature_rows * 0.00029 / effective_environment_workers
+  reference_parallel_workers <- 29
+  estimated_simulation_seconds <- (
+    nrow(expt) *
+      integration_steps *
+      rates$simulation_seconds_per_case_step *
+      reference_parallel_workers
+  ) / effective_workers
+  effective_community_measure_workers <- if (settings$parallel_community_measures) {
+    max(1, min(settings$parallel_workers, nrow(expt)) * 0.5)
+  } else {
+    1
+  }
+  estimated_community_measure_seconds <- (
+    nrow(expt) * rates$community_measure_seconds_per_case
+  ) / effective_community_measure_workers
+  estimated_io_seconds <- (dynamics_rows + resource_rows) * 0.00001
+  estimated_total_seconds <- estimated_experiment_table_seconds +
+    estimated_environment_seconds +
+    estimated_simulation_seconds +
+    estimated_community_measure_seconds +
+    estimated_io_seconds
+
+  list(
+    n_cases = nrow(expt),
+    dynamics_type = settings$dynamics_type,
+    integration_steps = integration_steps,
+    saved_time_points = saved_time_points,
+    saved_resource_time_points = saved_resource_time_points,
+    dynamics_save_every = settings$dynamics_save_every,
+    resources_save_every = settings$resources_save_every,
+    summary_checkpoint_every = settings$summary_checkpoint_every,
+    runtime_update_every = settings$runtime_update_every,
+    save_dynamics = settings$save_dynamics,
+    save_resources = save_resources,
+    dynamics_rows = dynamics_rows,
+    resource_rows = resource_rows,
+    temperature_rows = temperature_rows,
+    parallel_environments = settings$parallel_environments,
+    parallel_simulations = settings$parallel_simulations,
+    parallel_community_measures = settings$parallel_community_measures,
+    parallel_workers = settings$parallel_workers,
+    estimated_dynamics_db_bytes = estimated_dynamics_db_bytes,
+    estimated_resources_db_bytes = estimated_resources_db_bytes,
+    estimated_temperatures_db_bytes = estimated_temperatures_db_bytes,
+    estimated_total_db_bytes = estimated_total_db_bytes,
+    estimated_total_seconds = estimated_total_seconds
+  )
+}
+
 #' Run a complete experiment workflow
 #'
-#' This is a convenience wrapper for the standard experiment workflow. It
-#' creates the experiment folder, builds the experiment table, generates
-#' environmental time series, simulates dynamics, and calculates community-level
-#' summary measures.
+#' This is the standard YAML experiment workflow. It creates or locates the
+#' experiment folder, reads the YAML experiment specification from that folder,
+#' builds the canonical experiment table, generates environmental time series,
+#' simulates dynamics, and calculates community-level summary measures.
 #'
 #' @param experiment_folder_location Location where the experiment folder should
 #'   be created.
 #' @param experiment_name Name of the experiment folder.
 #' @param experiment_design_filename Name of the experiment definition file.
-#'   This file must already be present inside the experiment folder.
+#'   This must be a `.yaml` or `.yml` file already present inside the experiment
+#'   folder.
 #' @param overwrite Logical. If `TRUE`, overwrite existing workflow outputs.
 #' @param verbose Logical. If `TRUE`, print progress messages during the
 #'   workflow.
@@ -435,18 +363,12 @@ run_logged_experiment_step <- function(step_name, log_path, code) {
 #'   `interactive()`.
 #'
 #' @details The preflight summary estimates output rows, database sizes, and
-#'   runtime from the experiment table and design settings, including output
-#'   controls such as `save_dynamics`, `save_resources`,
-#'   `dynamics_save_every`, `resources_save_every`,
-#'   `summary_checkpoint_every`, and `runtime_update_every`. Confirmation
-#'   happens before environment generation, dynamics simulation, and analysis.
-#'   These estimates are intended as rough guidance before launching large
-#'   experiments. Compact simulation summaries are checkpointed during
-#'   simulation and are used to calculate `community_measures.RDS` even when
-#'   `save_dynamics = FALSE`. Each run also writes `experiment_log.txt`, a
-#'   plain-text newline-delimited JSON log containing the experiment
-#'   specification, preflight summary, output paths, workflow status, and elapsed
-#'   time for each workflow step.
+#'   total runtime from the canonical experiment table and YAML settings.
+#'   Confirmation happens before environment generation, dynamics simulation,
+#'   and analysis. Each run also writes `experiment_log.txt`, a plain-text
+#'   newline-delimited JSON log containing the parsed YAML specification,
+#'   preflight summary, output paths, workflow status, and elapsed time for each
+#'   workflow step.
 #'
 #' @return Invisibly returns a named list containing the experiment folder and
 #'   the main output file paths.
@@ -474,11 +396,18 @@ run_experiment <- function(experiment_folder_location,
     stop(
       paste0(
         "Experiment design file not found: ", design_path,
-        "\nCopy the JSON file into the experiment folder before calling run_experiment()."
+        "\nCopy the YAML file into the experiment folder before calling run_experiment()."
       ),
       call. = FALSE
     )
   }
+  if (!tolower(tools::file_ext(design_path)) %in% c("yaml", "yml")) {
+    stop(
+      "`experiment_design_filename` must point to a `.yaml` or `.yml` file.",
+      call. = FALSE
+    )
+  }
+  spec <- read_experiment_spec(design_path)
 
   experiment_log <- file.path(experiment_folder, "experiment_log.txt")
   initialise_experiment_log(
@@ -498,9 +427,9 @@ run_experiment <- function(experiment_folder_location,
       message("Creating experiment table")
     }
     run_logged_experiment_step("create_experiment_table", experiment_log, {
-      create_experiment_table(
-        experiment_folder,
-        experiment_design_filename,
+      create_experiment_table_from_spec(
+        spec,
+        output_path = file.path(experiment_folder, "experiment_table.RDS"),
         overwrite = overwrite,
         verbose = verbose
       )
@@ -510,9 +439,9 @@ run_experiment <- function(experiment_folder_location,
       "estimate_experiment_outputs",
       experiment_log,
       {
-        estimate_experiment_outputs(
+        estimate_experiment_outputs_from_spec(
           experiment_folder,
-          experiment_design_filename
+          spec
         )
       }
     )
@@ -541,9 +470,9 @@ run_experiment <- function(experiment_folder_location,
       message("Creating environments")
     }
     run_logged_experiment_step("create_environments", experiment_log, {
-      create_environments(
+      create_environments_from_spec(
         experiment_folder,
-        experiment_design_filename,
+        spec,
         overwrite = overwrite,
         verbose = verbose
       )
@@ -553,9 +482,9 @@ run_experiment <- function(experiment_folder_location,
       message("Simulating dynamics")
     }
     run_logged_experiment_step("simulate_dynamics", experiment_log, {
-      simulate_dynamics(
+      simulate_dynamics_from_spec(
         experiment_folder,
-        experiment_design_filename,
+        spec,
         overwrite = overwrite,
         verbose = verbose
       )
@@ -565,9 +494,9 @@ run_experiment <- function(experiment_folder_location,
       message("Calculating community measures")
     }
     run_logged_experiment_step("get_community_measures", experiment_log, {
-      get_community_measures(
+      get_community_measures_from_spec(
         experiment_folder,
-        experiment_design_filename,
+        spec,
         overwrite = overwrite,
         verbose = verbose
       )

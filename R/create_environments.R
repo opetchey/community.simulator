@@ -30,21 +30,18 @@ create_one_environment <- function(i, environments, expt_def) {
     dplyr::filter(time > expt_def$burn_in_duration)
 }
 
-#' Create temperature time series.
+#' Legacy JSON temperature time-series creator
 #'
-#' Environmental series sharing is controlled in the experiment table by the
-#' JSON field `environment_sharing`. With `"same_per_replicate"`, cases with
-#' the same environment treatment and replicate number share an environmental
-#' time series. With `"all_different"`, each simulation case gets its own
-#' environmental time series. The legacy field `temperature_series_control` is
-#' still accepted as an alias.
+#' This internal helper creates temperature time series for the old JSON
+#' experiment format. New user-facing workflows should use
+#' [create_environments_from_spec()] through [run_experiment()].
 #'
 #' @param experiment_folder The folder where all information about the experiment is stored
 #' @param experiment_design_filename The filename of the experiment design file
 #' @param overwrite Logical. If `TRUE`, overwrite an existing temperatures database.
 #' @param verbose Logical. If `TRUE`, print messages about written outputs.
 #'
-#' @details Experiment JSON files can optionally include
+#' @details Old experiment JSON files can optionally include
 #'   `parallel_environments`, `parallel_simulations`, `parallel_workers`,
 #'   `environment_progress`, and `runtime_update_every`. When
 #'   `parallel_environments` evaluates to `TRUE`, or when it is absent and
@@ -53,7 +50,7 @@ create_one_environment <- function(i, environments, expt_def) {
 #'   parent process. Parallel processing is intended for macOS/Linux.
 #'
 #' @return Returns nothing. Saves to SQLite databases the temperature time series.
-#' @export
+#' @keywords internal
 #'
 #' @examples NULL
 create_environments <- function(experiment_folder,

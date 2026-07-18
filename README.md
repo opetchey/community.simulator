@@ -97,9 +97,9 @@ Start here in this order:
 4. Try the Shiny simulation explorer with `run_simulation_explorer()` if you
    want to build one community, inspect its structure, and simulate it
    interactively.
-5. View the provided JSON experiment
-   definitions in [inst/test_experiments](inst/test_experiments) and run larger
-   experiments.
+5. View the provided YAML experiment templates in
+   [inst/experiment_templates](inst/experiment_templates), copy one into an
+   experiment folder, and run larger experiments with `run_experiment()`.
 6. Use the
    [User Guide](https://opetchey.github.io/community.simulator/articles/User_guide.html)
    as a reference. Some sections still need polish, so treat it as the
@@ -148,11 +148,11 @@ browseVignettes("community.simulator")
 
 ## Developer Note
 
-Some user-facing JSON parameter names have been renamed to be clearer for
-reviewers and users. These changes preserve backwards compatibility through
-aliases, so older experiment-definition files should continue to work.
+The main experiment path is now the YAML specification read by
+`run_experiment()`. The 0.8.0 release preserved backwards compatibility for
+older names and JSON-era workflows; this rewrite intentionally makes the
+clearer YAML schema the user-facing interface.
 
-As a result, internal parameter names, function arguments, and output-column
-names may differ from the preferred user-facing JSON names. When changing the
-experiment schema, please preserve existing aliases unless there is a deliberate
-reason to make a breaking change.
+Some internal parameter names, function arguments, and output-column names may
+still differ from the preferred YAML names while the implementation is being
+cleaned up.
