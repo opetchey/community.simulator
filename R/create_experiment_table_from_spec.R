@@ -176,7 +176,7 @@ expand_factorial_treatments <- function(values) {
   validate_treatment_values_mapping(values)
   value_grid <- expand.grid(values, KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE)
   lapply(seq_len(nrow(value_grid)), function(i) {
-    as.list(value_grid[i, , drop = FALSE])
+    simplify_treatment_row(as.list(value_grid[i, , drop = FALSE]))
   })
 }
 
@@ -187,8 +187,22 @@ expand_paired_treatments <- function(values) {
   lapply(seq_along(values), function(i) {
     row <- values[[i]]
     validate_treatment_values_mapping(row, label = paste0("treatments.values[[", i, "]]"))
-    row
+    simplify_treatment_row(row)
   })
+}
+
+simplify_treatment_row <- function(row) {
+  lapply(row, simplify_treatment_value)
+}
+
+simplify_treatment_value <- function(value) {
+  if (is.factor(value)) {
+    value <- as.character(value)
+  }
+  if (is.list(value) && length(value) == 1 && !is.list(value[[1]])) {
+    return(value[[1]])
+  }
+  value
 }
 
 validate_treatment_values_mapping <- function(values, label = "treatments.values") {

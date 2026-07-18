@@ -10,5 +10,7 @@
 ^\.\.Rcheck$
 ^.*\.Rcheck$
 ^from before$
+^publication_experiments 20260718$
+^publication_experiments_yaml_20260718$
 ^LICENSE\.md$
 ^TODO\.md$

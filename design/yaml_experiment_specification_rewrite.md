@@ -445,3 +445,9 @@ Keep this section updated as the rewrite proceeds.
   grouping reference topics around the current public API.
 - Added dedicated pkgdown articles for YAML experiment templates and the Shiny
   simulation explorer, including links to the rich YAML examples.
+- Added a converted `publication_experiments_yaml_20260718` folder containing
+  YAML versions of the six active publication experiment specifications,
+  a runnable `run_all.R` script with Codex-branch install instructions, and an
+  updated stability/CPC report source for the new output names.
+- Fixed factorial treatment expansion so scalar values read from YAML sequences
+  are unboxed before applying dotted-path overrides.

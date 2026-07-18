@@ -14,3 +14,5 @@ inst/doc
 *.Rcheck/
 ..Rcheck/
 *.tar.gz
+publication_experiments 20260718/
+publication_experiments_yaml_20260718/

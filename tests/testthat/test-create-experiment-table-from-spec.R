@@ -42,6 +42,27 @@ test_that("factorial treatments are the default", {
   )
 })
 
+test_that("factorial YAML sequence values are unboxed to scalars", {
+  spec <- read_experiment_spec(system.file(
+    "experiment_templates/consumer_resource.yaml",
+    package = "community.simulator"
+  ))
+  spec$resources$private_use$distribution <- "constant"
+  spec$resources$private_use$range <- 0
+  spec$treatments <- list(
+    values = list(
+      "resources.private_use.mean" = list(0, 0.25, 0.5, 0.75, 1)
+    )
+  )
+  table <- create_experiment_table_from_spec(spec)
+
+  expect_equal(nrow(table), 5)
+  expect_equal(
+    vapply(table$case_spec, function(x) x$resources$private_use$mean, numeric(1)),
+    c(0, 0.25, 0.5, 0.75, 1)
+  )
+})
+
 test_that("paired treatments expand exactly supplied rows", {
   spec <- read_experiment_spec(system.file(
     "experiment_templates/consumer_resource.yaml",
