@@ -74,3 +74,22 @@ test_that("all YAML model templates run end to end", {
     expect_gt(nrow(readRDS(outputs$community_measures)), 0)
   }
 })
+
+test_that("progress reporter prints sparse elapsed-time updates", {
+  reporter <- community.simulator:::make_progress_reporter(
+    label = "Simulating cases",
+    total = 250,
+    update_every = 100,
+    enabled = TRUE
+  )
+
+  expect_silent(reporter(99))
+  expect_message(
+    reporter(100),
+    "Simulating cases: 100 of 250 .* elapsed: .* estimated remaining:"
+  )
+  expect_message(
+    reporter(250),
+    "Simulating cases: 250 of 250 .* estimated remaining: 0 sec"
+  )
+})

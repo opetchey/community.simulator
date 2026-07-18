@@ -11,6 +11,8 @@
 # @param parallel_workers Number of worker processes to use when
 #   `parallel_community_measures` is `TRUE`.
 # @param verbose Logical. If `TRUE`, print progress messages.
+# @param progress_update_every Number of completed cases between progress
+#   updates.
 #
 # @returns A dataset containing measures of community performance curves, including CV of community performance, synchrony of performance curves, and average CV of species performance curves weighted by their mean contribution to community performance.
 # @keywords internal
@@ -23,7 +25,8 @@ get_community_CPC_measures <- function(temperatures,
                                  soft_viability_scale = 0.01,
                                  parallel_community_measures = FALSE,
                                  parallel_workers = 1,
-                                 verbose = TRUE) {
+                                 verbose = TRUE,
+                                 progress_update_every = 100) {
 
 
 
@@ -325,6 +328,12 @@ get_community_CPC_measures <- function(temperatures,
   }
 
   case_indices <- seq_along(expt$case_id)
+  report_cpc_progress <- make_progress_reporter(
+    label = "Calculating CPC measures",
+    total = length(case_indices),
+    update_every = progress_update_every,
+    enabled = verbose
+  )
 
   if (parallel_community_measures && parallel_workers > 1) {
     if (verbose) {
@@ -387,18 +396,15 @@ get_community_CPC_measures <- function(temperatures,
 
         community_performance_measures[[case_index]] <- case_result
         completed_cases <- completed_cases + 1L
-        if (verbose && completed_cases %% 100 == 0) {
-          message("Processed CPC cases: ", completed_cases, " of ", length(case_indices))
-        }
+        report_cpc_progress(completed_cases)
         active_jobs[[active_name]] <- NULL
       }
     }
   } else {
     community_performance_measures <- lapply(case_indices, function(i) {
-      if (verbose && i %% 100 == 0) {
-        message("Processing CPC case: ", i)
-      }
-      calculate_case_cpc(i)
+      out <- calculate_case_cpc(i)
+      report_cpc_progress(i)
+      out
     })
   }
 

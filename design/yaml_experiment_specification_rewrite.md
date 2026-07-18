@@ -456,3 +456,11 @@ Keep this section updated as the rewrite proceeds.
   seed and generated environment series.
 - Added declarative parallel worker settings: `available_cores`,
   `available_cores_minus_1`, and `auto`.
+- Restored use of `parallel.environments` and `parallel.simulations` in the
+  YAML runner. Forked workers create environments and simulate cases when
+  enabled on macOS/Linux, while database writing remains in the parent process.
+- Updated long-step progress reporting. `output.runtime_update_every` now
+  defaults to 100; environment creation, simulation, and CPC/community
+  performance calculations report sparse progress with elapsed time and
+  estimated remaining time; and these progress updates are controlled by YAML
+  output settings rather than by `run_experiment(verbose = ...)`.

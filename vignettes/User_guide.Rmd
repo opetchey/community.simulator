@@ -623,6 +623,9 @@ the bundled example experiments.
 | `output.resources_save_every` | CR | Interval between saved resource output time points. |
 | `output.save_dynamics` | All | Logical. If `TRUE`, write `dynamics.db`. |
 | `output.save_resources` | CR | Logical. If `TRUE`, write `resources.db`. |
+| `output.runtime_update_every` | All | Number of completed cases between sparse progress updates. Defaults to 100. |
+| `output.environment_progress` | All | Logical. If `TRUE`, print elapsed-time progress while environments are generated. |
+| `output.simulation_progress` | All | Logical. If `TRUE`, print elapsed-time progress while simulations and community-performance measures are calculated. |
 | `treatments.mode` | All | Treatment expansion mode. Defaults to `factorial`; use `paired` for explicit treatment rows. |
 | `treatments.values` | All | Named dotted paths and treatment values to apply to the baseline specification. |
 
@@ -733,9 +736,17 @@ Experiment YAML files can include runtime controls for larger runs:
 - `parallel.community_measures`: calculate community performance curve measures
   in parallel.
 - `parallel.workers`: number of worker processes.
-- `runtime.update_every`: how often progress updates are printed.
-- `runtime.environment_progress`: whether environment-generation progress is
+- `output.runtime_update_every`: how often sparse progress updates are printed;
+  the default is every 100 completed cases.
+- `output.environment_progress`: whether environment-generation progress is
   printed.
+- `output.simulation_progress`: whether simulation and community-performance
+  progress is printed.
+
+Progress updates are separate from the `verbose` argument to `run_experiment()`.
+Setting `verbose = FALSE` suppresses setup and file-writing chatter, but still
+allows the sparse progress updates requested in the YAML. Each progress message
+includes completed cases, elapsed time, and estimated remaining time.
 
 When parallel generation or simulation is enabled, database writing is still
 handled by the parent process. Parallel processing is intended for macOS/Linux.

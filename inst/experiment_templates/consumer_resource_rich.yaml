@@ -68,7 +68,7 @@ output:
   dynamics_save_every: 5
   resources_save_every: 5
   summary_checkpoint_every: 10
-  runtime_update_every: 10
+  runtime_update_every: 100
   simulation_progress: true
   environment_progress: true
 

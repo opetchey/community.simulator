@@ -77,9 +77,9 @@ flatten_spec_settings <- function(spec) {
     save_resources = isTRUE(spec_setting(spec, "output", "save_resources", TRUE)),
     extinction_threshold = numeric_spec_setting(spec_setting(spec, "measures", "extinction_threshold", 1e-8), "measures.extinction_threshold"),
     summary_checkpoint_every = integer_spec_setting(spec_setting(spec, "output", "summary_checkpoint_every", 1), "output.summary_checkpoint_every"),
-    runtime_update_every = integer_spec_setting(spec_setting(spec, "output", "runtime_update_every", 1), "output.runtime_update_every"),
-    simulation_progress = isTRUE(spec_setting(spec, "output", "simulation_progress", FALSE)),
-    environment_progress = isTRUE(spec_setting(spec, "output", "environment_progress", FALSE)),
+    runtime_update_every = integer_spec_setting(spec_setting(spec, "output", "runtime_update_every", 100), "output.runtime_update_every"),
+    simulation_progress = isTRUE(spec_setting(spec, "output", "simulation_progress", TRUE)),
+    environment_progress = isTRUE(spec_setting(spec, "output", "environment_progress", TRUE)),
     parallel_workers = worker_spec_setting(spec_setting(spec, "parallel", "workers", 1), "parallel.workers"),
     parallel_environments = isTRUE(spec_setting(spec, "parallel", "environments", FALSE)),
     parallel_simulations = isTRUE(spec_setting(spec, "parallel", "simulations", FALSE)),
@@ -87,6 +87,135 @@ flatten_spec_settings <- function(spec) {
     initial_abundance_seed_base = spec_setting(spec, "simulation", "initial_abundance_seed_base", NULL),
     soft_viability_scale = numeric_spec_setting(spec_setting(spec, "measures", "soft_viability_scale", 0.01), "measures.soft_viability_scale")
   )
+}
+
+make_progress_reporter <- function(label,
+                                   total,
+                                   update_every = 100,
+                                   enabled = TRUE) {
+  total <- as.integer(total)
+  update_every <- as.integer(update_every)
+  started_at <- Sys.time()
+
+  force(label)
+  force(total)
+  force(update_every)
+  force(enabled)
+
+  function(completed) {
+    completed <- as.integer(completed)
+    if (!isTRUE(enabled) || total < 1L || completed < 1L) {
+      return(invisible(FALSE))
+    }
+    if (completed < total && completed %% update_every != 0L) {
+      return(invisible(FALSE))
+    }
+
+    elapsed_seconds <- as.numeric(difftime(Sys.time(), started_at, units = "secs"))
+    remaining_seconds <- if (completed > 0L) {
+      elapsed_seconds * (total - completed) / completed
+    } else {
+      NA_real_
+    }
+    percent_complete <- round(100 * completed / total, 1)
+    message(
+      label,
+      ": ",
+      completed,
+      " of ",
+      total,
+      " (",
+      percent_complete,
+      "%) | elapsed: ",
+      format_duration(elapsed_seconds),
+      " | estimated remaining: ",
+      format_duration(remaining_seconds)
+    )
+    invisible(TRUE)
+  }
+}
+
+supports_forked_parallel <- function(enabled, workers) {
+  isTRUE(enabled) && workers > 1L && .Platform$OS.type != "windows"
+}
+
+run_indexed_jobs <- function(indices,
+                             workers,
+                             FUN,
+                             progress_reporter,
+                             failure_label,
+                             on_result = NULL,
+                             store_results = TRUE) {
+  pending_cases <- indices
+  active_jobs <- list()
+  out <- vector("list", length(indices))
+  completed_cases <- 0L
+
+  start_job <- function(case_index) {
+    job <- parallel::mcparallel(
+      FUN(case_index),
+      name = as.character(case_index),
+      silent = TRUE
+    )
+    list(case_index = case_index, job = job)
+  }
+
+  while (length(pending_cases) > 0 || length(active_jobs) > 0) {
+    while (length(pending_cases) > 0 && length(active_jobs) < workers) {
+      next_case <- pending_cases[[1]]
+      pending_cases <- pending_cases[-1]
+      active_jobs[[as.character(next_case)]] <- start_job(next_case)
+    }
+
+    job_list <- lapply(active_jobs, `[[`, "job")
+    collected <- parallel::mccollect(job_list, wait = FALSE)
+
+    if (length(collected) == 0) {
+      Sys.sleep(0.1)
+      next
+    }
+
+    for (pid in names(collected)) {
+      if (pid %in% names(active_jobs)) {
+        active_name <- pid
+      } else {
+        active_match <- vapply(
+          active_jobs,
+          function(active_job) as.character(active_job$job$pid) == pid,
+          logical(1)
+        )
+        if (!any(active_match)) {
+          next
+        }
+        active_name <- names(active_jobs)[active_match][[1]]
+      }
+
+      case_index <- active_jobs[[active_name]]$case_index
+      case_result <- collected[[pid]]
+      if (inherits(case_result, "try-error")) {
+        stop(
+          failure_label,
+          " ",
+          case_index,
+          " failed in a parallel worker: ",
+          conditionMessage(attr(case_result, "condition")),
+          call. = FALSE
+        )
+      }
+
+      if (!is.null(on_result)) {
+        on_result(case_index, case_result)
+      }
+      if (isTRUE(store_results)) {
+        out[[case_index]] <- case_result
+      }
+      completed_cases <- completed_cases + 1L
+      progress_reporter(completed_cases)
+      active_jobs[[active_name]] <- NULL
+    }
+  }
+
+  out
 }
 
 #' Create environments from a YAML experiment specification
@@ -156,14 +285,36 @@ create_environments_from_spec <- function(experiment_folder,
   on.exit(DBI::dbDisconnect(conn), add = TRUE)
   table_written <- FALSE
 
-  for (i in seq_len(nrow(environments))) {
-    if (isTRUE(verbose)) {
-      message("Creating environment ", i, " of ", nrow(environments))
-    }
+  report_environment_progress <- make_progress_reporter(
+    label = "Creating environments",
+    total = nrow(environments),
+    update_every = settings$runtime_update_every,
+    enabled = settings$environment_progress
+  )
+  environment_indices <- seq_len(nrow(environments))
+
+  if (supports_forked_parallel(settings$parallel_environments, settings$parallel_workers)) {
+    environment_series <- run_indexed_jobs(
+      indices = environment_indices,
+      workers = min(settings$parallel_workers, length(environment_indices)),
+      FUN = create_environment,
+      progress_reporter = report_environment_progress,
+      failure_label = "Environment",
+      store_results = TRUE
+    )
+  } else {
+    environment_series <- lapply(environment_indices, function(i) {
+      out <- create_environment(i)
+      report_environment_progress(i)
+      out
+    })
+  }
+
+  for (i in seq_along(environment_series)) {
     DBI::dbWriteTable(
       conn,
       "temperatures",
-      create_environment(i),
+      environment_series[[i]],
       overwrite = !table_written,
       append = table_written
     )
@@ -251,12 +402,15 @@ simulate_dynamics_from_spec <- function(experiment_folder,
   resources_written <- FALSE
   case_summaries <- vector("list", nrow(expt))
   population_summaries <- vector("list", nrow(expt))
+  report_simulation_progress <- make_progress_reporter(
+    label = "Simulating cases",
+    total = nrow(expt),
+    update_every = settings$runtime_update_every,
+    enabled = settings$simulation_progress
+  )
 
-  for (i in seq_len(nrow(expt))) {
-    if (isTRUE(verbose)) {
-      message("Simulating case ", i, " of ", nrow(expt))
-    }
-    case_result <- simulate_one_dynamics_case(
+  simulate_case <- function(i) {
+    simulate_one_dynamics_case(
       i = i,
       expt = expt,
       temperatures_data = temperatures_data,
@@ -281,9 +435,11 @@ simulate_dynamics_from_spec <- function(experiment_folder,
       extinction_threshold = settings$extinction_threshold,
       initial_abundance_seed_base = settings$initial_abundance_seed_base
     )
-    case_summaries[[i]] <- case_result$case_summary
-    population_summaries[[i]] <- case_result$population_summary
+  }
 
+  write_simulation_result <- function(i, case_result) {
+    case_summaries[[i]] <<- case_result$case_summary
+    population_summaries[[i]] <<- case_result$population_summary
     if (!is.null(conn_dynamics) && !is.null(case_result$dynamics)) {
       DBI::dbWriteTable(
         conn_dynamics,
@@ -303,6 +459,24 @@ simulate_dynamics_from_spec <- function(experiment_folder,
         append = resources_written
       )
       resources_written <- TRUE
+    }
+  }
+
+  case_indices <- seq_len(nrow(expt))
+  if (supports_forked_parallel(settings$parallel_simulations, settings$parallel_workers)) {
+    run_indexed_jobs(
+      indices = case_indices,
+      workers = min(settings$parallel_workers, length(case_indices)),
+      FUN = simulate_case,
+      progress_reporter = report_simulation_progress,
+      failure_label = "Simulation case",
+      on_result = write_simulation_result,
+      store_results = FALSE
+    )
+  } else {
+    for (i in case_indices) {
+      write_simulation_result(i, simulate_case(i))
+      report_simulation_progress(i)
     }
   }
 
@@ -359,7 +533,8 @@ get_community_measures_from_spec <- function(experiment_folder,
     soft_viability_scale = settings$soft_viability_scale,
     parallel_community_measures = settings$parallel_community_measures,
     parallel_workers = settings$parallel_workers,
-    verbose = verbose
+    verbose = settings$simulation_progress,
+    progress_update_every = settings$runtime_update_every
   )
 
   comm_measures <- expt |>

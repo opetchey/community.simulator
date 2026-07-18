@@ -356,8 +356,10 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
 #'   This must be a `.yaml` or `.yml` file already present inside the experiment
 #'   folder.
 #' @param overwrite Logical. If `TRUE`, overwrite existing workflow outputs.
-#' @param verbose Logical. If `TRUE`, print progress messages during the
-#'   workflow.
+#' @param verbose Logical. If `TRUE`, print setup, output-file, and workflow
+#'   status messages. Sparse progress updates during long-running steps are
+#'   controlled by the YAML `output.*_progress` and
+#'   `output.runtime_update_every` fields.
 #' @param confirm_run Logical. If `TRUE`, show a preflight summary and ask
 #'   whether to continue before creating environments and simulating dynamics. Defaults to
 #'   `interactive()`.

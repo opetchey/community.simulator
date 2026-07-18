@@ -25,8 +25,10 @@ folder.}
 
 \item{overwrite}{Logical. If \code{TRUE}, overwrite existing workflow outputs.}
 
-\item{verbose}{Logical. If \code{TRUE}, print progress messages during the
-workflow.}
+\item{verbose}{Logical. If \code{TRUE}, print setup, output-file, and workflow
+status messages. Sparse progress updates during long-running steps are
+controlled by the YAML \verb{output.*_progress} and
+\code{output.runtime_update_every} fields.}
 
 \item{confirm_run}{Logical. If \code{TRUE}, show a preflight summary and ask
 whether to continue before creating environments and simulating dynamics. Defaults to
