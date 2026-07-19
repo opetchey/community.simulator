@@ -148,14 +148,43 @@ it, please fork the repository and submit a pull request.
 
 ## Installation
 
-Install the package from GitHub:
+Install the package from GitHub with `remotes`:
 
 ```r
 install.packages("remotes")
-remotes::install_github("opetchey/community.simulator",
-                        build_vignettes = TRUE,
-                        dependencies = TRUE,
-                        upgrade = "never")
+```
+
+To install release 0.9.0, the current YAML-first release:
+
+```r
+remotes::install_github(
+  "opetchey/community.simulator@v0.9.0",
+  build_vignettes = TRUE,
+  dependencies = TRUE,
+  upgrade = "never"
+)
+```
+
+To install release 0.8.0, the earlier compatibility-preserving release:
+
+```r
+remotes::install_github(
+  "opetchey/community.simulator@v0.8.0",
+  build_vignettes = TRUE,
+  dependencies = TRUE,
+  upgrade = "never"
+)
+```
+
+To install the latest commit on the main branch:
+
+```r
+remotes::install_github(
+  "opetchey/community.simulator",
+  build_vignettes = TRUE,
+  dependencies = TRUE,
+  upgrade = "never"
+)
 ```
 
 For local development from a cloned repository:
