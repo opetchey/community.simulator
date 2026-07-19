@@ -1,5 +1,35 @@
 # Changelog
 
+## community.simulator 0.9.0
+
+- Made YAML experiment specifications the main workflow for reading,
+  expanding, running, and measuring simulation experiments.
+- Added schema validation, richer YAML examples, and clearer error
+  messages for experiment specifications.
+- Standardised user-facing parameter names across LV and
+  consumer-resource model specifications.
+- Cleaned the community-builder API around
+  [`build_LV_community()`](https://opetchey.github.io/community.simulator/reference/build_community_constructors.md),
+  [`build_CR_community()`](https://opetchey.github.io/community.simulator/reference/build_community_constructors.md),
+  [`build_community_from_spec()`](https://opetchey.github.io/community.simulator/reference/build_community_from_spec.md),
+  [`build_LV_community_from_spec()`](https://opetchey.github.io/community.simulator/reference/build_community_from_spec.md),
+  and
+  [`build_CR_community_from_spec()`](https://opetchey.github.io/community.simulator/reference/build_community_from_spec.md).
+- Renamed the discrete-time LV simulator to
+  [`simulator_lv_discrete()`](https://opetchey.github.io/community.simulator/reference/simulator_lv_discrete.md).
+- Made discrete-time LV immigration rate an explicit required YAML
+  simulation parameter.
+- Improved experiment progress reporting, runtime estimates, experiment
+  logs, and parallel workflow controls.
+- Added and documented single-community walkthroughs,
+  reviewer/user/developer entry points, richer pkgdown navigation, and
+  the Shiny simulation explorer.
+- Expanded the User Guide with full model equations, symbol definitions,
+  output-measure tables, workflow diagrams, and CR resource-use
+  notation.
+- Cleaned generated documentation and removed obsolete JSON-era helpers
+  and stale documentation artifacts where no longer needed.
+
 ## community.simulator 0.8.0
 
 - Added workflows for discrete-time LV, continuous-time LV, and

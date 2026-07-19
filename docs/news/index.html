@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">community.simulator</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,6 +31,19 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.9.0" id="communitysimulator-090">community.simulator 0.9.0<a class="anchor" aria-label="anchor" href="#communitysimulator-090"></a></h2>
+<ul><li>Made YAML experiment specifications the main workflow for reading, expanding, running, and measuring simulation experiments.</li>
+<li>Added schema validation, richer YAML examples, and clearer error messages for experiment specifications.</li>
+<li>Standardised user-facing parameter names across LV and consumer-resource model specifications.</li>
+<li>Cleaned the community-builder API around <code><a href="../reference/build_community_constructors.html">build_LV_community()</a></code>, <code><a href="../reference/build_community_constructors.html">build_CR_community()</a></code>, <code><a href="../reference/build_community_from_spec.html">build_community_from_spec()</a></code>, <code><a href="../reference/build_community_from_spec.html">build_LV_community_from_spec()</a></code>, and <code><a href="../reference/build_community_from_spec.html">build_CR_community_from_spec()</a></code>.</li>
+<li>Renamed the discrete-time LV simulator to <code><a href="../reference/simulator_lv_discrete.html">simulator_lv_discrete()</a></code>.</li>
+<li>Made discrete-time LV immigration rate an explicit required YAML simulation parameter.</li>
+<li>Improved experiment progress reporting, runtime estimates, experiment logs, and parallel workflow controls.</li>
+<li>Added and documented single-community walkthroughs, reviewer/user/developer entry points, richer pkgdown navigation, and the Shiny simulation explorer.</li>
+<li>Expanded the User Guide with full model equations, symbol definitions, output-measure tables, workflow diagrams, and CR resource-use notation.</li>
+<li>Cleaned generated documentation and removed obsolete JSON-era helpers and stale documentation artifacts where no longer needed.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.8.0" id="communitysimulator-080">community.simulator 0.8.0<a class="anchor" aria-label="anchor" href="#communitysimulator-080"></a></h2>
 <ul><li>Added workflows for discrete-time LV, continuous-time LV, and continuous-time consumer-resource simulations.</li>
 <li>Added experiment logging with step timings, experiment specifications, output paths, and workflow status.</li>
@@ -41,7 +54,8 @@
 <li>Improved user-facing parameter names while preserving backward compatibility with older names.</li>
 </ul><p>Known compatibility note: some output datasets and internal objects still retain older internal parameter names for backward compatibility. A future release will standardise output and reporting names around the user-facing YAML terminology.</p>
 </div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

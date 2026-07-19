@@ -1,6 +1,6 @@
 Package: community.simulator
 Title: Simulate Temperature-Dependent Community Dynamics and Experiments
-Version: 0.8.0
+Version: 0.9.0
 Authors@R: 
     person("Owen L.", "Petchey", , "owen.petchey@uzh.ch", role = c("aut", "cre"))
 Author: Owen L. Petchey [aut, cre]
