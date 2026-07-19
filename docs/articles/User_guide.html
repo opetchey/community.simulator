@@ -149,7 +149,7 @@ table.</p>
 </td>
 </tr>
 <tr class="odd">
-<td>Explore one simulation interactively</td>
+<td>Run a simulation interactively in a ShinyApp</td>
 <td><code><a href="../reference/run_simulation_explorer.html">run_simulation_explorer()</a></code></td>
 </tr>
 <tr class="even">
@@ -354,6 +354,70 @@ d_i(T) = a_{d,i} \exp(z_i T)
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>b</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><msub><mi>d</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">
 r_i(T) = b_i(T) - d_i(T)
 </annotation></semantics></math></p>
+<p>Symbols in these equations are:</p>
+<ul>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>:
+focal species.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>:
+environmental temperature.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>b</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">b_i(T)</annotation></semantics></math>:
+birth rate of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+at temperature
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d_i(T)</annotation></semantics></math>:
+death rate of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+at temperature
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">r_i(T)</annotation></semantics></math>:
+intrinsic growth rate of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+at temperature
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>,
+before the small numerical offset used inside the LV simulators.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mrow><mi>b</mi><mo>,</mo><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">a_{b,i}</annotation></semantics></math>:
+maximum birth rate of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+This is the species-level value drawn from the distribution specified by
+<code>birth_maximum_mean</code>, <code>birth_maximum_range</code>, and
+<code>birth_maximum_distribution</code>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>b</mi><mrow><mrow><mi mathvariant="normal">o</mi><mi mathvariant="normal">p</mi><mi mathvariant="normal">t</mi></mrow><mo>,</mo><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">b_{\mathrm{opt},i}</annotation></semantics></math>:
+thermal optimum of the birth-rate curve for species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+This is drawn from the distribution specified by
+<code>birth_optimum_mean</code>, <code>birth_optimum_range</code>, and
+<code>birth_optimum_distribution</code>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><msub><mi>d</mi><mrow><mrow><mi mathvariant="normal">p</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">f</mi></mrow><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">sd_{\mathrm{perf},i}</annotation></semantics></math>:
+width of the Gaussian birth-rate curve for species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+This is drawn from the distribution specified by
+<code>birth_width_mean</code>, <code>birth_width_range</code>, and
+<code>birth_width_distribution</code>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mrow><mi>d</mi><mo>,</mo><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">a_{d,i}</annotation></semantics></math>:
+death-rate intercept for species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+In current YAML specifications this comes from
+<code>death_intercept</code> and is shared across species.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>z</mi><mi>i</mi></msub><annotation encoding="application/x-tex">z_i</annotation></semantics></math>:
+temperature sensitivity of the death-rate curve for species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+In current YAML specifications this comes from
+<code>death_temperature_slope</code> and is shared across species.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>⋅</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\exp(\cdot)</annotation></semantics></math>:
+the exponential function.</li>
+</ul>
 <p>The width parameter is the standard-deviation scale of the Gaussian
 performance curve. In YAML experiment files, the distribution of LV
 birth-curve widths is controlled by:</p>
@@ -480,19 +544,81 @@ g_i(t) = \tilde{r}_i(T_t)
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>N</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">[</mo><msub><mi>g</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">]</mo><mo>+</mo><mi>I</mi></mrow><annotation encoding="application/x-tex">
 N_i(t + 1) = N_i(t) \exp[g_i(t)] + I
 </annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">N_i(t)</annotation></semantics></math>
-is the abundance of species
+<p>Symbols in these equations are:</p>
+<ul>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>:
+focal species.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>:
+species whose abundance affects species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>:
+discrete time step.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>T</mi><mi>t</mi></msub><annotation encoding="application/x-tex">T_t</annotation></semantics></math>:
+environmental temperature at time step
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">N_i(t)</annotation></semantics></math>:
+abundance of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+at time step
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>j</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">N_j(t)</annotation></semantics></math>:
+abundance of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+at time step
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>b</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>T</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">b_i(T_t)</annotation></semantics></math>:
+temperature-dependent birth rate of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>T</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d_i(T_t)</annotation></semantics></math>:
+temperature-dependent death rate of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>r</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>T</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\tilde{r}_i(T_t)</annotation></semantics></math>:
+net intrinsic growth rate of species
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">\alpha_{ij}</annotation></semantics></math>
-is the LV interaction matrix,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="application/x-tex">I</annotation></semantics></math>
-is <code>simulation.immigration_rate</code>, and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ϵ</mi><mo>=</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>6</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\epsilon = 10^{-6}</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>0.001</mn></mrow><annotation encoding="application/x-tex">\beta = 0.001</annotation></semantics></math>,
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>δ</mi><mo>=</mo><mn>0.001</mn></mrow><annotation encoding="application/x-tex">\delta = 0.001</annotation></semantics></math>
-are fixed internal constants.</p>
+after adding the small fixed offset
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϵ</mi><annotation encoding="application/x-tex">\epsilon</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>K</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>T</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">K_i(T_t)</annotation></semantics></math>:
+temperature-dependent carrying-capacity scaling term for species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">\alpha_{ij}</annotation></semantics></math>:
+LV interaction coefficient describing the effect of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+on species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>g</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">g_i(t)</annotation></semantics></math>:
+per-step exponential growth term for species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="application/x-tex">I</annotation></semantics></math>:
+immigration added to species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+each time step, specified as
+<code>simulation.immigration_rate</code>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϵ</mi><annotation encoding="application/x-tex">\epsilon</annotation></semantics></math>:
+fixed net-growth offset, currently
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mi>−</mi><mn>6</mn></mrow></msup><annotation encoding="application/x-tex">10^{-6}</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>:
+fixed density-dependence scaling constant, currently
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.001</mn><annotation encoding="application/x-tex">0.001</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>:
+fixed density-dependence scaling constant, currently
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.001</mn><annotation encoding="application/x-tex">0.001</annotation></semantics></math>.</li>
+</ul>
 <p>This model is the default when <code>model.type</code> is absent or
 set to <code>"lv_discrete"</code>.</p>
 </div>
@@ -545,14 +671,82 @@ N_i(t)\,
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>K</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>T</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mfrac><mrow><msub><mover><mi>r</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>T</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><mrow><mi>β</mi><mo>+</mo><mi>δ</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">
 K_i(T_t) = \frac{\tilde{r}_i(T_t)}{\beta + \delta}
 </annotation></semantics></math></p>
-<p>For continuous immigration,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="application/x-tex">I</annotation></semantics></math>
-is <code>simulation.immigration_rate</code> per unit time. For pulse
-immigration, the same value is added as a pulse at output times.
-Temperature
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>T</mi><mi>t</mi></msub><annotation encoding="application/x-tex">T_t</annotation></semantics></math>
-is obtained from the generated temperature series using the selected
-<code>simulation.temperature_interpolation</code> method.</p>
+<p>Symbols in these equations are:</p>
+<ul>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>:
+focal species.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>:
+species whose abundance affects species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>:
+continuous simulation time.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>T</mi><mi>t</mi></msub><annotation encoding="application/x-tex">T_t</annotation></semantics></math>:
+environmental temperature at time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
+obtained from the generated temperature series using
+<code>simulation.temperature_interpolation</code>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">N_i(t)</annotation></semantics></math>:
+abundance of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+at time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>j</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">N_j(t)</annotation></semantics></math>:
+abundance of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+at time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><msub><mi>N</mi><mi>i</mi></msub><mi>/</mi><mi>d</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">dN_i/dt</annotation></semantics></math>:
+instantaneous rate of change in abundance for species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>b</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>T</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">b_i(T_t)</annotation></semantics></math>:
+temperature-dependent birth rate of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>d</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>T</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d_i(T_t)</annotation></semantics></math>:
+temperature-dependent death rate of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>r</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>T</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\tilde{r}_i(T_t)</annotation></semantics></math>:
+net intrinsic growth rate of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+after adding the small fixed offset
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϵ</mi><annotation encoding="application/x-tex">\epsilon</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>K</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>T</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">K_i(T_t)</annotation></semantics></math>:
+temperature-dependent carrying-capacity scaling term for species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">\alpha_{ij}</annotation></semantics></math>:
+LV interaction coefficient describing the effect of species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+on species
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="application/x-tex">I</annotation></semantics></math>:
+immigration term. For continuous immigration this is
+<code>simulation.immigration_rate</code> per unit time; for pulse
+immigration the same value is added as a pulse at output times.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϵ</mi><annotation encoding="application/x-tex">\epsilon</annotation></semantics></math>:
+fixed net-growth offset, currently
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mi>−</mi><mn>6</mn></mrow></msup><annotation encoding="application/x-tex">10^{-6}</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>:
+fixed density-dependence scaling constant, currently
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.001</mn><annotation encoding="application/x-tex">0.001</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>:
+fixed density-dependence scaling constant, currently
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.001</mn><annotation encoding="application/x-tex">0.001</annotation></semantics></math>.</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="fixed-numerical-constants-in-the-lv-models">Fixed Numerical Constants In The LV Models<a class="anchor" aria-label="anchor" href="#fixed-numerical-constants-in-the-lv-models"></a>
@@ -658,17 +852,128 @@ N_i(t)
 \rho_j \left(K_{R,j} - R_j(t)\right)
 - \sum_i N_i(t) U_{ij}(T_t, R_j)
 </annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>e</mi><mi>i</mi></msub><annotation encoding="application/x-tex">e_i</annotation></semantics></math>
-is conversion efficiency,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mi>i</mi></msub><annotation encoding="application/x-tex">d_i</annotation></semantics></math>
-is consumer death rate,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ρ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\rho_j</annotation></semantics></math>
-is resource renewal rate,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>K</mi><mrow><mi>R</mi><mo>,</mo><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">K_{R,j}</annotation></semantics></math>
-is resource supply, and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>I</mi><mi>N</mi></msub><annotation encoding="application/x-tex">I_N</annotation></semantics></math>
-is <code>simulation.consumer_immigration_rate</code>.</p>
+<p>Symbols in these equations are:</p>
+<ul>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>:
+focal consumer species.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>:
+focal resource.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>:
+continuous simulation time.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>:
+temperature used to describe a generic uptake curve.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>T</mi><mi>t</mi></msub><annotation encoding="application/x-tex">T_t</annotation></semantics></math>:
+environmental temperature at time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">N_i(t)</annotation></semantics></math>:
+abundance of consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+at time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>j</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">R_j(t)</annotation></semantics></math>:
+concentration of resource
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+at time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><msub><mi>N</mi><mi>i</mi></msub><mi>/</mi><mi>d</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">dN_i/dt</annotation></semantics></math>:
+instantaneous rate of change in abundance for consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><msub><mi>R</mi><mi>j</mi></msub><mi>/</mi><mi>d</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">dR_j/dt</annotation></semantics></math>:
+instantaneous rate of change in concentration for resource
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">u_i(T)</annotation></semantics></math>:
+simplified temperature-dependent uptake curve for consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+shown to introduce the uptake-curve form.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>u</mi><mrow><mrow><mi mathvariant="normal">max</mi><mo>⁡</mo></mrow><mo>,</mo><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">u_{\max,i}</annotation></semantics></math>:
+maximum uptake parameter for the simplified uptake curve of consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>u</mi><mrow><mrow><mi mathvariant="normal">o</mi><mi mathvariant="normal">p</mi><mi mathvariant="normal">t</mi></mrow><mo>,</mo><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">u_{\mathrm{opt},i}</annotation></semantics></math>:
+thermal optimum for the simplified uptake curve of consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><msub><mi>d</mi><mrow><mi>u</mi><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">sd_{u,i}</annotation></semantics></math>:
+thermal width of the simplified uptake curve of consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mrow><mrow><mi mathvariant="normal">max</mi><mo>⁡</mo></mrow><mo>,</mo><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>T</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">u_{\max,ij}(T_t)</annotation></semantics></math>:
+temperature-dependent maximum uptake of resource
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+by consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+at time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mrow><mi>u</mi><mo>,</mo><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">a_{u,ij}</annotation></semantics></math>:
+height, or maximum value, of the uptake curve for consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+on resource
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>u</mi><mrow><mrow><mi mathvariant="normal">o</mi><mi mathvariant="normal">p</mi><mi mathvariant="normal">t</mi></mrow><mo>,</mo><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">u_{\mathrm{opt},ij}</annotation></semantics></math>:
+thermal optimum of the uptake curve for consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+on resource
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><msub><mi>d</mi><mrow><mi>u</mi><mo>,</mo><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">sd_{u,ij}</annotation></semantics></math>:
+thermal width of the uptake curve for consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+on resource
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>U</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>T</mi><mi>t</mi></msub><mo>,</mo><msub><mi>R</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">U_{ij}(T_t, R_j)</annotation></semantics></math>:
+realised per-capita uptake rate of resource
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+by consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+after accounting for temperature and current resource
+concentration.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">q_{ij}</annotation></semantics></math>:
+resource-use matrix entry describing how strongly consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+uses resource
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>h</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">h_{ij}</annotation></semantics></math>:
+Monod half-saturation constant for consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+on resource
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>e</mi><mi>i</mi></msub><annotation encoding="application/x-tex">e_i</annotation></semantics></math>:
+conversion efficiency for consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mi>i</mi></msub><annotation encoding="application/x-tex">d_i</annotation></semantics></math>:
+consumer death rate for consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>I</mi><mi>N</mi></msub><annotation encoding="application/x-tex">I_N</annotation></semantics></math>:
+consumer immigration term, specified as
+<code>simulation.consumer_immigration_rate</code>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ρ</mi><mi>j</mi></msub><annotation encoding="application/x-tex">\rho_j</annotation></semantics></math>:
+renewal rate of resource
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>K</mi><mrow><mi>R</mi><mo>,</mo><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">K_{R,j}</annotation></semantics></math>:
+supply concentration of resource
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.</li>
+</ul>
 <p>The main consumer-resource trait treatments are:</p>
 <ul>
 <li>
@@ -702,18 +1007,43 @@ file to select this model.</p>
 <div class="section level3">
 <h3 id="resource-use-modes">Resource-Use Modes<a class="anchor" aria-label="anchor" href="#resource-use-modes"></a>
 </h3>
-<p>The consumer-resource model supports three resource-use modes:</p>
+<p>The consumer-resource model supports three resource-use modes. These
+modes are different ways of constructing the resource-use matrix
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">q_{ij}</annotation></semantics></math>
+that appears in the CR dynamic model. In the uptake equation above,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">q_{ij}</annotation></semantics></math>
+multiplies the temperature- and resource-dependent uptake rate, so it
+controls how strongly consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+uses resource
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.</p>
 <ul>
 <li>
 <code>"one_resource_all_consumers"</code>: all consumers use one
-active resource.</li>
+active resource. The active resource has
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">q_{ij} = 1</annotation></semantics></math>
+for every consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+and inactive resources have
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">q_{ij} = 0</annotation></semantics></math>.</li>
 <li>
 <code>"diagonal"</code>: each consumer uses its corresponding
-resource.</li>
+resource. The diagonal entries have
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>q</mi><mrow><mi>i</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">q_{ii} = 1</annotation></semantics></math>,
+and off-diagonal entries have
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">q_{ij} = 0</annotation></semantics></math>.</li>
 <li>
 <code>"shared_to_private"</code>: each consumer splits uptake
-between one shared resource and a species-specific private
-resource.</li>
+between one shared resource and a species-specific private resource. If
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>p</mi><mi>i</mi></msub><annotation encoding="application/x-tex">p_i</annotation></semantics></math>
+is the private resource-use fraction for consumer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+then the shared-resource entry has
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mn>1</mn><mo>−</mo><msub><mi>p</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">q_{ij} = 1 - p_i</annotation></semantics></math>,
+the private-resource entry has
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>p</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">q_{ij} = p_i</annotation></semantics></math>,
+and all other entries have
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">q_{ij} = 0</annotation></semantics></math>.</li>
 </ul>
 <p>For <code>"shared_to_private"</code>, the number of resources is
 <code>S + 1</code>. The <code>active_resource</code> is the shared
@@ -1688,6 +2018,8 @@ range.</td>
 <div class="section level2">
 <h2 id="parallel-processing-and-runtime-reporting">Parallel Processing and Runtime Reporting<a class="anchor" aria-label="anchor" href="#parallel-processing-and-runtime-reporting"></a>
 </h2>
+<p>Only available for use in macOS and Linux. Windows users can still
+run experiments, but parallel processing is not supported.</p>
 <p>Experiment YAML files can include runtime controls for larger
 runs:</p>
 <ul>
@@ -1700,7 +2032,8 @@ series in parallel.</li>
 <code>parallel.community_measures</code>: calculate community
 performance curve measures in parallel.</li>
 <li>
-<code>parallel.workers</code>: number of worker processes.</li>
+<code>parallel.workers</code>: number of worker processes;
+<code>available_cores_minus_1</code>.</li>
 <li>
 <code>output.runtime_update_every</code>: how often sparse progress
 updates are printed; the default is every 100 completed cases.</li>

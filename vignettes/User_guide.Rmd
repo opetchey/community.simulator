@@ -63,7 +63,7 @@ Most users only need the YAML workflow:
 | Run workflow stages manually | `create_environments_from_spec()`, `simulate_dynamics_from_spec()`, `get_community_measures_from_spec()` |
 | Build one community from explicit parameters | `build_LV_community()`, `build_CR_community()` |
 | Build one community from a resolved specification | `build_community_from_spec()`, `build_LV_community_from_spec()`, `build_CR_community_from_spec()` |
-| Explore one simulation interactively | `run_simulation_explorer()` |
+| Run a simulation interactively in a ShinyApp | `run_simulation_explorer()` |
 | Make standard diagnostic plots | `plot_case_temperature()`, `plot_case_abundances()`, `plot_case_total_abundance()`, `plot_community_matrix()`, `plot_resource_dynamics()` |
 
 The direct simulator functions remain available for advanced use, but the
@@ -199,6 +199,32 @@ The intrinsic growth rate is:
 r_i(T) = b_i(T) - d_i(T)
 \]
 
+Symbols in these equations are:
+
+- \(i\): focal species.
+- \(T\): environmental temperature.
+- \(b_i(T)\): birth rate of species \(i\) at temperature \(T\).
+- \(d_i(T)\): death rate of species \(i\) at temperature \(T\).
+- \(r_i(T)\): intrinsic growth rate of species \(i\) at temperature \(T\),
+  before the small numerical offset used inside the LV simulators.
+- \(a_{b,i}\): maximum birth rate of species \(i\). This is the species-level
+  value drawn from the distribution specified by `birth_maximum_mean`,
+  `birth_maximum_range`, and `birth_maximum_distribution`.
+- \(b_{\mathrm{opt},i}\): thermal optimum of the birth-rate curve for species
+  \(i\). This is drawn from the distribution specified by
+  `birth_optimum_mean`, `birth_optimum_range`, and
+  `birth_optimum_distribution`.
+- \(sd_{\mathrm{perf},i}\): width of the Gaussian birth-rate curve for species
+  \(i\). This is drawn from the distribution specified by
+  `birth_width_mean`, `birth_width_range`, and `birth_width_distribution`.
+- \(a_{d,i}\): death-rate intercept for species \(i\). In current YAML
+  specifications this comes from `death_intercept` and is shared across
+  species.
+- \(z_i\): temperature sensitivity of the death-rate curve for species \(i\).
+  In current YAML specifications this comes from `death_temperature_slope` and
+  is shared across species.
+- \(\exp(\cdot)\): the exponential function.
+
 The width parameter is the standard-deviation scale of the Gaussian performance
 curve. In YAML experiment files, the distribution of LV birth-curve widths is
 controlled by:
@@ -300,10 +326,28 @@ g_i(t) = \tilde{r}_i(T_t)
 N_i(t + 1) = N_i(t) \exp[g_i(t)] + I
 \]
 
-where \(N_i(t)\) is the abundance of species \(i\), \(\alpha_{ij}\) is the LV
-interaction matrix, \(I\) is `simulation.immigration_rate`, and
-\(\epsilon = 10^{-6}\), \(\beta = 0.001\), and \(\delta = 0.001\) are fixed
-internal constants.
+Symbols in these equations are:
+
+- \(i\): focal species.
+- \(j\): species whose abundance affects species \(i\).
+- \(t\): discrete time step.
+- \(T_t\): environmental temperature at time step \(t\).
+- \(N_i(t)\): abundance of species \(i\) at time step \(t\).
+- \(N_j(t)\): abundance of species \(j\) at time step \(t\).
+- \(b_i(T_t)\): temperature-dependent birth rate of species \(i\).
+- \(d_i(T_t)\): temperature-dependent death rate of species \(i\).
+- \(\tilde{r}_i(T_t)\): net intrinsic growth rate of species \(i\), after
+  adding the small fixed offset \(\epsilon\).
+- \(K_i(T_t)\): temperature-dependent carrying-capacity scaling term for
+  species \(i\).
+- \(\alpha_{ij}\): LV interaction coefficient describing the effect of
+  species \(j\) on species \(i\).
+- \(g_i(t)\): per-step exponential growth term for species \(i\).
+- \(I\): immigration added to species \(i\) each time step, specified as
+  `simulation.immigration_rate`.
+- \(\epsilon\): fixed net-growth offset, currently \(10^{-6}\).
+- \(\beta\): fixed density-dependence scaling constant, currently \(0.001\).
+- \(\delta\): fixed density-dependence scaling constant, currently \(0.001\).
 
 This model is the default when `model.type` is absent or set to
 `"lv_discrete"`.
@@ -346,10 +390,30 @@ with:
 K_i(T_t) = \frac{\tilde{r}_i(T_t)}{\beta + \delta}
 \]
 
-For continuous immigration, \(I\) is `simulation.immigration_rate` per unit
-time. For pulse immigration, the same value is added as a pulse at output times.
-Temperature \(T_t\) is obtained from the generated temperature series using the
-selected `simulation.temperature_interpolation` method.
+Symbols in these equations are:
+
+- \(i\): focal species.
+- \(j\): species whose abundance affects species \(i\).
+- \(t\): continuous simulation time.
+- \(T_t\): environmental temperature at time \(t\), obtained from the generated
+  temperature series using `simulation.temperature_interpolation`.
+- \(N_i(t)\): abundance of species \(i\) at time \(t\).
+- \(N_j(t)\): abundance of species \(j\) at time \(t\).
+- \(dN_i/dt\): instantaneous rate of change in abundance for species \(i\).
+- \(b_i(T_t)\): temperature-dependent birth rate of species \(i\).
+- \(d_i(T_t)\): temperature-dependent death rate of species \(i\).
+- \(\tilde{r}_i(T_t)\): net intrinsic growth rate of species \(i\), after
+  adding the small fixed offset \(\epsilon\).
+- \(K_i(T_t)\): temperature-dependent carrying-capacity scaling term for
+  species \(i\).
+- \(\alpha_{ij}\): LV interaction coefficient describing the effect of
+  species \(j\) on species \(i\).
+- \(I\): immigration term. For continuous immigration this is
+  `simulation.immigration_rate` per unit time; for pulse immigration the same
+  value is added as a pulse at output times.
+- \(\epsilon\): fixed net-growth offset, currently \(10^{-6}\).
+- \(\beta\): fixed density-dependence scaling constant, currently \(0.001\).
+- \(\delta\): fixed density-dependence scaling constant, currently \(0.001\).
 
 ### Fixed Numerical Constants In The LV Models
 
@@ -429,9 +493,46 @@ Resource concentrations follow:
 - \sum_i N_i(t) U_{ij}(T_t, R_j)
 \]
 
-where \(e_i\) is conversion efficiency, \(d_i\) is consumer death rate,
-\(\rho_j\) is resource renewal rate, \(K_{R,j}\) is resource supply, and \(I_N\)
-is `simulation.consumer_immigration_rate`.
+Symbols in these equations are:
+
+- \(i\): focal consumer species.
+- \(j\): focal resource.
+- \(t\): continuous simulation time.
+- \(T\): temperature used to describe a generic uptake curve.
+- \(T_t\): environmental temperature at time \(t\).
+- \(N_i(t)\): abundance of consumer \(i\) at time \(t\).
+- \(R_j(t)\): concentration of resource \(j\) at time \(t\).
+- \(dN_i/dt\): instantaneous rate of change in abundance for consumer \(i\).
+- \(dR_j/dt\): instantaneous rate of change in concentration for resource
+  \(j\).
+- \(u_i(T)\): simplified temperature-dependent uptake curve for consumer \(i\),
+  shown to introduce the uptake-curve form.
+- \(u_{\max,i}\): maximum uptake parameter for the simplified uptake curve of
+  consumer \(i\).
+- \(u_{\mathrm{opt},i}\): thermal optimum for the simplified uptake curve of
+  consumer \(i\).
+- \(sd_{u,i}\): thermal width of the simplified uptake curve of consumer \(i\).
+- \(u_{\max,ij}(T_t)\): temperature-dependent maximum uptake of resource \(j\)
+  by consumer \(i\) at time \(t\).
+- \(a_{u,ij}\): height, or maximum value, of the uptake curve for consumer
+  \(i\) on resource \(j\).
+- \(u_{\mathrm{opt},ij}\): thermal optimum of the uptake curve for consumer
+  \(i\) on resource \(j\).
+- \(sd_{u,ij}\): thermal width of the uptake curve for consumer \(i\) on
+  resource \(j\).
+- \(U_{ij}(T_t, R_j)\): realised per-capita uptake rate of resource \(j\) by
+  consumer \(i\), after accounting for temperature and current resource
+  concentration.
+- \(q_{ij}\): resource-use matrix entry describing how strongly consumer \(i\)
+  uses resource \(j\).
+- \(h_{ij}\): Monod half-saturation constant for consumer \(i\) on resource
+  \(j\).
+- \(e_i\): conversion efficiency for consumer \(i\).
+- \(d_i\): consumer death rate for consumer \(i\).
+- \(I_N\): consumer immigration term, specified as
+  `simulation.consumer_immigration_rate`.
+- \(\rho_j\): renewal rate of resource \(j\).
+- \(K_{R,j}\): supply concentration of resource \(j\).
 
 The main consumer-resource trait treatments are:
 
@@ -455,12 +556,22 @@ model.
 
 ### Resource-Use Modes
 
-The consumer-resource model supports three resource-use modes:
+The consumer-resource model supports three resource-use modes. These modes are
+different ways of constructing the resource-use matrix \(q_{ij}\) that appears
+in the CR dynamic model. In the uptake equation above, \(q_{ij}\) multiplies the
+temperature- and resource-dependent uptake rate, so it controls how strongly
+consumer \(i\) uses resource \(j\).
 
-- `"one_resource_all_consumers"`: all consumers use one active resource.
-- `"diagonal"`: each consumer uses its corresponding resource.
+- `"one_resource_all_consumers"`: all consumers use one active resource. The
+  active resource has \(q_{ij} = 1\) for every consumer \(i\), and inactive
+  resources have \(q_{ij} = 0\).
+- `"diagonal"`: each consumer uses its corresponding resource. The diagonal
+  entries have \(q_{ii} = 1\), and off-diagonal entries have \(q_{ij} = 0\).
 - `"shared_to_private"`: each consumer splits uptake between one shared
-  resource and a species-specific private resource.
+  resource and a species-specific private resource. If \(p_i\) is the private
+  resource-use fraction for consumer \(i\), then the shared-resource entry has
+  \(q_{ij} = 1 - p_i\), the private-resource entry has \(q_{ij} = p_i\), and
+  all other entries have \(q_{ij} = 0\).
 
 For `"shared_to_private"`, the number of resources is `S + 1`. The
 `active_resource` is the shared resource. Each species gets a private-resource
@@ -906,13 +1017,15 @@ experiment will contain every measure.
 
 ## Parallel Processing and Runtime Reporting
 
+Only available for use in macOS and Linux. Windows users can still run experiments, but parallel processing is not supported.
+
 Experiment YAML files can include runtime controls for larger runs:
 
 - `parallel.environments`: generate environmental time series in parallel.
 - `parallel.simulations`: simulate cases in parallel.
 - `parallel.community_measures`: calculate community performance curve measures
   in parallel.
-- `parallel.workers`: number of worker processes.
+- `parallel.workers`: number of worker processes; `available_cores_minus_1`.
 - `output.runtime_update_every`: how often sparse progress updates are printed;
   the default is every 100 completed cases.
 - `output.environment_progress`: whether environment-generation progress is

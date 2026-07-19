@@ -123,7 +123,7 @@ a few basic plots.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
-<h3 id="species-traits">Species traits<a class="anchor" aria-label="anchor" href="#species-traits"></a>
+<h3 id="view-species-traits">View species traits<a class="anchor" aria-label="anchor" href="#view-species-traits"></a>
 </h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">species_traits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
@@ -146,7 +146,7 @@ a few basic plots.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​death_temperature_slope</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="temperature-performance-curves">Temperature performance curves<a class="anchor" aria-label="anchor" href="#temperature-performance-curves"></a>
+<h3 id="view-temperature-performance-curves">View temperature performance curves<a class="anchor" aria-label="anchor" href="#view-temperature-performance-curves"></a>
 </h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">temperature_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>temperature <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">35</span>, length.out <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span></span>
@@ -172,7 +172,7 @@ a few basic plots.</p>
 <p><img src="lv_discrete_single_community_files/figure-html/performance-curves-1.png" class="r-plt" alt="Line plot of intrinsic growth rate against temperature for each species." width="700"></p>
 </div>
 <div class="section level3">
-<h3 id="interaction-matrix">Interaction matrix<a class="anchor" aria-label="anchor" href="#interaction-matrix"></a>
+<h3 id="view-interaction-matrix">View interaction matrix<a class="anchor" aria-label="anchor" href="#view-interaction-matrix"></a>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">interaction_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">as.table</a></span><span class="op">(</span><span class="va">community</span><span class="op">$</span><span class="va">alpha_ij</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>

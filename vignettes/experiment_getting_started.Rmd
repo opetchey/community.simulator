@@ -18,8 +18,8 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-This guide runs a very small end-to-end experiment using
-`community.simulator`. The goal is to show the simplest successful workflow for
+This guide runs a very small end-to-end experiment using the
+`community.simulator` package. The goal is to show the simplest successful workflow for
 creating an experiment folder, running the standard workflow, and inspecting the
 main summary output.
 
@@ -39,6 +39,8 @@ library(community.simulator)
 
 ```{r run-example}
 project_folder_location <- tempdir()
+## or desktop 
+project_folder_location <- "~/Desktop"
 experiment_name <- "getting_started_example"
 experiment_design_filename <- "experiment.yaml"
 experiment_folder <- file.path(project_folder_location, experiment_name)

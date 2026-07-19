@@ -125,7 +125,7 @@ consumer-resource simulator, and makes a few basic plots.</p>
 <span>  community_seed <span class="op">=</span> <span class="fl">13</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
-<h3 id="consumer-traits">Consumer traits<a class="anchor" aria-label="anchor" href="#consumer-traits"></a>
+<h3 id="view-consumer-traits">View consumer traits<a class="anchor" aria-label="anchor" href="#view-consumer-traits"></a>
 </h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">consumer_traits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
@@ -150,7 +150,7 @@ consumer-resource simulator, and makes a few basic plots.</p>
 <span><span class="co">#&gt; <span style="color: #949494;">#   shared_resource_fraction &lt;dbl&gt;</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="temperature-uptake-curves">Temperature uptake curves<a class="anchor" aria-label="anchor" href="#temperature-uptake-curves"></a>
+<h3 id="view-temperature-uptake-curves">View temperature uptake curves<a class="anchor" aria-label="anchor" href="#view-temperature-uptake-curves"></a>
 </h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">temperature_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>temperature <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">35</span>, length.out <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span></span>
@@ -176,7 +176,7 @@ consumer-resource simulator, and makes a few basic plots.</p>
 <p><img src="consumer_resource_single_community_files/figure-html/uptake-curves-1.png" class="r-plt" alt="Line plot of approximate high-resource consumer growth against temperature for each species." width="700"></p>
 </div>
 <div class="section level3">
-<h3 id="resource-use-matrix">Resource-use matrix<a class="anchor" aria-label="anchor" href="#resource-use-matrix"></a>
+<h3 id="view-resource-use-matrix">View resource-use matrix<a class="anchor" aria-label="anchor" href="#view-resource-use-matrix"></a>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">resource_use</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">as.table</a></span><span class="op">(</span><span class="va">community</span><span class="op">$</span><span class="va">resource_use_ij</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>

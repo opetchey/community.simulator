@@ -71,7 +71,7 @@ community <- build_LV_community(
 )
 ```
 
-### Species traits
+### View species traits
 
 ``` r
 
@@ -95,7 +95,7 @@ species_traits
 #> # ℹ abbreviated name: ¹​death_temperature_slope
 ```
 
-### Temperature performance curves
+### View temperature performance curves
 
 ``` r
 
@@ -124,7 +124,7 @@ ggplot(performance_curves, aes(x = temperature, y = intrinsic_growth, colour = s
 ![Line plot of intrinsic growth rate against temperature for each
 species.](lv_continuous_single_community_files/figure-html/performance-curves-1.png)
 
-### Interaction matrix
+### View interaction matrix
 
 ``` r
 

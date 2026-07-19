@@ -73,7 +73,7 @@ community <- build_CR_community(
 )
 ```
 
-### Consumer traits
+### View consumer traits
 
 ``` r
 
@@ -99,7 +99,7 @@ consumer_traits
 #> #   shared_resource_fraction <dbl>
 ```
 
-### Temperature uptake curves
+### View temperature uptake curves
 
 ``` r
 
@@ -129,7 +129,7 @@ ggplot(uptake_curves, aes(x = temperature, y = expected_growth_at_high_resource,
 temperature for each
 species.](consumer_resource_single_community_files/figure-html/uptake-curves-1.png)
 
-### Resource-use matrix
+### View resource-use matrix
 
 ``` r
 

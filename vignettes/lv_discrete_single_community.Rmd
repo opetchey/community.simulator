@@ -82,7 +82,7 @@ community <- build_LV_community(
 )
 ```
 
-### Species traits
+### View species traits
 
 ```{r traits}
 species_traits <- tibble(
@@ -97,7 +97,7 @@ species_traits <- tibble(
 species_traits
 ```
 
-### Temperature performance curves
+### View temperature performance curves
 
 ```{r performance-curves, fig.alt="Line plot of intrinsic growth rate against temperature for each species."}
 temperature_grid <- tibble(temperature = seq(5, 35, length.out = 200))
@@ -122,7 +122,7 @@ ggplot(performance_curves, aes(x = temperature, y = intrinsic_growth, colour = s
   )
 ```
 
-### Interaction matrix
+### View interaction matrix
 
 ```{r interaction-matrix, fig.alt="Heatmap of the Lotka-Volterra interaction matrix."}
 interaction_matrix <- as.data.frame(as.table(community$alpha_ij)) |>
