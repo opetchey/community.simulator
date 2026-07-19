@@ -13,7 +13,7 @@ The package currently supports three model families:
 | Model | Dynamics | Main use |
 | --- | --- | --- |
 | Lotka-Volterra | discrete time | Fast experiments with temperature-dependent intrinsic growth and interaction matrices |
-| Lotka-Volterra | continuous time | ODE-based LV dynamics with temperature interpolation and immigration controls |
+| Lotka-Volterra | continuous time | ODE-based LV dynamics with temperature interpolation |
 | Consumer-resource | continuous time | Resource-mediated consumer dynamics with temperature-dependent uptake |
 
 The package can:
@@ -110,6 +110,13 @@ section of the User Guide. That section explains the three implemented model
 families: discrete-time Lotka-Volterra, continuous-time Lotka-Volterra, and
 continuous-time consumer-resource dynamics.
 
+The full dynamic equations are in these User Guide sections:
+
+- [Discrete-time LV dynamics](https://opetchey.github.io/community.simulator/articles/User_guide.html#discrete-time-lv-dynamics)
+- [Continuous-time LV dynamics](https://opetchey.github.io/community.simulator/articles/User_guide.html#continuous-time-lv-dynamics)
+- [Consumer-resource model](https://opetchey.github.io/community.simulator/articles/User_guide.html#consumer-resource-model)
+- [Fixed numerical constants in the LV models](https://opetchey.github.io/community.simulator/articles/User_guide.html#fixed-numerical-constants-in-the-lv-models)
+
 For implementation-level detail, see the low-level simulator reference pages:
 
 - [Discrete-time Lotka-Volterra](https://opetchey.github.io/community.simulator/reference/simulator_lv_discrete.html)
@@ -179,9 +186,9 @@ browseVignettes("community.simulator")
 
 The main experiment path is now the YAML specification read by
 `run_experiment()`. The 0.8.0 release preserved backwards compatibility for
-older names and JSON-era workflows; this rewrite intentionally makes the
-clearer YAML schema the user-facing interface and removes obsolete JSON-era
-helpers where they are no longer needed.
+older names and earlier experiment-specification workflows; this rewrite
+intentionally makes the clearer YAML schema the user-facing interface and
+removes obsolete helpers where they are no longer needed.
 
 Some internal parameter names, function arguments, and output-column names may
 still differ from the preferred YAML names while the implementation is being

@@ -47,7 +47,9 @@
 #' @export
 #'
 #' @examples
-#' build_single_community(model_type = "lv_discrete", richness = 3)
+#' community <- build_single_community(model_type = "lv_discrete", richness = 3)
+#' names(community)
+#' community$traits
 build_single_community <- function(model_type = c(
                                      "lv_discrete",
                                      "lv_continuous",

@@ -6,21 +6,7 @@ This walkthrough defines one Lotka-Volterra community, exposes it to one
 temperature time series, runs the discrete-time simulator, and makes a
 few basic plots.
 
-## Interactive Shiny Version
-
-You can explore the same kind of one-community setup interactively with
-the Shiny simulation explorer:
-
-``` r
-
-run_simulation_explorer()
-```
-
-In the app, choose **Discrete-time LV**, press **Build community** to
-inspect the interaction matrix and thermal performance curves, and press
-**Simulate** only when you want to run the dynamics. The app has both a
-simple specification mode and a detailed mode for expanding the LV
-interaction treatment.
+## Set up R
 
 ``` r
 
@@ -205,3 +191,19 @@ ggplot(total_abundance, aes(x = time, y = total_abundance)) +
 
 ![Line plot of total community abundance through
 time.](lv_discrete_single_community_files/figure-html/total-abundance-1.png)
+
+## Interactive Shiny Version
+
+You can explore the same kind of one-community setup interactively with
+the Shiny simulation explorer:
+
+``` r
+
+run_simulation_explorer()
+```
+
+In the app, choose **Discrete-time LV**, press **Build community** to
+inspect the interaction matrix and thermal performance curves, and press
+**Simulate** only when you want to run the dynamics. The app has both a
+simple specification mode and a detailed mode for expanding the LV
+interaction treatment.

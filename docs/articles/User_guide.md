@@ -275,6 +275,33 @@ The discrete-time LV simulator is
 It updates species abundances through time using temperature-dependent
 intrinsic growth and the LV interaction matrix.
 
+For species $`i`$, the implementation uses:
+
+``` math
+\tilde{r}_i(T_t) = b_i(T_t) - d_i(T_t) + \epsilon
+```
+
+``` math
+K_i(T_t) = \frac{\tilde{r}_i(T_t)}{\beta + \delta}
+```
+
+``` math
+g_i(t) = \tilde{r}_i(T_t)
+  \left[
+    1 -
+    \frac{\sum_j \alpha_{ij} N_j(t)}{K_i(T_t)}
+  \right]
+```
+
+``` math
+N_i(t + 1) = N_i(t) \exp[g_i(t)] + I
+```
+
+where $`N_i(t)`$ is the abundance of species $`i`$, $`\alpha_{ij}`$ is
+the LV interaction matrix, $`I`$ is `simulation.immigration_rate`, and
+$`\epsilon = 10^{-6}`$, $`\beta = 0.001`$, and $`\delta = 0.001`$ are
+fixed internal constants.
+
 This model is the default when `model.type` is absent or set to
 `"lv_discrete"`.
 
@@ -295,6 +322,35 @@ adds ODE-specific controls:
 - `blowup_threshold`: abundance threshold above which the run stops.
 
 Use `model.type: lv_continuous` in the YAML file to select this model.
+
+For species $`i`$, the continuous-time LV rate equation is:
+
+``` math
+\frac{dN_i}{dt} =
+N_i(t)\,
+\tilde{r}_i(T_t)
+  \left[
+    1 -
+    \frac{\sum_j \alpha_{ij} N_j(t)}{K_i(T_t)}
+  \right]
++ I
+```
+
+with:
+
+``` math
+\tilde{r}_i(T_t) = b_i(T_t) - d_i(T_t) + \epsilon
+```
+
+``` math
+K_i(T_t) = \frac{\tilde{r}_i(T_t)}{\beta + \delta}
+```
+
+For continuous immigration, $`I`$ is `simulation.immigration_rate` per
+unit time. For pulse immigration, the same value is added as a pulse at
+output times. Temperature $`T_t`$ is obtained from the generated
+temperature series using the selected
+`simulation.temperature_interpolation` method.
 
 ### Fixed Numerical Constants In The LV Models
 
@@ -335,6 +391,51 @@ u_i(T) = u_{\max,i} \exp\left[-\frac{1}{2}
 \right]
 ```
 
+In the full consumer-resource model, temperature-dependent maximum
+uptake can vary by consumer $`i`$ and resource $`j`$:
+
+``` math
+u_{\max,ij}(T_t) =
+a_{u,ij} \exp\left[-\frac{1}{2}
+  \left(\frac{T_t - u_{\mathrm{opt},ij}}{sd_{u,ij}}\right)^2
+\right]
+```
+
+The per-capita uptake of resource $`j`$ by consumer $`i`$ is:
+
+``` math
+U_{ij}(T_t, R_j) =
+q_{ij}\,
+u_{\max,ij}(T_t)
+\frac{R_j(t)}{h_{ij} + R_j(t)}
+```
+
+where $`q_{ij}`$ is the resource-use matrix and $`h_{ij}`$ is the Monod
+half-saturation constant.
+
+Consumer abundances follow:
+
+``` math
+\frac{dN_i}{dt} =
+N_i(t)
+\left[
+  e_i \sum_j U_{ij}(T_t, R_j) - d_i
+\right]
++ I_N
+```
+
+Resource concentrations follow:
+
+``` math
+\frac{dR_j}{dt} =
+\rho_j \left(K_{R,j} - R_j(t)\right)
+- \sum_i N_i(t) U_{ij}(T_t, R_j)
+```
+
+where $`e_i`$ is conversion efficiency, $`d_i`$ is consumer death rate,
+$`\rho_j`$ is resource renewal rate, $`K_{R,j}`$ is resource supply, and
+$`I_N`$ is `simulation.consumer_immigration_rate`.
+
 The main consumer-resource trait treatments are:
 
 - `uptake_maximum_mean`, `uptake_maximum_range`,
@@ -365,8 +466,7 @@ The consumer-resource model supports three resource-use modes:
 For `"shared_to_private"`, the number of resources is `S + 1`. The
 `active_resource` is the shared resource. Each species gets a
 private-resource use fraction; its shared-resource fraction is one minus
-that private-resource fraction. This is stored internally as
-`resource_specialization_i`.
+that private-resource fraction.
 
 Species-level private-resource use is controlled by:
 

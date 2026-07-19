@@ -64,19 +64,9 @@ one temperature time series, runs the discrete-time simulator, and makes
 a few basic plots.</p>
 </div>
 <div class="section level2">
-<h2 id="interactive-shiny-version">Interactive Shiny Version<a class="anchor" aria-label="anchor" href="#interactive-shiny-version"></a>
+<h2 id="set-up-r">Set up R<a class="anchor" aria-label="anchor" href="#set-up-r"></a>
 </h2>
-<p>You can explore the same kind of one-community setup interactively
-with the Shiny simulation explorer:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/run_simulation_explorer.html">run_simulation_explorer</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>In the app, choose <strong>Discrete-time LV</strong>, press
-<strong>Build community</strong> to inspect the interaction matrix and
-thermal performance curves, and press <strong>Simulate</strong> only
-when you want to run the dynamics. The app has both a simple
-specification mode and a detailed mode for expanding the LV interaction
-treatment.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
@@ -87,7 +77,7 @@ treatment.</p>
 <div class="section level2">
 <h2 id="define-one-environment">Define One Environment<a class="anchor" aria-label="anchor" href="#define-one-environment"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">duration</span> <span class="op">&lt;-</span> <span class="fl">120</span></span>
 <span><span class="va">time</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">duration</span><span class="op">)</span></span>
@@ -108,7 +98,7 @@ treatment.</p>
 <div class="section level2">
 <h2 id="define-one-community">Define One Community<a class="anchor" aria-label="anchor" href="#define-one-community"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">community</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_community_constructors.html">build_LV_community</a></span><span class="op">(</span></span>
 <span>  S <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  birth_maximum_mean <span class="op">=</span> <span class="fl">0.34</span>,</span>
@@ -135,7 +125,7 @@ treatment.</p>
 <div class="section level3">
 <h3 id="species-traits">Species traits<a class="anchor" aria-label="anchor" href="#species-traits"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">species_traits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>  species <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Spp"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">community</span><span class="op">$</span><span class="va">S</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  max_birth <span class="op">=</span> <span class="va">community</span><span class="op">$</span><span class="va">birth_maximum_i</span>,</span>
@@ -158,7 +148,7 @@ treatment.</p>
 <div class="section level3">
 <h3 id="temperature-performance-curves">Temperature performance curves<a class="anchor" aria-label="anchor" href="#temperature-performance-curves"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">temperature_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>temperature <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">35</span>, length.out <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">performance_curves</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/expand.html" class="external-link">crossing</a></span><span class="op">(</span></span>
@@ -184,7 +174,7 @@ treatment.</p>
 <div class="section level3">
 <h3 id="interaction-matrix">Interaction matrix<a class="anchor" aria-label="anchor" href="#interaction-matrix"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">interaction_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">as.table</a></span><span class="op">(</span><span class="va">community</span><span class="op">$</span><span class="va">alpha_ij</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>consumer <span class="op">=</span> <span class="va">Var1</span>, neighbour <span class="op">=</span> <span class="va">Var2</span>, interaction <span class="op">=</span> <span class="va">Freq</span><span class="op">)</span></span>
 <span></span>
@@ -204,7 +194,7 @@ treatment.</p>
 <div class="section level2">
 <h2 id="run-dynamics">Run Dynamics<a class="anchor" aria-label="anchor" href="#run-dynamics"></a>
 </h2>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">initial_abundances</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">25</span>, <span class="va">community</span><span class="op">$</span><span class="va">S</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">abundances</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulator_lv_discrete.html">simulator_lv_discrete</a></span><span class="op">(</span></span>
@@ -223,7 +213,7 @@ treatment.</p>
 <div class="section level2">
 <h2 id="plot-dynamics">Plot Dynamics<a class="anchor" aria-label="anchor" href="#plot-dynamics"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">total_abundance</span> <span class="op">&lt;-</span> <span class="va">abundances</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>total_abundance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">abundance</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span></span>
@@ -232,11 +222,25 @@ treatment.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time"</span>, y <span class="op">=</span> <span class="st">"Abundance"</span>, title <span class="op">=</span> <span class="st">"Population Dynamics"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="lv_discrete_single_community_files/figure-html/plot-dynamics-1.png" class="r-plt" alt="Line plot of abundance through time for each species." width="700"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">total_abundance</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">time</span>, y <span class="op">=</span> <span class="va">total_abundance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time"</span>, y <span class="op">=</span> <span class="st">"Total abundance"</span>, title <span class="op">=</span> <span class="st">"Community Total Abundance"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="lv_discrete_single_community_files/figure-html/total-abundance-1.png" class="r-plt" alt="Line plot of total community abundance through time." width="700"></p>
+</div>
+<div class="section level2">
+<h2 id="interactive-shiny-version">Interactive Shiny Version<a class="anchor" aria-label="anchor" href="#interactive-shiny-version"></a>
+</h2>
+<p>You can explore the same kind of one-community setup interactively
+with the Shiny simulation explorer:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/run_simulation_explorer.html">run_simulation_explorer</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>In the app, choose <strong>Discrete-time LV</strong>, press
+<strong>Build community</strong> to inspect the interaction matrix and
+thermal performance curves, and press <strong>Simulate</strong> only
+when you want to run the dynamics. The app has both a simple
+specification mode and a detailed mode for expanding the LV interaction
+treatment.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

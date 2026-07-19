@@ -1,25 +1,29 @@
-#' Calculate intrinsic growth rate from species parameters and a temperature, assuming a Gaussian birth rate - temperature response curve and an exponential death rate - temperature response curve.
+#' Calculate intrinsic growth rate from species parameters and temperature
 #'
-#' @param a_b_i Value of birth rate when temperature is equal to b_opt_i
-#' @param b_opt_i Temperature at which birth rate is maximized
-#' @param s_i Standard-deviation width of the Gaussian birth-rate curve.
-#' @param a_d_i Value of death rate when temperature is equal to 0
-#' @param z_i Slope of the exponential curve
-#' @param temperature Temperature at which to calculate the intrinsic growth rate
+#' Assumes a Gaussian birth-rate temperature response curve and an exponential
+#' death-rate temperature response curve.
+#'
+#' @param birth_maximum Value of birth rate at the birth optimum.
+#' @param birth_optimum Temperature at which birth rate is maximized.
+#' @param birth_width Standard-deviation width of the Gaussian birth-rate curve.
+#' @param death_intercept Value of death rate when temperature is equal to 0.
+#' @param death_temperature_slope Slope of the exponential death-rate curve.
+#' @param temperature Temperature at which to calculate the intrinsic growth
+#'   rate.
 #'
 #' @return Returns the intrinsic growth rate at the given temperature
 #' @export
 #'
 #' @examples NULL
-intrinsic_growth_gaussian <- function(a_b_i,
-                                   b_opt_i,
-                                   s_i,
-                                   a_d_i,
-                                   z_i,
-                                   temperature)
+intrinsic_growth_gaussian <- function(birth_maximum,
+                                      birth_optimum,
+                                      birth_width,
+                                      death_intercept,
+                                      death_temperature_slope,
+                                      temperature)
 {
-  b0 <- a_b_i * exp(-0.5 * ((temperature - b_opt_i) / s_i)^2)
-  d0 <- a_d_i * exp(z_i * temperature)
+  b0 <- birth_maximum * exp(-0.5 * ((temperature - birth_optimum) / birth_width)^2)
+  d0 <- death_intercept * exp(death_temperature_slope * temperature)
   b0 - d0
 
 }

@@ -69,7 +69,7 @@
 <tr>
 <td>Lotka-Volterra</td>
 <td>continuous time</td>
-<td>ODE-based LV dynamics with temperature interpolation and immigration controls</td>
+<td>ODE-based LV dynamics with temperature interpolation</td>
 </tr>
 <tr>
 <td>Consumer-resource</td>
@@ -152,6 +152,13 @@
 <h3 id="where-to-find-the-equations-for-the-ecological-dynamics">Where To Find The Equations For The Ecological Dynamics<a class="anchor" aria-label="anchor" href="#where-to-find-the-equations-for-the-ecological-dynamics"></a>
 </h3>
 <p>The ecological dynamics are described in the <a href="https://opetchey.github.io/community.simulator/articles/User_guide.html#population-dynamic-models">Population Dynamic Models</a> section of the User Guide. That section explains the three implemented model families: discrete-time Lotka-Volterra, continuous-time Lotka-Volterra, and continuous-time consumer-resource dynamics.</p>
+<p>The full dynamic equations are in these User Guide sections:</p>
+<ul>
+<li><a href="https://opetchey.github.io/community.simulator/articles/User_guide.html#discrete-time-lv-dynamics">Discrete-time LV dynamics</a></li>
+<li><a href="https://opetchey.github.io/community.simulator/articles/User_guide.html#continuous-time-lv-dynamics">Continuous-time LV dynamics</a></li>
+<li><a href="https://opetchey.github.io/community.simulator/articles/User_guide.html#consumer-resource-model">Consumer-resource model</a></li>
+<li><a href="https://opetchey.github.io/community.simulator/articles/User_guide.html#fixed-numerical-constants-in-the-lv-models">Fixed numerical constants in the LV models</a></li>
+</ul>
 <p>For implementation-level detail, see the low-level simulator reference pages:</p>
 <ul>
 <li><a href="https://opetchey.github.io/community.simulator/reference/simulator_lv_discrete.html">Discrete-time Lotka-Volterra</a></li>
@@ -193,7 +200,7 @@
 <div class="section level2">
 <h2 id="developer-note">Developer Note<a class="anchor" aria-label="anchor" href="#developer-note"></a>
 </h2>
-<p>The main experiment path is now the YAML specification read by <code><a href="reference/run_experiment.html">run_experiment()</a></code>. The 0.8.0 release preserved backwards compatibility for older names and JSON-era workflows; this rewrite intentionally makes the clearer YAML schema the user-facing interface and removes obsolete JSON-era helpers where they are no longer needed.</p>
+<p>The main experiment path is now the YAML specification read by <code><a href="reference/run_experiment.html">run_experiment()</a></code>. The 0.8.0 release preserved backwards compatibility for older names and earlier experiment-specification workflows; this rewrite intentionally makes the clearer YAML schema the user-facing interface and removes obsolete helpers where they are no longer needed.</p>
 <p>Some internal parameter names, function arguments, and output-column names may still differ from the preferred YAML names while the implementation is being cleaned up.</p>
 </div>
 <div class="section level2">

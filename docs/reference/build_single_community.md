@@ -178,66 +178,12 @@ summed community performance curve.
 ## Examples
 
 ``` r
-build_single_community(model_type = "lv_discrete", richness = 3)
-#> $model_type
-#> [1] "lv_discrete"
-#> 
-#> $community
-#> $community$S
-#> [1] 3
-#> 
-#> $community$birth_maximum_i
-#> [1] 0.3 0.3 0.3
-#> 
-#> $community$birth_optimum_i
-#> [1] 17 20 23
-#> 
-#> $community$birth_width_i
-#> [1] 8 8 8
-#> 
-#> $community$death_intercept_i
-#> [1] 0 0 0
-#> 
-#> $community$death_temperature_slope_i
-#> [1] 0.05 0.05 0.05
-#> 
-#> $community$a_b_i
-#> [1] 0.3 0.3 0.3
-#> 
-#> $community$b_opt_i
-#> [1] 17 20 23
-#> 
-#> $community$sd_perf_i
-#> [1] 8 8 8
-#> 
-#> $community$s_i
-#> [1] 8 8 8
-#> 
-#> $community$a_d_i
-#> [1] 0 0 0
-#> 
-#> $community$z_i
-#> [1] 0.05 0.05 0.05
-#> 
-#> $community$alpha_ij
-#>      [,1] [,2] [,3]
-#> [1,]    1    0    0
-#> [2,]    0    1    0
-#> [3,]    0    0    1
-#> 
-#> $community$lv_interaction_spec
-#> $community$lv_interaction_spec$label
-#> [1] "no_interactions"
-#> 
-#> $community$lv_interaction_spec$type
-#> [1] "none"
-#> 
-#> $community$lv_interaction_spec$diagonal
-#> [1] 1
-#> 
-#> 
-#> 
-#> $traits
+community <- build_single_community(model_type = "lv_discrete", richness = 3)
+names(community)
+#> [1] "model_type"                  "community"                  
+#> [3] "traits"                      "structure_matrix"           
+#> [5] "performance_curves"          "community_performance_curve"
+community$traits
 #> # A tibble: 3 × 6
 #>   species birth_maximum birth_optimum birth_width death_intercept
 #>   <chr>           <dbl>         <dbl>       <dbl>           <dbl>
@@ -245,49 +191,4 @@ build_single_community(model_type = "lv_discrete", richness = 3)
 #> 2 Spp2              0.3            20           8               0
 #> 3 Spp3              0.3            23           8               0
 #> # ℹ 1 more variable: death_temperature_slope <dbl>
-#> 
-#> $structure_matrix
-#>   row_index column_index value       row    column    matrix_type
-#> 1         1            1     1 Species 1 Species 1 LV interaction
-#> 2         2            1     0 Species 2 Species 1 LV interaction
-#> 3         3            1     0 Species 3 Species 1 LV interaction
-#> 4         1            2     0 Species 1 Species 2 LV interaction
-#> 5         2            2     1 Species 2 Species 2 LV interaction
-#> 6         3            2     0 Species 3 Species 2 LV interaction
-#> 7         1            3     0 Species 1 Species 3 LV interaction
-#> 8         2            3     0 Species 2 Species 3 LV interaction
-#> 9         3            3     1 Species 3 Species 3 LV interaction
-#> 
-#> $performance_curves
-#> # A tibble: 600 × 6
-#>    species_index temperature species performance viable model_type 
-#>            <int>       <dbl> <chr>         <dbl> <lgl>  <chr>      
-#>  1             1       -7    Spp1       0.00333  TRUE   lv_discrete
-#>  2             2       -7    Spp2       0.00101  TRUE   lv_discrete
-#>  3             3       -7    Spp3       0.000265 TRUE   lv_discrete
-#>  4             1       -6.73 Spp1       0.00369  TRUE   lv_discrete
-#>  5             2       -6.73 Spp2       0.00113  TRUE   lv_discrete
-#>  6             3       -6.73 Spp3       0.000301 TRUE   lv_discrete
-#>  7             1       -6.46 Spp1       0.00408  TRUE   lv_discrete
-#>  8             2       -6.46 Spp2       0.00127  TRUE   lv_discrete
-#>  9             3       -6.46 Spp3       0.000341 TRUE   lv_discrete
-#> 10             1       -6.19 Spp1       0.00450  TRUE   lv_discrete
-#> # ℹ 590 more rows
-#> 
-#> $community_performance_curve
-#> # A tibble: 200 × 4
-#>    temperature community_performance performance_type   y_label                 
-#>          <dbl>                 <dbl> <chr>              <chr>                   
-#>  1       -7                  0.00461 summed_performance Summed community perfor…
-#>  2       -6.73               0.00512 summed_performance Summed community perfor…
-#>  3       -6.46               0.00568 summed_performance Summed community perfor…
-#>  4       -6.19               0.00630 summed_performance Summed community perfor…
-#>  5       -5.91               0.00698 summed_performance Summed community perfor…
-#>  6       -5.64               0.00772 summed_performance Summed community perfor…
-#>  7       -5.37               0.00853 summed_performance Summed community perfor…
-#>  8       -5.10               0.00942 summed_performance Summed community perfor…
-#>  9       -4.83               0.0104  summed_performance Summed community perfor…
-#> 10       -4.56               0.0114  summed_performance Summed community perfor…
-#> # ℹ 190 more rows
-#> 
 ```

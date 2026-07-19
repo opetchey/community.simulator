@@ -1,40 +1,46 @@
-# Calculate intrinsic growth rate from species parameters and a temperature, assuming a Gaussian birth rate - temperature response curve and an exponential death rate - temperature response curve.
+# Calculate intrinsic growth rate from species parameters and temperature
 
-Calculate intrinsic growth rate from species parameters and a
-temperature, assuming a Gaussian birth rate - temperature response curve
-and an exponential death rate - temperature response curve.
+Assumes a Gaussian birth-rate temperature response curve and an
+exponential death-rate temperature response curve.
 
 ## Usage
 
 ``` r
-intrinsic_growth_gaussian(a_b_i, b_opt_i, s_i, a_d_i, z_i, temperature)
+intrinsic_growth_gaussian(
+  birth_maximum,
+  birth_optimum,
+  birth_width,
+  death_intercept,
+  death_temperature_slope,
+  temperature
+)
 ```
 
 ## Arguments
 
-- a_b_i:
+- birth_maximum:
 
-  Value of birth rate when temperature is equal to b_opt_i
+  Value of birth rate at the birth optimum.
 
-- b_opt_i:
+- birth_optimum:
 
-  Temperature at which birth rate is maximized
+  Temperature at which birth rate is maximized.
 
-- s_i:
+- birth_width:
 
   Standard-deviation width of the Gaussian birth-rate curve.
 
-- a_d_i:
+- death_intercept:
 
-  Value of death rate when temperature is equal to 0
+  Value of death rate when temperature is equal to 0.
 
-- z_i:
+- death_temperature_slope:
 
-  Slope of the exponential curve
+  Slope of the exponential death-rate curve.
 
 - temperature:
 
-  Temperature at which to calculate the intrinsic growth rate
+  Temperature at which to calculate the intrinsic growth rate.
 
 ## Value
 

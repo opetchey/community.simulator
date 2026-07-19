@@ -118,5 +118,7 @@ community performance curve.
 Build a single exploratory community
 }
 \examples{
-build_single_community(model_type = "lv_discrete", richness = 3)
+community <- build_single_community(model_type = "lv_discrete", richness = 3)
+names(community)
+community$traits
 }

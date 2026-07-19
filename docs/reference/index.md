@@ -70,6 +70,5 @@ Direct low-level simulators for advanced use.
 - [`simulator_consumer_resource_continuous()`](https://opetchey.github.io/community.simulator/reference/simulator_consumer_resource_continuous.md)
   : Simulate consumer-resource dynamics in continuous time
 - [`intrinsic_growth_gaussian()`](https://opetchey.github.io/community.simulator/reference/intrinsic_growth_gaussian.md)
-  : Calculate intrinsic growth rate from species parameters and a
-  temperature, assuming a Gaussian birth rate - temperature response
-  curve and an exponential death rate - temperature response curve.
+  : Calculate intrinsic growth rate from species parameters and
+  temperature
