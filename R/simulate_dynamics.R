@@ -226,10 +226,11 @@ simulate_one_dynamics_case <- function(i,
   resources_ts <- NULL
   returned_times <- integration_times
   if (dynamics_type == "discrete") {
-    spts <- simulator_lv(
+    spts <- simulator_lv_discrete(
       input_com_params = expt$community_object[[i]],
       TcelSeries = Tcel_controlm,
-      initial_abundances = initial_abundances
+      initial_abundances = initial_abundances,
+      immigration_rate = immigration_rate
     )
   }
 

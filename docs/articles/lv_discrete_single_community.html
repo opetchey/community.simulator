@@ -207,10 +207,11 @@ treatment.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">initial_abundances</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">25</span>, <span class="va">community</span><span class="op">$</span><span class="va">S</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">abundances</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulator_lv.html">simulator_lv</a></span><span class="op">(</span></span>
+<span><span class="va">abundances</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulator_lv_discrete.html">simulator_lv_discrete</a></span><span class="op">(</span></span>
 <span>  input_com_params <span class="op">=</span> <span class="va">community</span>,</span>
 <span>  TcelSeries <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">environment</span><span class="op">$</span><span class="va">temperature</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  initial_abundances <span class="op">=</span> <span class="va">initial_abundances</span></span>
+<span>  initial_abundances <span class="op">=</span> <span class="va">initial_abundances</span>,</span>
+<span>  immigration_rate <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>time <span class="op">=</span> <span class="va">environment</span><span class="op">$</span><span class="va">time</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span></span>

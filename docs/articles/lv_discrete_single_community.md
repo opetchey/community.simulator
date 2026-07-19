@@ -166,10 +166,11 @@ matrix.](lv_discrete_single_community_files/figure-html/interaction-matrix-1.png
 
 initial_abundances <- rep(25, community$S)
 
-abundances <- simulator_lv(
+abundances <- simulator_lv_discrete(
   input_com_params = community,
   TcelSeries = matrix(environment$temperature, nrow = 1),
-  initial_abundances = initial_abundances
+  initial_abundances = initial_abundances,
+  immigration_rate = 0.1
 ) |>
   mutate(time = environment$time) |>
   pivot_longer(

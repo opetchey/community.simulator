@@ -28,29 +28,13 @@ The package can:
 - launch a small Shiny simulation explorer with
   [`run_simulation_explorer()`](https://opetchey.github.io/community.simulator/reference/run_simulation_explorer.md)
 
-## Scientific Scope
-
-The package focuses on community dynamics with temperature-dependent
-rates. Environmental variation can be generated as a `1/f` process, and
-the package was originally built to study how response diversity relates
-to community stability. The current code supports both Lotka-Volterra
-and consumer-resource model families.
-
-For a fuller description of the model structure and terminology, see the
-[User
-Guide](https://opetchey.github.io/community.simulator/articles/User_guide.html).
-For runnable experiment specifications, see the [YAML templates
-article](https://opetchey.github.io/community.simulator/articles/yaml_templates.html).
-
 ## Current Status
 
 This package is an active research codebase. The main workflow is
-available, but some parts of the interface and documentation are still
-being improved for broader external use.
+available. Some parts of the interface and documentation are still being
+improved.
 
 ## Where To Start
-
-Different readers usually need different entry points.
 
 ### If You Are Reviewing The Package
 
@@ -128,6 +112,30 @@ Start here in this order:
     as a reference. Some sections still need polish, so treat it as the
     developing reference rather than a finished manual.
 
+### Where To Find The Equations For The Ecological Dynamics
+
+The ecological dynamics are described in the [Population Dynamic
+Models](https://opetchey.github.io/community.simulator/articles/User_guide.html#population-dynamic-models)
+section of the User Guide. That section explains the three implemented
+model families: discrete-time Lotka-Volterra, continuous-time
+Lotka-Volterra, and continuous-time consumer-resource dynamics.
+
+For implementation-level detail, see the low-level simulator reference
+pages:
+
+- [Discrete-time
+  Lotka-Volterra](https://opetchey.github.io/community.simulator/reference/simulator_lv_discrete.html)
+- [Continuous-time
+  Lotka-Volterra](https://opetchey.github.io/community.simulator/reference/simulator_lv_continuous.html)
+- [Continuous-time
+  consumer-resource](https://opetchey.github.io/community.simulator/reference/simulator_consumer_resource_continuous.html)
+
+The corresponding source files are
+[`R/simulator_lv_discrete.R`](https://github.com/opetchey/community.simulator/blob/main/R/simulator_lv_discrete.R),
+[`R/simulator_lv_continuous.R`](https://github.com/opetchey/community.simulator/blob/main/R/simulator_lv_continuous.R),
+and
+[`R/simulator_consumer_resource_continuous.R`](https://github.com/opetchey/community.simulator/blob/main/R/simulator_consumer_resource_continuous.R).
+
 ### If You Are A Prospective Developer
 
 Start with the [User
@@ -195,6 +203,13 @@ Some internal parameter names, function arguments, and output-column
 names may still differ from the preferred YAML names while the
 implementation is being cleaned up.
 
+## AI declaration
+
+This package was created with the help of AI tools, including agents and
+large language models. The AI tools were used to assist with code
+generation, documentation, and testing. The authors have reviewed the
+simulation outputs to ensure their validity.
+
 # Package index
 
 ## Experiment workflow
@@ -258,7 +273,7 @@ Plot one-community outputs or launch the Shiny simulation explorer.
 
 Direct low-level simulators for advanced use.
 
-- [`simulator_lv()`](https://opetchey.github.io/community.simulator/reference/simulator_lv.md)
+- [`simulator_lv_discrete()`](https://opetchey.github.io/community.simulator/reference/simulator_lv_discrete.md)
   : Simulate the population dynamics of a community of species using the
   Lotka-Volterra competition model with temperature-dependent vital
   rates.

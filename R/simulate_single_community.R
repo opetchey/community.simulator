@@ -429,10 +429,11 @@ simulate_single_community <- function(model_type = c(
 
   resources <- NULL
   if (model_type == "lv_discrete") {
-    simulated <- simulator_lv(
+    simulated <- simulator_lv_discrete(
       input_com_params = community,
       TcelSeries = temperature_matrix,
-      initial_abundances = initial_abundances
+      initial_abundances = initial_abundances,
+      immigration_rate = immigration_rate
     )
     abundances <- simulated |>
       tibble::as_tibble() |>

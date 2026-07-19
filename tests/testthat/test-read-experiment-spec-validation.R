@@ -130,3 +130,17 @@ test_that("YAML validation rejects invalid runtime controls", {
     fixed = TRUE
   )
 })
+
+test_that("YAML validation requires immigration rate for discrete LV", {
+  spec <- read_experiment_spec(system.file(
+    "experiment_templates/lv_discrete.yaml",
+    package = "community.simulator"
+  ))
+  spec$simulation$immigration_rate <- NULL
+
+  expect_error(
+    validate_experiment_spec(spec),
+    "`simulation.immigration_rate` is required when `model.type` is `lv_discrete`.",
+    fixed = TRUE
+  )
+})

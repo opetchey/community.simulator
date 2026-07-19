@@ -1,12 +1,17 @@
 # Simulate the population dynamics of a community of species using the Lotka-Volterra competition model with temperature-dependent vital rates.
 
-Simulate the population dynamics of a community of species using the
-Lotka-Volterra competition model with temperature-dependent vital rates.
+The LV carrying-capacity scaling constants are fixed internally at
+`bet = delt = 0.001`, and net growth includes a small offset of `1e-6`.
 
 ## Usage
 
 ``` r
-simulator_lv(input_com_params, TcelSeries, initial_abundances)
+simulator_lv_discrete(
+  input_com_params,
+  TcelSeries,
+  initial_abundances,
+  immigration_rate
+)
 ```
 
 ## Arguments
@@ -22,6 +27,10 @@ simulator_lv(input_com_params, TcelSeries, initial_abundances)
 - initial_abundances:
 
   Initial abundances of each species
+
+- immigration_rate:
+
+  Immigration rate added to each species per time step.
 
 ## Value
 

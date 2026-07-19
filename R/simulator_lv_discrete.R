@@ -1,16 +1,21 @@
 #' Simulate the population dynamics of a community of species using the Lotka-Volterra competition model with temperature-dependent vital rates.
 #'
+#' The LV carrying-capacity scaling constants are fixed internally at
+#' `bet = delt = 0.001`, and net growth includes a small offset of `1e-6`.
+#'
 #' @param input_com_params Community object, containing all species and community parameters
 #' @param TcelSeries Time series of temperature values
 #' @param initial_abundances Initial abundances of each species
+#' @param immigration_rate Immigration rate added to each species per time step.
 #'
 #' @return Time series of population abundances for each species
 #' @export
 #'
 #' @examples NULL
-simulator_lv<-function(input_com_params,
-                       TcelSeries,
-                       initial_abundances){
+simulator_lv_discrete<-function(input_com_params,
+                                TcelSeries,
+                                initial_abundances,
+                                immigration_rate){
 
   S<-input_com_params$S
   al<-input_com_params$alpha_ij
@@ -74,9 +79,7 @@ simulator_lv<-function(input_com_params,
 
     TimeSeries[,t+1]<- Ntnext
 
-    ## immigration of 0.1 per time step
-    ## WARNING: immigration rate is hard coded
-    TimeSeries[,t+1] <- TimeSeries[,t+1] + 0.1
+    TimeSeries[,t+1] <- TimeSeries[,t+1] + immigration_rate
 
     ## this was an previously used method for avoiding
     ## very low abundances
@@ -95,7 +98,4 @@ simulator_lv<-function(input_com_params,
 
   return(sp_ts)
 }
-
-
-
 

@@ -89,20 +89,13 @@
 </li>
 </ul>
 <div class="section level2">
-<h2 id="scientific-scope">Scientific Scope<a class="anchor" aria-label="anchor" href="#scientific-scope"></a>
-</h2>
-<p>The package focuses on community dynamics with temperature-dependent rates. Environmental variation can be generated as a <code>1/f</code> process, and the package was originally built to study how response diversity relates to community stability. The current code supports both Lotka-Volterra and consumer-resource model families.</p>
-<p>For a fuller description of the model structure and terminology, see the <a href="https://opetchey.github.io/community.simulator/articles/User_guide.html">User Guide</a>. For runnable experiment specifications, see the <a href="https://opetchey.github.io/community.simulator/articles/yaml_templates.html">YAML templates article</a>.</p>
-</div>
-<div class="section level2">
 <h2 id="current-status">Current Status<a class="anchor" aria-label="anchor" href="#current-status"></a>
 </h2>
-<p>This package is an active research codebase. The main workflow is available, but some parts of the interface and documentation are still being improved for broader external use.</p>
+<p>This package is an active research codebase. The main workflow is available. Some parts of the interface and documentation are still being improved.</p>
 </div>
 <div class="section level2">
 <h2 id="where-to-start">Where To Start<a class="anchor" aria-label="anchor" href="#where-to-start"></a>
 </h2>
-<p>Different readers usually need different entry points.</p>
 <div class="section level3">
 <h3 id="if-you-are-reviewing-the-package">If You Are Reviewing The Package<a class="anchor" aria-label="anchor" href="#if-you-are-reviewing-the-package"></a>
 </h3>
@@ -156,6 +149,18 @@
 </ol>
 </div>
 <div class="section level3">
+<h3 id="where-to-find-the-equations-for-the-ecological-dynamics">Where To Find The Equations For The Ecological Dynamics<a class="anchor" aria-label="anchor" href="#where-to-find-the-equations-for-the-ecological-dynamics"></a>
+</h3>
+<p>The ecological dynamics are described in the <a href="https://opetchey.github.io/community.simulator/articles/User_guide.html#population-dynamic-models">Population Dynamic Models</a> section of the User Guide. That section explains the three implemented model families: discrete-time Lotka-Volterra, continuous-time Lotka-Volterra, and continuous-time consumer-resource dynamics.</p>
+<p>For implementation-level detail, see the low-level simulator reference pages:</p>
+<ul>
+<li><a href="https://opetchey.github.io/community.simulator/reference/simulator_lv_discrete.html">Discrete-time Lotka-Volterra</a></li>
+<li><a href="https://opetchey.github.io/community.simulator/reference/simulator_lv_continuous.html">Continuous-time Lotka-Volterra</a></li>
+<li><a href="https://opetchey.github.io/community.simulator/reference/simulator_consumer_resource_continuous.html">Continuous-time consumer-resource</a></li>
+</ul>
+<p>The corresponding source files are <a href="https://github.com/opetchey/community.simulator/blob/main/R/simulator_lv_discrete.R" class="external-link"><code>R/simulator_lv_discrete.R</code></a>, <a href="https://github.com/opetchey/community.simulator/blob/main/R/simulator_lv_continuous.R" class="external-link"><code>R/simulator_lv_continuous.R</code></a>, and <a href="https://github.com/opetchey/community.simulator/blob/main/R/simulator_consumer_resource_continuous.R" class="external-link"><code>R/simulator_consumer_resource_continuous.R</code></a>.</p>
+</div>
+<div class="section level3">
 <h3 id="if-you-are-a-prospective-developer">If You Are A Prospective Developer<a class="anchor" aria-label="anchor" href="#if-you-are-a-prospective-developer"></a>
 </h3>
 <p>Start with the <a href="https://opetchey.github.io/community.simulator/articles/User_guide.html">User Guide</a>, then inspect the pkgdown <a href="https://opetchey.github.io/community.simulator/reference/index.html">reference index</a> to see the intended public API surface. The main user-facing path is the YAML workflow; legacy internals are deliberately kept out of the reference index where possible.</p>
@@ -190,6 +195,11 @@
 </h2>
 <p>The main experiment path is now the YAML specification read by <code><a href="reference/run_experiment.html">run_experiment()</a></code>. The 0.8.0 release preserved backwards compatibility for older names and JSON-era workflows; this rewrite intentionally makes the clearer YAML schema the user-facing interface and removes obsolete JSON-era helpers where they are no longer needed.</p>
 <p>Some internal parameter names, function arguments, and output-column names may still differ from the preferred YAML names while the implementation is being cleaned up.</p>
+</div>
+<div class="section level2">
+<h2 id="ai-declaration">AI declaration<a class="anchor" aria-label="anchor" href="#ai-declaration"></a>
+</h2>
+<p>This package was created with the help of AI tools, including agents and large language models. The AI tools were used to assist with code generation, documentation, and testing. The authors have reviewed the simulation outputs to ensure their validity.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

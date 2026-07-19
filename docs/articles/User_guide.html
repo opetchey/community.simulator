@@ -457,9 +457,10 @@ interactions are competitive.</p>
 <div class="section level3">
 <h3 id="discrete-time-lv-dynamics">Discrete-Time LV Dynamics<a class="anchor" aria-label="anchor" href="#discrete-time-lv-dynamics"></a>
 </h3>
-<p>The discrete-time LV simulator is <code><a href="../reference/simulator_lv.html">simulator_lv()</a></code>. It
-updates species abundances through time using temperature-dependent
-intrinsic growth and the LV interaction matrix.</p>
+<p>The discrete-time LV simulator is
+<code><a href="../reference/simulator_lv_discrete.html">simulator_lv_discrete()</a></code>. It updates species abundances
+through time using temperature-dependent intrinsic growth and the LV
+interaction matrix.</p>
 <p>This model is the default when <code>model.type</code> is absent or
 set to <code>"lv_discrete"</code>.</p>
 </div>
@@ -492,6 +493,55 @@ run stops.</li>
 </ul>
 <p>Use <code>model.type: lv_continuous</code> in the YAML file to select
 this model.</p>
+</div>
+<div class="section level3">
+<h3 id="fixed-numerical-constants-in-the-lv-models">Fixed Numerical Constants In The LV Models<a class="anchor" aria-label="anchor" href="#fixed-numerical-constants-in-the-lv-models"></a>
+</h3>
+<p>Both LV simulators currently include three fixed internal constants
+that are part of the model implementation rather than YAML options:</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="23%">
+<col width="30%">
+<col width="23%">
+<col width="23%">
+</colgroup>
+<thead><tr class="header">
+<th>Constant</th>
+<th align="right">Value</th>
+<th>Where used</th>
+<th>Meaning</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>bet</code></td>
+<td align="right"><code>0.001</code></td>
+<td>Discrete and continuous LV</td>
+<td>Density-dependence scaling constant.</td>
+</tr>
+<tr class="even">
+<td><code>delt</code></td>
+<td align="right"><code>0.001</code></td>
+<td>Discrete and continuous LV</td>
+<td>Density-dependence scaling constant.</td>
+</tr>
+<tr class="odd">
+<td><code>net_growth_offset</code></td>
+<td align="right"><code>1e-6</code></td>
+<td>Discrete and continuous LV</td>
+<td>Small offset added to net intrinsic growth as a numerical
+safeguard.</td>
+</tr>
+</tbody>
+</table>
+<p>The two density-dependence constants enter the LV models through the
+carrying capacity scaling:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">K</span> <span class="op">&lt;-</span> <span class="va">rms</span> <span class="op">/</span> <span class="op">(</span><span class="va">bet</span> <span class="op">+</span> <span class="va">delt</span><span class="op">)</span></span></code></pre></div>
+<p>where <code>rms</code> is the temperature-dependent net intrinsic
+growth rate after adding the small offset. These constants are currently
+documented here for transparency, but they are not yet configurable in
+the YAML experiment specification.</p>
 </div>
 </div>
 <div class="section level2">
@@ -640,7 +690,7 @@ experiment with <code><a href="../reference/run_experiment.html">run_experiment(
 <li>Inspect outputs in the experiment folder.</li>
 </ol>
 <p>A compact example is:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">project_folder_location</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"~/Desktop"</span>, <span class="st">"community_simulator_projects"</span><span class="op">)</span></span>
 <span><span class="va">experiment_name</span> <span class="op">&lt;-</span> <span class="st">"discrete_lv_example"</span></span>
 <span><span class="va">experiment_design_filename</span> <span class="op">&lt;-</span> <span class="st">"experiment.yaml"</span></span>
@@ -675,6 +725,66 @@ experiment with <code><a href="../reference/run_experiment.html">run_experiment(
 developing a new workflow. By default, workflow functions stop if an
 output file already exists. Use <code>overwrite = TRUE</code> only when
 you deliberately want to replace existing outputs.</p>
+<div class="section level3">
+<h3 id="function-flow-for-one-simulation-case">Function Flow For One Simulation Case<a class="anchor" aria-label="anchor" href="#function-flow-for-one-simulation-case"></a>
+</h3>
+<p>The high-level workflow above expands a full experiment. Internally,
+each row of <code>experiment_table.RDS</code> represents one simulation
+case. For one case, the main flow is:</p>
+<pre class="text"><code>YAML experiment specification
+  -&gt; read_experiment_spec()
+  -&gt; create_experiment_table_from_spec()
+       -&gt; one row in experiment_table.RDS
+       -&gt; resolved case_spec
+       -&gt; build_community_from_spec()
+       -&gt; community_object
+
+experiment_table.RDS
+  -&gt; create_environments_from_spec()
+       -&gt; temperatures.db
+
+one experiment-table row + community_object + matching temperature series
+  -&gt; simulate_dynamics_from_spec()
+       -&gt; simulate_one_dynamics_case()
+            -&gt; simulator_lv_discrete()
+            -&gt; simulator_lv_continuous()
+            -&gt; simulator_consumer_resource_continuous()
+       -&gt; simulation_summaries.RDS
+       -&gt; population_summaries.RDS
+       -&gt; dynamics.db / resources.db, when enabled
+
+experiment table + simulation summaries + temperature series + community objects
+  -&gt; get_community_measures_from_spec()
+       -&gt; get_community_performance_optimum_measures()
+       -&gt; get_community_CPC_measures()
+       -&gt; community_measures.RDS</code></pre>
+<p>In words:</p>
+<ol style="list-style-type: decimal">
+<li>
+<code><a href="../reference/run_experiment.html">run_experiment()</a></code> reads and validates the YAML
+experiment specification.</li>
+<li>
+<code><a href="../reference/create_experiment_table_from_spec.html">create_experiment_table_from_spec()</a></code> expands treatments
+and replicates into one row per simulation case.</li>
+<li>Each row contains a resolved <code>case_spec</code> and a generated
+<code>community_object</code>.</li>
+<li>
+<code><a href="../reference/create_environments_from_spec.html">create_environments_from_spec()</a></code> creates environmental
+temperature series, keyed by <code>env_series_id</code>.</li>
+<li>
+<code><a href="../reference/simulate_dynamics_from_spec.html">simulate_dynamics_from_spec()</a></code> loops over the
+experiment-table rows. For each case it selects the community, selects
+the matching environment, and dispatches to the appropriate simulator
+for the model type.</li>
+<li>Simulation output is summarised into compact case and population
+summaries; full dynamics or resource time series are written only when
+requested.</li>
+<li>
+<code><a href="../reference/get_community_measures_from_spec.html">get_community_measures_from_spec()</a></code> combines dynamic
+summaries, realized trait summaries, and community performance or
+viability measures into <code>community_measures.RDS</code>.</li>
+</ol>
+</div>
 </div>
 <div class="section level2">
 <h2 id="interactive-shiny-explorer">Interactive Shiny Explorer<a class="anchor" aria-label="anchor" href="#interactive-shiny-explorer"></a>
@@ -683,11 +793,11 @@ you deliberately want to replace existing outputs.</p>
 one community at a time. It is intended as a learning and reviewer aid
 rather than a replacement for the YAML experiment workflow.</p>
 <p>Launch the app from an installed package with:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/run_simulation_explorer.html">run_simulation_explorer</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>If you are working from the RStudio project in a local checkout, you
 can also source the project launcher:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="st">"scripts/run_simulation_explorer.R"</span><span class="op">)</span></span></code></pre></div>
 <p>The app supports all three population dynamic models:</p>
 <ul>
@@ -750,27 +860,27 @@ a user would adapt for analysis.</p>
 written directly as YAML scalars, lists, and mappings. The package does
 not evaluate R expressions from the experiment specification.</p>
 <p>Single numeric and character values are written directly:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">model</span><span class="kw">:</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="at">  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> lv_continuous</span></span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="fu">environment</span><span class="kw">:</span></span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="at">  </span><span class="fu">temperature</span><span class="kw">:</span></span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="at">    </span><span class="fu">mean</span><span class="kw">:</span><span class="at"> </span><span class="dv">20</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">model</span><span class="kw">:</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="at">  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> lv_continuous</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="fu">environment</span><span class="kw">:</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="at">  </span><span class="fu">temperature</span><span class="kw">:</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="at">    </span><span class="fu">mean</span><span class="kw">:</span><span class="at"> </span><span class="dv">20</span></span></code></pre></div>
 <p>Treatment vectors are written as YAML lists. If
 <code>treatments.mode</code> is omitted, the package uses full factorial
 expansion.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">treatments</span><span class="kw">:</span></span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="at">  </span><span class="fu">values</span><span class="kw">:</span></span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="at">    </span><span class="fu">traits.birth_width.mean</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="dv">5</span><span class="kw">,</span><span class="at"> </span><span class="dv">10</span><span class="kw">,</span><span class="at"> </span><span class="dv">15</span><span class="kw">]</span></span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="at">    </span><span class="fu">environment.temperature.sd</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="fl">0.5</span><span class="kw">,</span><span class="at"> </span><span class="dv">1</span><span class="kw">,</span><span class="at"> </span><span class="dv">2</span><span class="kw">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">treatments</span><span class="kw">:</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="at">  </span><span class="fu">values</span><span class="kw">:</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="at">    </span><span class="fu">traits.birth_width.mean</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="dv">5</span><span class="kw">,</span><span class="at"> </span><span class="dv">10</span><span class="kw">,</span><span class="at"> </span><span class="dv">15</span><span class="kw">]</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="at">    </span><span class="fu">environment.temperature.sd</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="fl">0.5</span><span class="kw">,</span><span class="at"> </span><span class="dv">1</span><span class="kw">,</span><span class="at"> </span><span class="dv">2</span><span class="kw">]</span></span></code></pre></div>
 <p>Paired treatments are written as explicit rows:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">treatments</span><span class="kw">:</span></span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="at">  </span><span class="fu">mode</span><span class="kw">:</span><span class="at"> paired</span></span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="at">  </span><span class="fu">values</span><span class="kw">:</span></span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">traits.birth_width.mean</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="at">      </span><span class="fu">environment.temperature.sd</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.5</span></span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">traits.birth_width.mean</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span></span>
-<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="at">      </span><span class="fu">environment.temperature.sd</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">treatments</span><span class="kw">:</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="at">  </span><span class="fu">mode</span><span class="kw">:</span><span class="at"> paired</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="at">  </span><span class="fu">values</span><span class="kw">:</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">traits.birth_width.mean</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="at">      </span><span class="fu">environment.temperature.sd</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.5</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">traits.birth_width.mean</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="at">      </span><span class="fu">environment.temperature.sd</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span></code></pre></div>
 <p>Treatment paths must already exist in the baseline specification.
 This catches spelling errors before the experiment starts.</p>
 <div class="section level3">
@@ -936,8 +1046,9 @@ generated values. Options are <code>linear</code> and
 </tr>
 <tr class="even">
 <td><code>simulation.immigration_rate</code></td>
-<td>Continuous LV</td>
-<td>Immigration rate per species.</td>
+<td>Discrete LV, continuous LV</td>
+<td>Immigration rate per species. This field is required for discrete LV
+experiments.</td>
 </tr>
 <tr class="odd">
 <td><code>simulation.immigration_mode</code></td>
@@ -994,34 +1105,42 @@ blown up.</td>
 output.</td>
 </tr>
 <tr class="odd">
+<td>Fixed LV constants</td>
+<td>Discrete LV, continuous LV</td>
+<td>
+<code>bet = 0.001</code>, <code>delt = 0.001</code>, and
+<code>net_growth_offset = 1e-6</code> are fixed internally and are not
+currently YAML options.</td>
+</tr>
+<tr class="even">
 <td><code>traits.birth_maximum.*</code></td>
 <td>LV</td>
 <td>Mean, range, and distribution for maximum birth-rate
 performance.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>traits.birth_optimum.*</code></td>
 <td>LV</td>
 <td>Mean, range, and distribution for birth-rate thermal optima.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>traits.birth_width.*</code></td>
 <td>LV</td>
 <td>Mean, range, and distribution for Gaussian birth-rate
 performance-curve widths.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>traits.death.intercept</code></td>
 <td>LV</td>
 <td>Intercept of the death-rate curve, shared across species.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>traits.death.temperature_slope</code></td>
 <td>LV</td>
 <td>Temperature sensitivity of the death-rate curve, shared across
 species.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>interactions.treatments</code></td>
 <td>LV</td>
 <td>List of LV interaction-matrix treatments. Each treatment can include
@@ -1029,102 +1148,124 @@ species.</td>
 <code>distribution</code>, <code>parameters</code>, and
 <code>diagonal</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>traits.uptake_maximum.*</code></td>
 <td>CR</td>
 <td>Mean, range, and distribution for maximum consumer uptake.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>traits.uptake_optimum.*</code></td>
 <td>CR</td>
 <td>Mean, range, and distribution for uptake thermal optima.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>traits.uptake_width.*</code></td>
 <td>CR</td>
 <td>Mean, range, and distribution for Gaussian uptake-curve widths.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>traits.half_saturation.*</code></td>
 <td>CR</td>
 <td>Mean, range, and distribution for Monod half-saturation
 constants.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>resources.use_mode</code></td>
 <td>CR</td>
 <td>Resource-use structure. Options are
 <code>one_resource_all_consumers</code>, <code>diagonal</code>, and
 <code>shared_to_private</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>resources.private_use.*</code></td>
 <td>CR</td>
 <td>Distribution, mean, range or precision for species-level
 private-resource use.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>resources.consumer_death_rate</code></td>
 <td>CR</td>
 <td>Consumer death rate, shared across consumers.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>resources.renewal_rate</code></td>
 <td>CR</td>
 <td>Chemostat resource renewal rate.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>resources.supply</code></td>
 <td>CR</td>
 <td>Resource supply concentration.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>resources.conversion_efficiency</code></td>
 <td>CR</td>
 <td>Conversion efficiency from resource uptake to consumer growth.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>parallel.workers</code></td>
 <td>All</td>
-<td>Number of worker processes for parallel steps.</td>
+<td>Number of worker processes for parallel steps. Use a positive
+integer, <code>available_cores</code>,
+<code>available_cores_minus_1</code>, or <code>auto</code>
+(<code>auto</code> is equivalent to
+<code>available_cores_minus_1</code>).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>parallel.environments</code></td>
 <td>All</td>
 <td>Logical. If <code>TRUE</code>, generate environmental time series in
 parallel where supported.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>parallel.simulations</code></td>
 <td>All</td>
 <td>Logical. If <code>TRUE</code>, simulate cases in parallel where
 supported.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>parallel.community_measures</code></td>
 <td>All</td>
 <td>Logical. If <code>TRUE</code>, calculate community performance curve
 measures in parallel where supported.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>output.dynamics_save_every</code></td>
 <td>All</td>
 <td>Interval between saved population-dynamics output time points.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>output.resources_save_every</code></td>
 <td>CR</td>
 <td>Interval between saved resource output time points.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>output.save_dynamics</code></td>
 <td>All</td>
 <td>Logical. If <code>TRUE</code>, write <code>dynamics.db</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>output.save_resources</code></td>
 <td>CR</td>
 <td>Logical. If <code>TRUE</code>, write <code>resources.db</code>.</td>
+</tr>
+<tr class="even">
+<td><code>output.runtime_update_every</code></td>
+<td>All</td>
+<td>Number of completed cases between sparse progress updates. Defaults
+to 100.</td>
+</tr>
+<tr class="odd">
+<td><code>output.environment_progress</code></td>
+<td>All</td>
+<td>Logical. If <code>TRUE</code>, print elapsed-time progress while
+environments are generated.</td>
+</tr>
+<tr class="even">
+<td><code>output.simulation_progress</code></td>
+<td>All</td>
+<td>Logical. If <code>TRUE</code>, print elapsed-time progress while
+simulations and community-performance measures are calculated.</td>
 </tr>
 <tr class="odd">
 <td><code>treatments.mode</code></td>
@@ -1448,12 +1589,20 @@ performance curve measures in parallel.</li>
 <li>
 <code>parallel.workers</code>: number of worker processes.</li>
 <li>
-<code>runtime.update_every</code>: how often progress updates are
-printed.</li>
+<code>output.runtime_update_every</code>: how often sparse progress
+updates are printed; the default is every 100 completed cases.</li>
 <li>
-<code>runtime.environment_progress</code>: whether
+<code>output.environment_progress</code>: whether
 environment-generation progress is printed.</li>
+<li>
+<code>output.simulation_progress</code>: whether simulation and
+community-performance progress is printed.</li>
 </ul>
+<p>Progress updates are separate from the <code>verbose</code> argument
+to <code><a href="../reference/run_experiment.html">run_experiment()</a></code>. Setting <code>verbose = FALSE</code>
+suppresses setup and file-writing chatter, but still allows the sparse
+progress updates requested in the YAML. Each progress message includes
+completed cases, elapsed time, and estimated remaining time.</p>
 <p>When parallel generation or simulation is enabled, database writing
 is still handled by the parent process. Parallel processing is intended
 for macOS/Linux.</p>

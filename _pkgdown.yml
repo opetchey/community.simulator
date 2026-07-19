@@ -54,7 +54,7 @@ reference:
   - title: Model engines
     desc: Direct low-level simulators for advanced use.
     contents:
-      - simulator_lv
+      - simulator_lv_discrete
       - simulator_lv_continuous
       - simulator_consumer_resource_continuous
       - intrinsic_growth_gaussian

@@ -464,3 +464,6 @@ Keep this section updated as the rewrite proceeds.
   performance calculations report sparse progress with elapsed time and
   estimated remaining time; and these progress updates are controlled by YAML
   output settings rather than by `run_experiment(verbose = ...)`.
+- Discrete LV simulations now use `simulation.immigration_rate` from YAML. This
+  field is required for `model.type: lv_discrete` and is passed to
+  `simulator_lv_discrete()` rather than relying on a hard-coded value.

@@ -345,6 +345,12 @@ validate_environment_spec <- function(environment) {
 validate_simulation_spec <- function(simulation, model_type) {
   require_nonnegative_integer(simulation$burn_in_duration, "simulation.burn_in_duration")
   require_positive_integer(simulation$experiment_duration, "simulation.experiment_duration")
+  if (identical(model_type, "lv_discrete") && is.null(simulation$immigration_rate)) {
+    stop(
+      "`simulation.immigration_rate` is required when `model.type` is `lv_discrete`.",
+      call. = FALSE
+    )
+  }
   if (!is.null(simulation$temperature_interpolation)) {
     require_one_of(
       simulation$temperature_interpolation,

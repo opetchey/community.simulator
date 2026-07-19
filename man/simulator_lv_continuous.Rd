@@ -54,7 +54,8 @@ between supplied time points. One of \code{"linear"} or \code{"constant"}.}
 Time series of population abundances for each species.
 }
 \description{
-Simulate Lotka-Volterra community dynamics in continuous time
+The LV carrying-capacity scaling constants are fixed internally at
+\code{bet = delt = 0.001}, and net growth includes a small offset of \code{1e-6}.
 }
 \examples{
 NULL

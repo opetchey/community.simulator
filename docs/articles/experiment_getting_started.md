@@ -59,28 +59,28 @@ outputs <- suppressWarnings(
 
 outputs
 #> $experiment_folder
-#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpvLZy7y/getting_started_example/"
+#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpwRVFww/getting_started_example/"
 #> 
 #> $experiment_log
-#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpvLZy7y/getting_started_example//experiment_log.txt"
+#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpwRVFww/getting_started_example//experiment_log.txt"
 #> 
 #> $experiment_table
-#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpvLZy7y/getting_started_example//experiment_table.RDS"
+#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpwRVFww/getting_started_example//experiment_table.RDS"
 #> 
 #> $temperatures_db
-#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpvLZy7y/getting_started_example//temperatures.db"
+#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpwRVFww/getting_started_example//temperatures.db"
 #> 
 #> $simulation_summaries
-#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpvLZy7y/getting_started_example//simulation_summaries.RDS"
+#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpwRVFww/getting_started_example//simulation_summaries.RDS"
 #> 
 #> $population_summaries
-#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpvLZy7y/getting_started_example//population_summaries.RDS"
+#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpwRVFww/getting_started_example//population_summaries.RDS"
 #> 
 #> $community_measures
-#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpvLZy7y/getting_started_example//community_measures.RDS"
+#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpwRVFww/getting_started_example//community_measures.RDS"
 #> 
 #> $dynamics_db
-#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpvLZy7y/getting_started_example//dynamics.db"
+#> [1] "/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpwRVFww/getting_started_example//dynamics.db"
 ```
 
 ## Inspect the Main Output
@@ -93,8 +93,8 @@ community_measures[, c("case_id", "richness", "temperature_mean", "cv_total_abun
 #> # A tibble: 2 × 4
 #>   case_id richness temperature_mean cv_total_abundance
 #>   <chr>      <int>            <int>              <dbl>
-#> 1 case_1         2               20            0.00377
-#> 2 case_2         2               20            0.00596
+#> 1 case_1         2               20            0.00686
+#> 2 case_2         2               20            0.00197
 ```
 
 ## Inspect the Experiment Log
@@ -106,11 +106,11 @@ parsed by software.
 ``` r
 
 readLines(outputs$experiment_log, n = 5)
-#> [1] "{\"timestamp\":\"2026-07-18T13:13:04.440+0200\",\"event\":\"workflow_started\",\"log_format\":\"newline_delimited_json\",\"log_format_version\":1,\"message\":\"Experiment workflow started.\",\"experiment_name\":\"getting_started_example\",\"experiment_folder\":\"/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpvLZy7y/getting_started_example/\",\"experiment_design_filename\":\"experiment.yaml\",\"design_path\":\"/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpvLZy7y/getting_started_example//experiment.yaml\",\"r_version\":\"4.4.1\",\"platform\":\"aarch64-apple-darwin20\"} "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
-#> [2] "{\"timestamp\":\"2026-07-18T13:13:04.463+0200\",\"event\":\"experiment_specification\",\"message\":\"Experiment specification read from the design YAML file.\",\"experiment_design_filename\":\"experiment.yaml\",\"specification\":{\"experiment\":{\"name\":\"lv_discrete_example\",\"random_seed\":123},\"model\":{\"type\":\"lv_discrete\"},\"community\":{\"richness\":2,\"replicates\":1},\"traits\":{\"birth_maximum\":{\"mean\":0.3,\"range\":0,\"distribution\":\"random_uniform\"},\"birth_optimum\":{\"mean\":20,\"range\":4,\"distribution\":\"random_uniform\"},\"birth_width\":{\"mean\":10,\"range\":0,\"distribution\":\"random_uniform\"},\"death\":{\"intercept\":0,\"temperature_slope\":0.05}},\"interactions\":{\"treatments\":[{\"label\":\"no_interactions\",\"type\":\"none\",\"diagonal\":1},{\"label\":\"weak_asymmetric_competition\",\"type\":\"competition\",\"symmetry\":\"asymmetric\",\"distribution\":\"uniform\",\"parameters\":{\"min\":0,\"max\":0.2},\"diagonal\":1}]},\"environment\":{\"replicates\":1,\"sharing\":\"same_per_replicate\",\"temperature\":{\"mean\":20,\"sd\":1,\"one_over_f_gamma\":0.8}},\"simulation\":{\"burn_in_duration\":10,\"experiment_duration\":20},\"parallel\":{\"workers\":1,\"environments\":false,\"simulations\":false,\"community_measures\":false}}} "
-#> [3] "{\"timestamp\":\"2026-07-18T13:13:04.465+0200\",\"event\":\"step_started\",\"step\":\"create_experiment_table\",\"message\":\"Started create_experiment_table.\"} "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
-#> [4] "{\"timestamp\":\"2026-07-18T13:13:04.586+0200\",\"event\":\"step_completed\",\"step\":\"create_experiment_table\",\"message\":\"Completed create_experiment_table.\",\"elapsed_seconds\":0.1208,\"elapsed\":\"0 sec\"} "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-#> [5] "{\"timestamp\":\"2026-07-18T13:13:04.587+0200\",\"event\":\"step_started\",\"step\":\"estimate_experiment_outputs\",\"message\":\"Started estimate_experiment_outputs.\"} "
+#> [1] "{\"timestamp\":\"2026-07-19T09:27:35.012+0200\",\"event\":\"workflow_started\",\"log_format\":\"newline_delimited_json\",\"log_format_version\":1,\"message\":\"Experiment workflow started.\",\"experiment_name\":\"getting_started_example\",\"experiment_folder\":\"/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpwRVFww/getting_started_example/\",\"experiment_design_filename\":\"experiment.yaml\",\"design_path\":\"/var/folders/n6/znr623xs6p1c9cxng0bf52c40000gv/T//RtmpwRVFww/getting_started_example//experiment.yaml\",\"r_version\":\"4.4.1\",\"platform\":\"aarch64-apple-darwin20\"} "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+#> [2] "{\"timestamp\":\"2026-07-19T09:27:35.035+0200\",\"event\":\"experiment_specification\",\"message\":\"Experiment specification read from the design YAML file.\",\"experiment_design_filename\":\"experiment.yaml\",\"specification\":{\"experiment\":{\"name\":\"lv_discrete_example\",\"random_seed\":123},\"model\":{\"type\":\"lv_discrete\"},\"community\":{\"richness\":2,\"replicates\":1},\"traits\":{\"birth_maximum\":{\"mean\":0.3,\"range\":0,\"distribution\":\"random_uniform\"},\"birth_optimum\":{\"mean\":20,\"range\":4,\"distribution\":\"random_uniform\"},\"birth_width\":{\"mean\":10,\"range\":0,\"distribution\":\"random_uniform\"},\"death\":{\"intercept\":0,\"temperature_slope\":0.05}},\"interactions\":{\"treatments\":[{\"label\":\"no_interactions\",\"type\":\"none\",\"diagonal\":1},{\"label\":\"weak_asymmetric_competition\",\"type\":\"competition\",\"symmetry\":\"asymmetric\",\"distribution\":\"uniform\",\"parameters\":{\"min\":0,\"max\":0.2},\"diagonal\":1}]},\"environment\":{\"replicates\":1,\"sharing\":\"same_per_replicate\",\"temperature\":{\"mean\":20,\"sd\":1,\"one_over_f_gamma\":0.8}},\"simulation\":{\"burn_in_duration\":10,\"experiment_duration\":20,\"immigration_rate\":0.1},\"parallel\":{\"workers\":1,\"environments\":false,\"simulations\":false,\"community_measures\":false}}} "
+#> [3] "{\"timestamp\":\"2026-07-19T09:27:35.038+0200\",\"event\":\"step_started\",\"step\":\"create_experiment_table\",\"message\":\"Started create_experiment_table.\"} "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+#> [4] "{\"timestamp\":\"2026-07-19T09:27:35.163+0200\",\"event\":\"step_completed\",\"step\":\"create_experiment_table\",\"message\":\"Completed create_experiment_table.\",\"elapsed_seconds\":0.1246,\"elapsed\":\"0 sec\"} "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+#> [5] "{\"timestamp\":\"2026-07-19T09:27:35.163+0200\",\"event\":\"step_started\",\"step\":\"estimate_experiment_outputs\",\"message\":\"Started estimate_experiment_outputs.\"} "
 ```
 
 ## Main Output Files
@@ -142,6 +142,6 @@ Once this small example works, the usual next steps are:
 - rerun the workflow for a new experiment name
 - inspect `community_measures.RDS`, `experiment_log.txt`, `dynamics.db`,
   and `temperatures.db`
-- use the single-community walkthroughs in `reports/examples` to
+- use the single-community walkthroughs on the pkgdown site to
   understand how each model behaves before scaling up to experiment
   grids

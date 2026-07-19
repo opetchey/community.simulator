@@ -40,7 +40,10 @@ run_experiment(
 
 - verbose:
 
-  Logical. If `TRUE`, print progress messages during the workflow.
+  Logical. If `TRUE`, print setup, output-file, and workflow status
+  messages. Sparse progress updates during long-running steps are
+  controlled by the YAML `output.*_progress` and
+  `output.runtime_update_every` fields.
 
 - confirm_run:
 

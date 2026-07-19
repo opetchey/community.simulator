@@ -271,7 +271,7 @@ competitive.
 ### Discrete-Time LV Dynamics
 
 The discrete-time LV simulator is
-[`simulator_lv()`](https://opetchey.github.io/community.simulator/reference/simulator_lv.md).
+[`simulator_lv_discrete()`](https://opetchey.github.io/community.simulator/reference/simulator_lv_discrete.md).
 It updates species abundances through time using temperature-dependent
 intrinsic growth and the LV interaction matrix.
 
@@ -295,6 +295,30 @@ adds ODE-specific controls:
 - `blowup_threshold`: abundance threshold above which the run stops.
 
 Use `model.type: lv_continuous` in the YAML file to select this model.
+
+### Fixed Numerical Constants In The LV Models
+
+Both LV simulators currently include three fixed internal constants that
+are part of the model implementation rather than YAML options:
+
+| Constant | Value | Where used | Meaning |
+|----|---:|----|----|
+| `bet` | `0.001` | Discrete and continuous LV | Density-dependence scaling constant. |
+| `delt` | `0.001` | Discrete and continuous LV | Density-dependence scaling constant. |
+| `net_growth_offset` | `1e-6` | Discrete and continuous LV | Small offset added to net intrinsic growth as a numerical safeguard. |
+
+The two density-dependence constants enter the LV models through the
+carrying capacity scaling:
+
+``` r
+
+K <- rms / (bet + delt)
+```
+
+where `rms` is the temperature-dependent net intrinsic growth rate after
+adding the small offset. These constants are currently documented here
+for transparency, but they are not yet configurable in the YAML
+experiment specification.
 
 ## Consumer-Resource Model
 
@@ -447,6 +471,63 @@ These functions can also be run individually when debugging or
 developing a new workflow. By default, workflow functions stop if an
 output file already exists. Use `overwrite = TRUE` only when you
 deliberately want to replace existing outputs.
+
+### Function Flow For One Simulation Case
+
+The high-level workflow above expands a full experiment. Internally,
+each row of `experiment_table.RDS` represents one simulation case. For
+one case, the main flow is:
+
+``` text
+YAML experiment specification
+  -> read_experiment_spec()
+  -> create_experiment_table_from_spec()
+       -> one row in experiment_table.RDS
+       -> resolved case_spec
+       -> build_community_from_spec()
+       -> community_object
+
+experiment_table.RDS
+  -> create_environments_from_spec()
+       -> temperatures.db
+
+one experiment-table row + community_object + matching temperature series
+  -> simulate_dynamics_from_spec()
+       -> simulate_one_dynamics_case()
+            -> simulator_lv_discrete()
+            -> simulator_lv_continuous()
+            -> simulator_consumer_resource_continuous()
+       -> simulation_summaries.RDS
+       -> population_summaries.RDS
+       -> dynamics.db / resources.db, when enabled
+
+experiment table + simulation summaries + temperature series + community objects
+  -> get_community_measures_from_spec()
+       -> get_community_performance_optimum_measures()
+       -> get_community_CPC_measures()
+       -> community_measures.RDS
+```
+
+In words:
+
+1.  [`run_experiment()`](https://opetchey.github.io/community.simulator/reference/run_experiment.md)
+    reads and validates the YAML experiment specification.
+2.  [`create_experiment_table_from_spec()`](https://opetchey.github.io/community.simulator/reference/create_experiment_table_from_spec.md)
+    expands treatments and replicates into one row per simulation case.
+3.  Each row contains a resolved `case_spec` and a generated
+    `community_object`.
+4.  [`create_environments_from_spec()`](https://opetchey.github.io/community.simulator/reference/create_environments_from_spec.md)
+    creates environmental temperature series, keyed by `env_series_id`.
+5.  [`simulate_dynamics_from_spec()`](https://opetchey.github.io/community.simulator/reference/simulate_dynamics_from_spec.md)
+    loops over the experiment-table rows. For each case it selects the
+    community, selects the matching environment, and dispatches to the
+    appropriate simulator for the model type.
+6.  Simulation output is summarised into compact case and population
+    summaries; full dynamics or resource time series are written only
+    when requested.
+7.  [`get_community_measures_from_spec()`](https://opetchey.github.io/community.simulator/reference/get_community_measures_from_spec.md)
+    combines dynamic summaries, realized trait summaries, and community
+    performance or viability measures into `community_measures.RDS`.
 
 ## Interactive Shiny Explorer
 
@@ -603,7 +684,7 @@ used by the bundled example experiments.
 | `simulation.burn_in_duration` | All | Number of initial time steps or time units treated as burn-in. |
 | `simulation.experiment_duration` | All | Number of post-burn-in time steps or time units used for the experiment. |
 | `simulation.temperature_interpolation` | Continuous LV, CR | How the continuous-time simulator interpolates temperature between generated values. Options are `linear` and `constant`. |
-| `simulation.immigration_rate` | Continuous LV | Immigration rate per species. |
+| `simulation.immigration_rate` | Discrete LV, continuous LV | Immigration rate per species. This field is required for discrete LV experiments. |
 | `simulation.immigration_mode` | Continuous LV | How immigration is applied. Options are `continuous` and `pulse`. |
 | `simulation.consumer_immigration_rate` | CR | Immigration rate for consumers. |
 | `simulation.initial_consumer_total_abundance` | CR | Initial total consumer abundance distributed across consumers. |
@@ -614,6 +695,7 @@ used by the bundled example experiments.
 | `simulation.ode.max_step` | Continuous LV, CR | Maximum ODE solver step size. |
 | `simulation.blowup_threshold` | Continuous LV, CR | Abundance threshold above which a simulation is treated as having blown up. |
 | `simulation.negative_tolerance` | CR | Small numerical tolerance used when checking negative values in ODE output. |
+| Fixed LV constants | Discrete LV, continuous LV | `bet = 0.001`, `delt = 0.001`, and `net_growth_offset = 1e-6` are fixed internally and are not currently YAML options. |
 | `traits.birth_maximum.*` | LV | Mean, range, and distribution for maximum birth-rate performance. |
 | `traits.birth_optimum.*` | LV | Mean, range, and distribution for birth-rate thermal optima. |
 | `traits.birth_width.*` | LV | Mean, range, and distribution for Gaussian birth-rate performance-curve widths. |
@@ -630,7 +712,7 @@ used by the bundled example experiments.
 | `resources.renewal_rate` | CR | Chemostat resource renewal rate. |
 | `resources.supply` | CR | Resource supply concentration. |
 | `resources.conversion_efficiency` | CR | Conversion efficiency from resource uptake to consumer growth. |
-| `parallel.workers` | All | Number of worker processes for parallel steps. |
+| `parallel.workers` | All | Number of worker processes for parallel steps. Use a positive integer, `available_cores`, `available_cores_minus_1`, or `auto` (`auto` is equivalent to `available_cores_minus_1`). |
 | `parallel.environments` | All | Logical. If `TRUE`, generate environmental time series in parallel where supported. |
 | `parallel.simulations` | All | Logical. If `TRUE`, simulate cases in parallel where supported. |
 | `parallel.community_measures` | All | Logical. If `TRUE`, calculate community performance curve measures in parallel where supported. |
@@ -638,6 +720,9 @@ used by the bundled example experiments.
 | `output.resources_save_every` | CR | Interval between saved resource output time points. |
 | `output.save_dynamics` | All | Logical. If `TRUE`, write `dynamics.db`. |
 | `output.save_resources` | CR | Logical. If `TRUE`, write `resources.db`. |
+| `output.runtime_update_every` | All | Number of completed cases between sparse progress updates. Defaults to 100. |
+| `output.environment_progress` | All | Logical. If `TRUE`, print elapsed-time progress while environments are generated. |
+| `output.simulation_progress` | All | Logical. If `TRUE`, print elapsed-time progress while simulations and community-performance measures are calculated. |
 | `treatments.mode` | All | Treatment expansion mode. Defaults to `factorial`; use `paired` for explicit treatment rows. |
 | `treatments.values` | All | Named dotted paths and treatment values to apply to the baseline specification. |
 
@@ -752,9 +837,19 @@ Experiment YAML files can include runtime controls for larger runs:
 - `parallel.community_measures`: calculate community performance curve
   measures in parallel.
 - `parallel.workers`: number of worker processes.
-- `runtime.update_every`: how often progress updates are printed.
-- `runtime.environment_progress`: whether environment-generation
-  progress is printed.
+- `output.runtime_update_every`: how often sparse progress updates are
+  printed; the default is every 100 completed cases.
+- `output.environment_progress`: whether environment-generation progress
+  is printed.
+- `output.simulation_progress`: whether simulation and
+  community-performance progress is printed.
+
+Progress updates are separate from the `verbose` argument to
+[`run_experiment()`](https://opetchey.github.io/community.simulator/reference/run_experiment.md).
+Setting `verbose = FALSE` suppresses setup and file-writing chatter, but
+still allows the sparse progress updates requested in the YAML. Each
+progress message includes completed cases, elapsed time, and estimated
+remaining time.
 
 When parallel generation or simulation is enabled, database writing is
 still handled by the parent process. Parallel processing is intended for

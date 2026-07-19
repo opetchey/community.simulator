@@ -1,5 +1,8 @@
 #' Simulate Lotka-Volterra community dynamics in continuous time
 #'
+#' The LV carrying-capacity scaling constants are fixed internally at
+#' `bet = delt = 0.001`, and net growth includes a small offset of `1e-6`.
+#'
 #' @param input_com_params Community object, containing all species and
 #'   community parameters.
 #' @param TcelSeries Time series of temperature values.

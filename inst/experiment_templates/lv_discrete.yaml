@@ -51,6 +51,7 @@ environment:
 simulation:
   burn_in_duration: 10
   experiment_duration: 20
+  immigration_rate: 0.1
 
 parallel:
   workers: 1

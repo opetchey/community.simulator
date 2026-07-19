@@ -113,5 +113,5 @@ Once this small example works, the usual next steps are:
 - rerun the workflow for a new experiment name
 - inspect `community_measures.RDS`, `experiment_log.txt`, `dynamics.db`, and
   `temperatures.db`
-- use the single-community walkthroughs in `reports/examples` to understand how
+- use the single-community walkthroughs on the pkgdown site to understand how
   each model behaves before scaling up to experiment grids

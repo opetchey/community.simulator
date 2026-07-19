@@ -61,7 +61,7 @@ Plot one-community outputs or launch the Shiny simulation explorer.
 
 Direct low-level simulators for advanced use.
 
-- [`simulator_lv()`](https://opetchey.github.io/community.simulator/reference/simulator_lv.md)
+- [`simulator_lv_discrete()`](https://opetchey.github.io/community.simulator/reference/simulator_lv_discrete.md)
   : Simulate the population dynamics of a community of species using the
   Lotka-Volterra competition model with temperature-dependent vital
   rates.
