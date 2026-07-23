@@ -39,8 +39,6 @@ library(community.simulator)
 
 ```{r run-example}
 project_folder_location <- tempdir()
-## or desktop 
-project_folder_location <- "~/Desktop"
 experiment_name <- "getting_started_example"
 experiment_design_filename <- "experiment.yaml"
 experiment_folder <- file.path(project_folder_location, experiment_name)
