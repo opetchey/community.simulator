@@ -599,8 +599,10 @@ Higher beta precision gives less among-species variation around the mean.
 ## Environment Specification
 
 Environmental variation is generated as temperature time series. The current
-experiment workflow uses a `1/f` process from the `primer` package. The main
-temperature fields are:
+experiment workflow uses a memory-efficient spectral `1/f` process. The raw
+series is rescaled after generation, so the realized mean and sample standard
+deviation of each generated temperature series match the requested values. The
+main temperature fields are:
 
 - `temperature_mean`: mean temperature.
 - `temperature_sd`: standard deviation of the temperature series.
@@ -678,8 +680,10 @@ outputs.
 ### Function Flow For One Simulation Case
 
 The high-level workflow above expands a full experiment. Internally, each row of
-`experiment_table.RDS` represents one simulation case. For one case, the main
-flow is:
+`experiment_table.RDS` represents one simulation case. The workflow also writes
+lean runtime tables so environment creation and simulation do not need to keep
+the full table, including resolved `case_spec` objects, in memory. For one case,
+the main flow is:
 
 ```text
 YAML experiment specification
@@ -689,12 +693,15 @@ YAML experiment specification
        -> resolved case_spec
        -> build_community_from_spec()
        -> community_object
+       -> environment_table.RDS
+       -> simulation_table.RDS
+       -> community_objects.RDS
 
-experiment_table.RDS
+environment_table.RDS
   -> create_environments_from_spec()
        -> temperatures.db
 
-one experiment-table row + community_object + matching temperature series
+one simulation-table row + community_object + matching temperature series
   -> simulate_dynamics_from_spec()
        -> simulate_one_dynamics_case()
             -> simulator_lv_discrete()
@@ -716,10 +723,12 @@ In words:
 1. `run_experiment()` reads and validates the YAML experiment specification.
 2. `create_experiment_table_from_spec()` expands treatments and replicates into
    one row per simulation case.
-3. Each row contains a resolved `case_spec` and a generated `community_object`.
-4. `create_environments_from_spec()` creates environmental temperature series,
-   keyed by `env_series_id`.
-5. `simulate_dynamics_from_spec()` loops over the experiment-table rows. For
+3. The full experiment table contains a resolved `case_spec` and generated
+   `community_object`; lean runtime tables separate unique environment series,
+   simulation rows, and unique community objects.
+4. `create_environments_from_spec()` creates environmental temperature series
+   from `environment_table.RDS`, keyed by `env_series_id`.
+5. `simulate_dynamics_from_spec()` loops over the simulation-table rows. For
    each case it selects the community, selects the matching environment, and
    dispatches to the appropriate simulator for the model type.
 6. Simulation output is summarised into compact case and population summaries;
@@ -923,6 +932,12 @@ The workflow writes outputs inside the experiment folder. The core outputs are:
 
 - `experiment_table.RDS`: one row per simulation case, including the community
   object for each case.
+- `environment_table.RDS`: one row per unique environmental time series to
+  generate.
+- `simulation_table.RDS`: one row per simulation case, without the large
+  resolved specification and community-object list columns.
+- `community_objects.RDS`: one row per unique community object, keyed by
+  `community_id`.
 - `experiment_log.txt`: newline-delimited JSON records describing the
   experiment specification, workflow events, output paths, and elapsed time for
   each step.

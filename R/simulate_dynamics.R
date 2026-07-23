@@ -165,6 +165,7 @@ initial_abundance_seed_for_case <- function(initial_abundance_seed_base,
 
 simulate_one_dynamics_case <- function(i,
                                        expt,
+                                       community_objects = NULL,
                                        temperatures_data,
                                        expt_def,
                                        dynamics_type,
@@ -188,6 +189,15 @@ simulate_one_dynamics_case <- function(i,
                                        initial_abundance_seed_base) {
 
   env_series_oi <- expt$env_series_id[i]
+  community <- if (!is.null(community_objects)) {
+    community_id <- expt$community_id[[i]]
+    community_objects[[community_id]]
+  } else {
+    expt$community_object[[i]]
+  }
+  if (is.null(community)) {
+    stop("Community object not found for case ", expt$case_id[i], ".", call. = FALSE)
+  }
 
   temperatures_oi <- temperatures_data |>
     dplyr::filter(.data$env_series_id == env_series_oi)
@@ -216,7 +226,7 @@ simulate_one_dynamics_case <- function(i,
   ]
   solver_output_times <- sort(unique(c(output_times, resource_output_times)))
 
-  S <- expt[i, ]$community_object[[1]]$S
+  S <- community$S
   if (!is.null(initial_abundance_seed_base)) {
     set.seed(initial_abundance_seed_for_case(initial_abundance_seed_base, expt, i))
   }
@@ -227,7 +237,7 @@ simulate_one_dynamics_case <- function(i,
   returned_times <- integration_times
   if (dynamics_type == "discrete") {
     spts <- simulator_lv_discrete(
-      input_com_params = expt$community_object[[i]],
+      input_com_params = community,
       TcelSeries = Tcel_controlm,
       initial_abundances = initial_abundances,
       immigration_rate = immigration_rate
@@ -236,7 +246,7 @@ simulate_one_dynamics_case <- function(i,
 
   if (dynamics_type == "continuous") {
     spts <- simulator_lv_continuous(
-      input_com_params = expt$community_object[[i]],
+      input_com_params = community,
       TcelSeries = Tcel_controlm,
       initial_abundances = initial_abundances,
       times = integration_times,
@@ -254,9 +264,9 @@ simulate_one_dynamics_case <- function(i,
   }
 
   if (dynamics_type == "consumer_resource_continuous") {
-    initial_resources <- rep(resource_initial_value, expt$community_object[[i]]$R)
+    initial_resources <- rep(resource_initial_value, community$R)
     cr_output <- simulator_consumer_resource_continuous(
-      input_com_params = expt$community_object[[i]],
+      input_com_params = community,
       TcelSeries = Tcel_controlm,
       initial_consumer_abundances = initial_abundances,
       initial_resource_values = initial_resources,

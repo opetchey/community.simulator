@@ -393,6 +393,23 @@ get_community_CPC_measures <- function(temperatures,
             call. = FALSE
           )
         }
+        if (is.null(case_result)) {
+          warning(
+            "CPC measure case ",
+            case_index,
+            " did not return a result from a parallel worker; rerunning it in the main R process.",
+            call. = FALSE
+          )
+          case_result <- calculate_case_cpc(case_index)
+          if (is.null(case_result)) {
+            stop(
+              "CPC measure case ",
+              case_index,
+              " returned NULL after rerunning in the main R process.",
+              call. = FALSE
+            )
+          }
+        }
 
         community_performance_measures[[case_index]] <- case_result
         completed_cases <- completed_cases + 1L

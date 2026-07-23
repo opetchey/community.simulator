@@ -1,0 +1,80 @@
+experiment:
+  name: RC_gamma_11_local_smoke
+  random_seed: 20260665
+
+model:
+  type: consumer_resource_continuous
+
+community:
+  richness: 4
+  replicates: 1
+
+traits:
+  uptake_maximum:
+    mean: 0.06
+    range: 0
+    distribution: random_uniform
+  uptake_optimum:
+    mean: 16
+    range: 0
+    distribution: random_uniform
+  uptake_width:
+    mean: 1
+    range: 0.5
+    distribution: random_uniform
+  half_saturation:
+    mean: 100
+    range: 0
+    distribution: random_uniform
+
+resources:
+  use_mode: shared_to_private
+  active_resource: 1
+  private_use:
+    distribution: constant
+    mean: 0
+    range: 0
+  consumer_death_rate: 0.03
+  renewal_rate: 1
+  supply: 1000
+  conversion_efficiency: 1
+
+environment:
+  replicates: 1
+  sharing: same_per_replicate
+  temperature:
+    mean: 20
+    sd: 4
+    one_over_f_gamma: 0
+
+simulation:
+  burn_in_duration: 20
+  experiment_duration: 200
+  consumer_immigration_rate: 0.01
+  initial_consumer_total_abundance: 30
+  resource_initial_value: 1000
+  temperature_interpolation: linear
+  initial_abundance_seed_base: 4242
+  ode:
+    method: lsoda
+    rtol: 1e-4
+    atol: 1e-6
+    max_step: 1
+  blowup_threshold: 1e12
+  negative_tolerance: 1e-8
+
+output:
+  save_dynamics: false
+  save_resources: false
+  dynamics_save_every: 10
+
+parallel:
+  workers: 1
+  environments: false
+  simulations: false
+  community_measures: false
+
+treatments:
+  values:
+    resources.private_use.mean: [0, 0.5, 1]
+    environment.temperature.one_over_f_gamma: [0, 1]

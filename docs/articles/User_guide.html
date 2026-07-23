@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>User Guide • community.simulator</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="User Guide">
 </head>
 <body>
@@ -1081,8 +1081,11 @@ mean.</p>
 <h2 id="environment-specification">Environment Specification<a class="anchor" aria-label="anchor" href="#environment-specification"></a>
 </h2>
 <p>Environmental variation is generated as temperature time series. The
-current experiment workflow uses a <code>1/f</code> process from the
-<code>primer</code> package. The main temperature fields are:</p>
+current experiment workflow uses a memory-efficient spectral
+<code>1/f</code> process. The raw series is rescaled after generation,
+so the realized mean and sample standard deviation of each generated
+temperature series match the requested values. The main temperature
+fields are:</p>
 <ul>
 <li>
 <code>temperature_mean</code>: mean temperature.</li>
@@ -1173,7 +1176,10 @@ you deliberately want to replace existing outputs.</p>
 </h3>
 <p>The high-level workflow above expands a full experiment. Internally,
 each row of <code>experiment_table.RDS</code> represents one simulation
-case. For one case, the main flow is:</p>
+case. The workflow also writes lean runtime tables so environment
+creation and simulation do not need to keep the full table, including
+resolved <code>case_spec</code> objects, in memory. For one case, the
+main flow is:</p>
 <pre class="text"><code>YAML experiment specification
   -&gt; read_experiment_spec()
   -&gt; create_experiment_table_from_spec()
@@ -1181,12 +1187,15 @@ case. For one case, the main flow is:</p>
        -&gt; resolved case_spec
        -&gt; build_community_from_spec()
        -&gt; community_object
+       -&gt; environment_table.RDS
+       -&gt; simulation_table.RDS
+       -&gt; community_objects.RDS
 
-experiment_table.RDS
+environment_table.RDS
   -&gt; create_environments_from_spec()
        -&gt; temperatures.db
 
-one experiment-table row + community_object + matching temperature series
+one simulation-table row + community_object + matching temperature series
   -&gt; simulate_dynamics_from_spec()
        -&gt; simulate_one_dynamics_case()
             -&gt; simulator_lv_discrete()
@@ -1209,14 +1218,17 @@ experiment specification.</li>
 <li>
 <code><a href="../reference/create_experiment_table_from_spec.html">create_experiment_table_from_spec()</a></code> expands treatments
 and replicates into one row per simulation case.</li>
-<li>Each row contains a resolved <code>case_spec</code> and a generated
-<code>community_object</code>.</li>
+<li>The full experiment table contains a resolved <code>case_spec</code>
+and generated <code>community_object</code>; lean runtime tables
+separate unique environment series, simulation rows, and unique
+community objects.</li>
 <li>
 <code><a href="../reference/create_environments_from_spec.html">create_environments_from_spec()</a></code> creates environmental
-temperature series, keyed by <code>env_series_id</code>.</li>
+temperature series from <code>environment_table.RDS</code>, keyed by
+<code>env_series_id</code>.</li>
 <li>
 <code><a href="../reference/simulate_dynamics_from_spec.html">simulate_dynamics_from_spec()</a></code> loops over the
-experiment-table rows. For each case it selects the community, selects
+simulation-table rows. For each case it selects the community, selects
 the matching environment, and dispatches to the appropriate simulator
 for the model type.</li>
 <li>Simulation output is summarised into compact case and population
@@ -1735,6 +1747,16 @@ outputs are:</p>
 <code>experiment_table.RDS</code>: one row per simulation case,
 including the community object for each case.</li>
 <li>
+<code>environment_table.RDS</code>: one row per unique environmental
+time series to generate.</li>
+<li>
+<code>simulation_table.RDS</code>: one row per simulation case,
+without the large resolved specification and community-object list
+columns.</li>
+<li>
+<code>community_objects.RDS</code>: one row per unique community
+object, keyed by <code>community_id</code>.</li>
+<li>
 <code>experiment_log.txt</code>: newline-delimited JSON records
 describing the experiment specification, workflow events, output paths,
 and elapsed time for each step.</li>
@@ -2067,7 +2089,7 @@ easy to parse from R or other tools.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

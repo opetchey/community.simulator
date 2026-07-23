@@ -100,6 +100,9 @@ names(outputs)
 The most important outputs are:
 
 - `experiment_table.RDS`: one row per simulation case
+- `environment_table.RDS`: one row per unique environmental time series
+- `simulation_table.RDS`: one lean row per simulation case
+- `community_objects.RDS`: unique generated communities, keyed by community ID
 - `experiment_log.txt`: experiment specification, workflow events, and timings
 - `temperatures.db`: environmental time series
 - `dynamics.db`: saved population dynamics, when enabled

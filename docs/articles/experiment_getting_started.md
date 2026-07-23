@@ -69,6 +69,15 @@ outputs
 #> $experiment_table
 #> [1] "/Users/owenpetchey/Desktop/getting_started_example//experiment_table.RDS"
 #> 
+#> $environment_table
+#> [1] "/Users/owenpetchey/Desktop/getting_started_example//environment_table.RDS"
+#> 
+#> $simulation_table
+#> [1] "/Users/owenpetchey/Desktop/getting_started_example//simulation_table.RDS"
+#> 
+#> $community_objects
+#> [1] "/Users/owenpetchey/Desktop/getting_started_example//community_objects.RDS"
+#> 
 #> $temperatures_db
 #> [1] "/Users/owenpetchey/Desktop/getting_started_example//temperatures.db"
 #> 
@@ -95,8 +104,8 @@ community_measures[, c("case_id", "richness", "temperature_mean", "cv_total_abun
 #> # A tibble: 2 × 4
 #>   case_id richness temperature_mean cv_total_abundance
 #>   <chr>      <int>            <int>              <dbl>
-#> 1 case_1         2               20            0.00686
-#> 2 case_2         2               20            0.00197
+#> 1 case_1         2               20            0.00439
+#> 2 case_2         2               20            0.00534
 ```
 
 ## Inspect the Experiment Log
@@ -108,11 +117,11 @@ parsed by software.
 ``` r
 
 readLines(outputs$experiment_log, n = 5)
-#> [1] "{\"timestamp\":\"2026-07-19T11:29:19.726+0200\",\"event\":\"workflow_started\",\"log_format\":\"newline_delimited_json\",\"log_format_version\":1,\"message\":\"Experiment workflow started.\",\"experiment_name\":\"getting_started_example\",\"experiment_folder\":\"/Users/owenpetchey/Desktop/getting_started_example/\",\"experiment_design_filename\":\"experiment.yaml\",\"design_path\":\"/Users/owenpetchey/Desktop/getting_started_example//experiment.yaml\",\"r_version\":\"4.4.1\",\"platform\":\"aarch64-apple-darwin20\"} "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-#> [2] "{\"timestamp\":\"2026-07-19T11:29:19.728+0200\",\"event\":\"experiment_specification\",\"message\":\"Experiment specification read from the design YAML file.\",\"experiment_design_filename\":\"experiment.yaml\",\"specification\":{\"experiment\":{\"name\":\"lv_discrete_example\",\"random_seed\":123},\"model\":{\"type\":\"lv_discrete\"},\"community\":{\"richness\":2,\"replicates\":1},\"traits\":{\"birth_maximum\":{\"mean\":0.3,\"range\":0,\"distribution\":\"random_uniform\"},\"birth_optimum\":{\"mean\":20,\"range\":4,\"distribution\":\"random_uniform\"},\"birth_width\":{\"mean\":10,\"range\":0,\"distribution\":\"random_uniform\"},\"death\":{\"intercept\":0,\"temperature_slope\":0.05}},\"interactions\":{\"treatments\":[{\"label\":\"no_interactions\",\"type\":\"none\",\"diagonal\":1},{\"label\":\"weak_asymmetric_competition\",\"type\":\"competition\",\"symmetry\":\"asymmetric\",\"distribution\":\"uniform\",\"parameters\":{\"min\":0,\"max\":0.2},\"diagonal\":1}]},\"environment\":{\"replicates\":1,\"sharing\":\"same_per_replicate\",\"temperature\":{\"mean\":20,\"sd\":1,\"one_over_f_gamma\":0.8}},\"simulation\":{\"burn_in_duration\":10,\"experiment_duration\":20,\"immigration_rate\":0.1},\"parallel\":{\"workers\":1,\"environments\":false,\"simulations\":false,\"community_measures\":false}}} "
-#> [3] "{\"timestamp\":\"2026-07-19T11:29:19.731+0200\",\"event\":\"step_started\",\"step\":\"create_experiment_table\",\"message\":\"Started create_experiment_table.\"} "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-#> [4] "{\"timestamp\":\"2026-07-19T11:29:19.852+0200\",\"event\":\"step_completed\",\"step\":\"create_experiment_table\",\"message\":\"Completed create_experiment_table.\",\"elapsed_seconds\":0.121,\"elapsed\":\"0 sec\"} "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
-#> [5] "{\"timestamp\":\"2026-07-19T11:29:19.852+0200\",\"event\":\"step_started\",\"step\":\"estimate_experiment_outputs\",\"message\":\"Started estimate_experiment_outputs.\"} "
+#> [1] "{\"timestamp\":\"2026-07-23T09:34:31.464+0200\",\"event\":\"workflow_started\",\"log_format\":\"newline_delimited_json\",\"log_format_version\":1,\"message\":\"Experiment workflow started.\",\"experiment_name\":\"getting_started_example\",\"experiment_folder\":\"/Users/owenpetchey/Desktop/getting_started_example/\",\"experiment_design_filename\":\"experiment.yaml\",\"design_path\":\"/Users/owenpetchey/Desktop/getting_started_example//experiment.yaml\",\"r_version\":\"4.6.1\",\"platform\":\"aarch64-apple-darwin23\"} "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+#> [2] "{\"timestamp\":\"2026-07-23T09:34:31.466+0200\",\"event\":\"experiment_specification\",\"message\":\"Experiment specification read from the design YAML file.\",\"experiment_design_filename\":\"experiment.yaml\",\"specification\":{\"experiment\":{\"name\":\"lv_discrete_example\",\"random_seed\":123},\"model\":{\"type\":\"lv_discrete\"},\"community\":{\"richness\":2,\"replicates\":1},\"traits\":{\"birth_maximum\":{\"mean\":0.3,\"range\":0,\"distribution\":\"random_uniform\"},\"birth_optimum\":{\"mean\":20,\"range\":4,\"distribution\":\"random_uniform\"},\"birth_width\":{\"mean\":10,\"range\":0,\"distribution\":\"random_uniform\"},\"death\":{\"intercept\":0,\"temperature_slope\":0.05}},\"interactions\":{\"treatments\":[{\"label\":\"no_interactions\",\"type\":\"none\",\"diagonal\":1},{\"label\":\"weak_asymmetric_competition\",\"type\":\"competition\",\"symmetry\":\"asymmetric\",\"distribution\":\"uniform\",\"parameters\":{\"min\":0,\"max\":0.2},\"diagonal\":1}]},\"environment\":{\"replicates\":1,\"sharing\":\"same_per_replicate\",\"temperature\":{\"mean\":20,\"sd\":1,\"one_over_f_gamma\":0.8}},\"simulation\":{\"burn_in_duration\":10,\"experiment_duration\":20,\"immigration_rate\":0.1},\"parallel\":{\"workers\":1,\"environments\":false,\"simulations\":false,\"community_measures\":false}}} "
+#> [3] "{\"timestamp\":\"2026-07-23T09:34:31.468+0200\",\"event\":\"step_started\",\"step\":\"create_experiment_table\",\"message\":\"Started create_experiment_table.\"} "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+#> [4] "{\"timestamp\":\"2026-07-23T09:34:31.601+0200\",\"event\":\"step_completed\",\"step\":\"create_experiment_table\",\"message\":\"Completed create_experiment_table.\",\"elapsed_seconds\":0.1321,\"elapsed\":\"0 sec\"} "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+#> [5] "{\"timestamp\":\"2026-07-23T09:34:31.601+0200\",\"event\":\"step_started\",\"step\":\"estimate_experiment_outputs\",\"message\":\"Started estimate_experiment_outputs.\"} "
 ```
 
 ## Main Output Files
@@ -120,14 +129,19 @@ readLines(outputs$experiment_log, n = 5)
 ``` r
 
 names(outputs)
-#> [1] "experiment_folder"    "experiment_log"       "experiment_table"    
-#> [4] "temperatures_db"      "simulation_summaries" "population_summaries"
-#> [7] "community_measures"   "dynamics_db"
+#>  [1] "experiment_folder"    "experiment_log"       "experiment_table"    
+#>  [4] "environment_table"    "simulation_table"     "community_objects"   
+#>  [7] "temperatures_db"      "simulation_summaries" "population_summaries"
+#> [10] "community_measures"   "dynamics_db"
 ```
 
 The most important outputs are:
 
 - `experiment_table.RDS`: one row per simulation case
+- `environment_table.RDS`: one row per unique environmental time series
+- `simulation_table.RDS`: one lean row per simulation case
+- `community_objects.RDS`: unique generated communities, keyed by
+  community ID
 - `experiment_log.txt`: experiment specification, workflow events, and
   timings
 - `temperatures.db`: environmental time series

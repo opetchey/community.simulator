@@ -202,6 +202,25 @@ run_indexed_jobs <- function(indices,
           call. = FALSE
         )
       }
+      if (is.null(case_result)) {
+        warning(
+          failure_label,
+          " ",
+          case_index,
+          " did not return a result from a parallel worker; rerunning it in the main R process.",
+          call. = FALSE
+        )
+        case_result <- FUN(case_index)
+        if (is.null(case_result)) {
+          stop(
+            failure_label,
+            " ",
+            case_index,
+            " returned NULL after rerunning in the main R process.",
+            call. = FALSE
+          )
+        }
+      }
 
       if (!is.null(on_result)) {
         on_result(case_index, case_result)
@@ -216,6 +235,40 @@ run_indexed_jobs <- function(indices,
   }
 
   out
+}
+
+read_environment_table_for_runtime <- function(experiment_folder) {
+  path <- file.path(experiment_folder, "environment_table.RDS")
+  if (file.exists(path)) {
+    return(readRDS(path))
+  }
+
+  expt <- readRDS(file.path(experiment_folder, "experiment_table.RDS"))
+  derive_environment_table(expt)
+}
+
+read_simulation_table_for_runtime <- function(experiment_folder) {
+  path <- file.path(experiment_folder, "simulation_table.RDS")
+  if (file.exists(path)) {
+    return(readRDS(path))
+  }
+
+  expt <- readRDS(file.path(experiment_folder, "experiment_table.RDS"))
+  derive_simulation_table(expt)
+}
+
+read_community_objects_for_runtime <- function(experiment_folder) {
+  path <- file.path(experiment_folder, "community_objects.RDS")
+  if (file.exists(path)) {
+    communities <- readRDS(path)
+  } else {
+    expt <- readRDS(file.path(experiment_folder, "experiment_table.RDS"))
+    communities <- derive_community_objects(expt)
+  }
+
+  community_list <- communities$community_object
+  names(community_list) <- communities$community_id
+  community_list
 }
 
 #' Create environments from a YAML experiment specification
@@ -239,16 +292,7 @@ create_environments_from_spec <- function(experiment_folder,
   output_path <- file.path(experiment_folder, "temperatures.db")
   prepare_output_path(output_path, overwrite = overwrite, verbose = verbose, label = "temperatures database")
 
-  expt <- readRDS(file.path(experiment_folder, "experiment_table.RDS"))
-  environments <- expt |>
-    dplyr::select(
-      env_series_id,
-      temperature_mean,
-      temperature_sd,
-      one_over_f_gamma,
-      temperature_seed
-    ) |>
-    dplyr::distinct()
+  environments <- read_environment_table_for_runtime(experiment_folder)
 
   create_environment <- function(i) {
     set.seed(environments$temperature_seed[i])
@@ -257,28 +301,19 @@ create_environments_from_spec <- function(experiment_folder,
     one_over_f_gamma <- environments$one_over_f_gamma[i]
 
     tibble::tibble(
-      phase = c(
-        rep("burn_in", settings$burn_in_duration),
-        rep("expt", settings$experiment_duration + 1)
+      phase = "expt",
+      time = seq.int(
+        from = settings$burn_in_duration + 1L,
+        length.out = settings$experiment_duration
       ),
-      time = 0:(settings$burn_in_duration + settings$experiment_duration),
-      temperature = c(
-        rep(temperature_mean, settings$burn_in_duration),
-        as.numeric(
-          scale(primer::one_over_f(
-            gamma = one_over_f_gamma,
-            N = settings$experiment_duration + 1
-          ))
-        ) * temperature_sd + temperature_mean
+      temperature = generate_one_over_f_temperature(
+        n = settings$experiment_duration,
+        mean = temperature_mean,
+        sd = temperature_sd,
+        gamma = one_over_f_gamma
       ),
       env_series_id = environments$env_series_id[i]
-    ) |>
-      dplyr::mutate(temperature = ifelse(
-        phase == "burn_in",
-        temperature[settings$burn_in_duration + 1],
-        temperature
-      )) |>
-      dplyr::filter(.data$time > settings$burn_in_duration)
+    )
   }
 
   conn <- DBI::dbConnect(RSQLite::SQLite(), output_path)
@@ -293,32 +328,33 @@ create_environments_from_spec <- function(experiment_folder,
   )
   environment_indices <- seq_len(nrow(environments))
 
+  write_environment_result <- function(i, environment_result) {
+    DBI::dbWriteTable(
+      conn,
+      "temperatures",
+      environment_result,
+      overwrite = !table_written,
+      append = table_written
+    )
+    table_written <<- TRUE
+    invisible(NULL)
+  }
+
   if (supports_forked_parallel(settings$parallel_environments, settings$parallel_workers)) {
-    environment_series <- run_indexed_jobs(
+    run_indexed_jobs(
       indices = environment_indices,
       workers = min(settings$parallel_workers, length(environment_indices)),
       FUN = create_environment,
       progress_reporter = report_environment_progress,
       failure_label = "Environment",
-      store_results = TRUE
+      on_result = write_environment_result,
+      store_results = FALSE
     )
   } else {
-    environment_series <- lapply(environment_indices, function(i) {
-      out <- create_environment(i)
+    for (i in environment_indices) {
+      write_environment_result(i, create_environment(i))
       report_environment_progress(i)
-      out
-    })
-  }
-
-  for (i in seq_along(environment_series)) {
-    DBI::dbWriteTable(
-      conn,
-      "temperatures",
-      environment_series[[i]],
-      overwrite = !table_written,
-      append = table_written
-    )
-    table_written <- TRUE
+    }
   }
 
   announce_output_written(output_path, verbose = verbose, label = "temperatures database")
@@ -344,7 +380,8 @@ simulate_dynamics_from_spec <- function(experiment_folder,
   on.exit(DBI::dbDisconnect(conn_temperatures), add = TRUE)
   temperatures_data <- dplyr::tbl(conn_temperatures, "temperatures") |>
     dplyr::collect()
-  expt <- readRDS(file.path(experiment_folder, "experiment_table.RDS"))
+  expt <- read_simulation_table_for_runtime(experiment_folder)
+  community_objects <- read_community_objects_for_runtime(experiment_folder)
 
   if (!settings$dynamics_type %in% c("discrete", "continuous", "consumer_resource_continuous")) {
     stop(
@@ -413,6 +450,7 @@ simulate_dynamics_from_spec <- function(experiment_folder,
     simulate_one_dynamics_case(
       i = i,
       expt = expt,
+      community_objects = community_objects,
       temperatures_data = temperatures_data,
       expt_def = expt_def,
       dynamics_type = settings$dynamics_type,
@@ -448,7 +486,7 @@ simulate_dynamics_from_spec <- function(experiment_folder,
         overwrite = !dynamics_written,
         append = dynamics_written
       )
-      dynamics_written <- TRUE
+      dynamics_written <<- TRUE
     }
     if (!is.null(conn_resources) && !is.null(case_result$resources)) {
       DBI::dbWriteTable(
@@ -458,7 +496,7 @@ simulate_dynamics_from_spec <- function(experiment_folder,
         overwrite = !resources_written,
         append = resources_written
       )
-      resources_written <- TRUE
+      resources_written <<- TRUE
     }
   }
 

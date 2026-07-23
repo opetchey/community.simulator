@@ -24,7 +24,10 @@ written.}
 }
 \value{
 A tibble with one row per simulation case. The \code{case_spec} list-column
-contains the fully resolved nested specification for that case.
+contains the fully resolved nested specification for that case. When
+\code{output_path} is supplied, lean runtime tables are also written next to the
+full table: \code{environment_table.RDS}, \code{simulation_table.RDS}, and
+\code{community_objects.RDS}.
 }
 \description{
 Expands a validated YAML experiment specification into one row per simulation

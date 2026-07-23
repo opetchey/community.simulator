@@ -87,6 +87,9 @@ confirm_experiment_run <- function(summary) {
   }
   message("Estimated temperatures.db size: ", format_bytes(summary$estimated_temperatures_db_bytes))
   message("Estimated total DB size: ", format_bytes(summary$estimated_total_db_bytes))
+  message("Estimated runtime input memory: ", format_bytes(summary$estimated_runtime_input_memory_bytes))
+  message("  environment stage: ", format_bytes(summary$estimated_environment_stage_memory_bytes))
+  message("  simulation stage: ", format_bytes(summary$estimated_simulation_stage_memory_bytes))
   message("Estimated runtime: ", format_duration(summary$estimated_total_seconds))
   if (summary$parallel_environments || summary$parallel_simulations || summary$parallel_community_measures) {
     message("Parallel workers: ", summary$parallel_workers)
@@ -231,10 +234,12 @@ run_logged_experiment_step <- function(step_name, log_path, code) {
 }
 
 estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
-  expt <- readRDS(file.path(experiment_folder, "experiment_table.RDS"))
+  environment_table <- read_environment_table_for_runtime(experiment_folder)
+  simulation_table <- read_simulation_table_for_runtime(experiment_folder)
+  community_objects <- read_community_objects_for_runtime(experiment_folder)
   settings <- flatten_spec_settings(spec)
 
-  integration_steps <- settings$burn_in_duration + settings$experiment_duration + 1L
+  integration_steps <- settings$burn_in_duration + settings$experiment_duration
   output_times <- seq_len(integration_steps)
   output_times <- output_times[
     ((output_times - 1L) %% settings$dynamics_save_every) == 0L |
@@ -242,13 +247,22 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
   ]
   saved_time_points <- sum(output_times > settings$burn_in_duration)
 
-  species_per_case <- vapply(expt$community_object, function(x) x$S, numeric(1))
-  resource_per_case <- vapply(expt$community_object, function(x) {
+  species_by_community <- vapply(community_objects, function(x) x$S, numeric(1))
+  resource_by_community <- vapply(community_objects, function(x) {
     if (is.null(x$R)) {
       return(0)
     }
     x$R
   }, numeric(1))
+  species_per_case <- unname(species_by_community[simulation_table$community_id])
+  resource_per_case <- unname(resource_by_community[simulation_table$community_id])
+  if (anyNA(species_per_case) || anyNA(resource_per_case)) {
+    stop(
+      "Simulation table refers to one or more community IDs that are missing ",
+      "from `community_objects.RDS`.",
+      call. = FALSE
+    )
+  }
 
   resource_output_times <- seq_len(integration_steps)
   resource_output_times <- resource_output_times[
@@ -270,8 +284,8 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
     0
   }
 
-  env_series_count <- dplyr::n_distinct(expt$env_series_id)
-  temperature_rows <- env_series_count * (settings$experiment_duration + 1L)
+  env_series_count <- nrow(environment_table)
+  temperature_rows <- env_series_count * settings$experiment_duration
 
   estimated_dynamics_db_bytes <- dynamics_rows * 45
   estimated_resources_db_bytes <- resource_rows * 45
@@ -279,12 +293,21 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
   estimated_total_db_bytes <- estimated_dynamics_db_bytes +
     estimated_resources_db_bytes +
     estimated_temperatures_db_bytes
+  estimated_temperature_runtime_bytes <- temperature_rows * 32
+  estimated_environment_stage_memory_bytes <- as.numeric(utils::object.size(environment_table))
+  estimated_simulation_stage_memory_bytes <- as.numeric(utils::object.size(simulation_table)) +
+    as.numeric(utils::object.size(community_objects)) +
+    estimated_temperature_runtime_bytes
+  estimated_runtime_input_memory_bytes <- max(
+    estimated_environment_stage_memory_bytes,
+    estimated_simulation_stage_memory_bytes
+  )
 
   rates <- runtime_estimator_rates(settings$dynamics_type)
   effective_workers <- if (settings$parallel_simulations) settings$parallel_workers else 1L
   estimated_experiment_table_seconds <- max(
     rates$experiment_table_fixed_seconds,
-    nrow(expt) * rates$experiment_table_seconds_per_case
+    nrow(simulation_table) * rates$experiment_table_seconds_per_case
   )
   effective_environment_workers <- if (settings$parallel_environments) {
     max(1L, min(settings$parallel_workers, env_series_count))
@@ -295,18 +318,18 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
     temperature_rows * 0.00029 / effective_environment_workers
   reference_parallel_workers <- 29
   estimated_simulation_seconds <- (
-    nrow(expt) *
+    nrow(simulation_table) *
       integration_steps *
       rates$simulation_seconds_per_case_step *
       reference_parallel_workers
   ) / effective_workers
   effective_community_measure_workers <- if (settings$parallel_community_measures) {
-    max(1, min(settings$parallel_workers, nrow(expt)) * 0.5)
+    max(1, min(settings$parallel_workers, nrow(simulation_table)) * 0.5)
   } else {
     1
   }
   estimated_community_measure_seconds <- (
-    nrow(expt) * rates$community_measure_seconds_per_case
+    nrow(simulation_table) * rates$community_measure_seconds_per_case
   ) / effective_community_measure_workers
   estimated_io_seconds <- (dynamics_rows + resource_rows) * 0.00001
   estimated_total_seconds <- estimated_experiment_table_seconds +
@@ -316,7 +339,7 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
     estimated_io_seconds
 
   list(
-    n_cases = nrow(expt),
+    n_cases = nrow(simulation_table),
     dynamics_type = settings$dynamics_type,
     integration_steps = integration_steps,
     saved_time_points = saved_time_points,
@@ -338,6 +361,9 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
     estimated_resources_db_bytes = estimated_resources_db_bytes,
     estimated_temperatures_db_bytes = estimated_temperatures_db_bytes,
     estimated_total_db_bytes = estimated_total_db_bytes,
+    estimated_environment_stage_memory_bytes = estimated_environment_stage_memory_bytes,
+    estimated_simulation_stage_memory_bytes = estimated_simulation_stage_memory_bytes,
+    estimated_runtime_input_memory_bytes = estimated_runtime_input_memory_bytes,
     estimated_total_seconds = estimated_total_seconds
   )
 }
@@ -508,6 +534,9 @@ run_experiment <- function(experiment_folder_location,
       experiment_folder = experiment_folder,
       experiment_log = experiment_log,
       experiment_table = file.path(experiment_folder, "experiment_table.RDS"),
+      environment_table = file.path(experiment_folder, "environment_table.RDS"),
+      simulation_table = file.path(experiment_folder, "simulation_table.RDS"),
+      community_objects = file.path(experiment_folder, "community_objects.RDS"),
       temperatures_db = file.path(experiment_folder, "temperatures.db"),
       simulation_summaries = file.path(experiment_folder, "simulation_summaries.RDS"),
       population_summaries = file.path(experiment_folder, "population_summaries.RDS"),

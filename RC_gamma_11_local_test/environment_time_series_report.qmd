@@ -1,0 +1,247 @@
+---
+title: "Environment Time-Series Check"
+format:
+  html:
+    toc: true
+    code-fold: true
+execute:
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(DBI)
+library(RSQLite)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+report_dir <- dirname(normalizePath(knitr::current_input()))
+db_path <- file.path(report_dir, "temperatures.db")
+environment_table_path <- file.path(report_dir, "environment_table.RDS")
+
+stopifnot(file.exists(db_path))
+stopifnot(file.exists(environment_table_path))
+
+conn <- dbConnect(SQLite(), db_path)
+temperatures <- dbReadTable(conn, "temperatures")
+dbDisconnect(conn)
+
+environment_table <- readRDS(environment_table_path) |>
+  select(
+    env_series_id,
+    target_gamma = one_over_f_gamma,
+    temperature_mean,
+    temperature_sd,
+    environment_replicate
+  )
+
+temperatures <- temperatures |>
+  left_join(environment_table, by = "env_series_id")
+
+target_temperature_mean <- unique(environment_table$temperature_mean)
+target_temperature_sd <- unique(environment_table$temperature_sd)
+```
+
+## Overview
+
+```{r overview-table}
+overview <- temperatures |>
+  summarise(
+    rows = n(),
+    environments = n_distinct(env_series_id),
+    first_time = min(time),
+    last_time = max(time),
+    target_mean = first(temperature_mean),
+    target_sd = first(temperature_sd)
+  )
+
+knitr::kable(overview)
+```
+
+## Temperature-Series Moments
+
+Each generated time series should have mean close to `temperature_mean` and
+sample standard deviation close to `temperature_sd`.
+
+```{r moment-table}
+moment_summary <- temperatures |>
+  group_by(env_series_id, target_gamma, environment_replicate) |>
+  summarise(
+    n = n(),
+    mean_temperature = mean(temperature),
+    sd_temperature = sd(temperature),
+    .groups = "drop"
+  ) |>
+  mutate(
+    mean_error = mean_temperature - target_temperature_mean,
+    sd_error = sd_temperature - target_temperature_sd
+  )
+
+knitr::kable(
+  moment_summary |>
+    arrange(target_gamma, environment_replicate) |>
+    mutate(
+      mean_temperature = round(mean_temperature, 6),
+      sd_temperature = round(sd_temperature, 6),
+      mean_error = signif(mean_error, 3),
+      sd_error = signif(sd_error, 3)
+    )
+)
+```
+
+```{r moment-plot, fig.width=8, fig.height=4}
+moment_summary |>
+  pivot_longer(
+    cols = c(mean_temperature, sd_temperature),
+    names_to = "statistic",
+    values_to = "value"
+  ) |>
+  ggplot(aes(x = target_gamma, y = value, group = statistic, colour = statistic)) +
+  geom_hline(yintercept = target_temperature_mean, linetype = 2) +
+  geom_hline(yintercept = target_temperature_sd, linetype = 3) +
+  geom_point(alpha = 0.8) +
+  facet_wrap(~ statistic, scales = "free_y") +
+  labs(
+    x = "Specified one_over_f_gamma",
+    y = "Realized value",
+    colour = NULL
+  ) +
+  theme_minimal()
+```
+
+## Representative Time Series
+
+The plot below shows one environment replicate per value of
+`one_over_f_gamma`. To keep the plot readable, it shows evenly spaced sampled
+time points rather than every observation.
+
+```{r sampled-time-series, fig.width=10, fig.height=8}
+sample_every <- max(1L, floor(max(temperatures$time) / 1000))
+
+representative_series <- temperatures |>
+  group_by(target_gamma) |>
+  filter(environment_replicate == min(environment_replicate)) |>
+  ungroup() |>
+  filter((time - min(time)) %% sample_every == 0)
+
+ggplot(representative_series, aes(x = time, y = temperature)) +
+  geom_line(linewidth = 0.25) +
+  facet_wrap(~ target_gamma, ncol = 2) +
+  labs(
+    x = "Time",
+    y = "Temperature"
+  ) +
+  theme_minimal()
+```
+
+## Spectral Exponents
+
+The generator uses `one_over_f_gamma` as an amplitude-spectrum exponent:
+amplitudes scale approximately as `1 / frequency^gamma`. Therefore the power
+spectrum scales approximately as `1 / frequency^(2 * gamma)`.
+
+The table below estimates the slope of the log power spectrum for each
+environment. `estimated_power_exponent` should be close to
+`2 * one_over_f_gamma`; `estimated_amplitude_gamma` is half of that value and
+should be close to `one_over_f_gamma`.
+
+```{r spectral-functions}
+estimate_spectral_exponent <- function(temperature) {
+  y <- temperature - mean(temperature)
+  n <- length(y)
+  fft_values <- stats::fft(y)
+  frequencies <- seq_len(floor(n / 2)) / n
+  power <- Mod(fft_values[seq_along(frequencies) + 1L])^2 / n
+
+  keep <- is.finite(power) & power > 0 & frequencies > 0
+  fit <- stats::lm(log10(power[keep]) ~ log10(frequencies[keep]))
+  power_exponent <- -unname(stats::coef(fit)[[2]])
+
+  tibble(
+    estimated_power_exponent = power_exponent,
+    estimated_amplitude_gamma = power_exponent / 2,
+    spectral_r_squared = summary(fit)$r.squared
+  )
+}
+
+spectral_summary <- temperatures |>
+  group_by(env_series_id, target_gamma, environment_replicate) |>
+  summarise(
+    estimate_spectral_exponent(temperature),
+    .groups = "drop"
+  ) |>
+  mutate(
+    expected_power_exponent = 2 * target_gamma,
+    power_exponent_error = estimated_power_exponent - expected_power_exponent,
+    amplitude_gamma_error = estimated_amplitude_gamma - target_gamma
+  )
+```
+
+```{r spectral-table}
+knitr::kable(
+  spectral_summary |>
+    arrange(target_gamma, environment_replicate) |>
+    mutate(
+      across(
+        c(
+          estimated_power_exponent,
+          estimated_amplitude_gamma,
+          spectral_r_squared,
+          expected_power_exponent,
+          power_exponent_error,
+          amplitude_gamma_error
+        ),
+        ~ round(.x, 4)
+      )
+    )
+)
+```
+
+```{r spectral-plot, fig.width=8, fig.height=4}
+spectral_summary |>
+  ggplot(aes(x = target_gamma, y = estimated_amplitude_gamma)) +
+  geom_abline(intercept = 0, slope = 1, linetype = 2) +
+  geom_point(aes(colour = factor(environment_replicate)), size = 2) +
+  labs(
+    x = "Specified one_over_f_gamma",
+    y = "Estimated amplitude exponent",
+    colour = "Environment replicate"
+  ) +
+  theme_minimal()
+```
+
+## Example Spectra
+
+The plot below shows fitted spectra for representative environment series.
+
+```{r spectra-plot, fig.width=10, fig.height=8}
+spectrum_data <- temperatures |>
+  group_by(target_gamma) |>
+  filter(environment_replicate == min(environment_replicate)) |>
+  summarise(
+    data = list({
+      y <- temperature - mean(temperature)
+      n <- length(y)
+      fft_values <- stats::fft(y)
+      frequencies <- seq_len(floor(n / 2)) / n
+      power <- Mod(fft_values[seq_along(frequencies) + 1L])^2 / n
+      tibble(frequency = frequencies, power = power)
+    }),
+    .groups = "drop"
+  ) |>
+  tidyr::unnest(data) |>
+  filter(power > 0)
+
+ggplot(spectrum_data, aes(x = frequency, y = power)) +
+  geom_point(alpha = 0.08, size = 0.25) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE, colour = "red") +
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_wrap(~ target_gamma, ncol = 2) +
+  labs(
+    x = "Frequency",
+    y = "Power"
+  ) +
+  theme_minimal()
+```

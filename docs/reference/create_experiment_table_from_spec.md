@@ -40,7 +40,10 @@ create_experiment_table_from_spec(
 ## Value
 
 A tibble with one row per simulation case. The `case_spec` list-column
-contains the fully resolved nested specification for that case.
+contains the fully resolved nested specification for that case. When
+`output_path` is supplied, lean runtime tables are also written next to
+the full table: `environment_table.RDS`, `simulation_table.RDS`, and
+`community_objects.RDS`.
 
 ## Examples
 

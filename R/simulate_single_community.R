@@ -291,18 +291,14 @@ create_single_temperature_series <- function(experiment_duration,
   }
 
   set.seed(random_seed)
-  raw_temperature <- as.numeric(primer::one_over_f(
-    gamma = one_over_f_gamma,
-    N = experiment_duration
-  ))
-  scaled_temperature <- as.numeric(scale(raw_temperature))
-  if (any(!is.finite(scaled_temperature))) {
-    scaled_temperature <- rep(0, experiment_duration)
-  }
-
   tibble::tibble(
     time = seq_len(experiment_duration),
-    temperature = scaled_temperature * temperature_sd + temperature_mean
+    temperature = generate_one_over_f_temperature(
+      n = experiment_duration,
+      mean = temperature_mean,
+      sd = temperature_sd,
+      gamma = one_over_f_gamma
+    )
   )
 }
 

@@ -13,7 +13,10 @@
 #'   written.
 #'
 #' @return A tibble with one row per simulation case. The `case_spec` list-column
-#'   contains the fully resolved nested specification for that case.
+#'   contains the fully resolved nested specification for that case. When
+#'   `output_path` is supplied, lean runtime tables are also written next to the
+#'   full table: `environment_table.RDS`, `simulation_table.RDS`, and
+#'   `community_objects.RDS`.
 #' @export
 #'
 #' @examples
@@ -123,9 +126,96 @@ create_experiment_table_from_spec <- function(spec,
     if (isTRUE(verbose)) {
       message("Wrote experiment table: ", output_path)
     }
+    write_runtime_stage_tables(out, dirname(output_path), overwrite = overwrite, verbose = verbose)
   }
 
   out
+}
+
+write_runtime_stage_tables <- function(experiment_table,
+                                       output_dir,
+                                       overwrite = FALSE,
+                                       verbose = TRUE) {
+  output_dir <- path.expand(output_dir)
+  outputs <- list(
+    environment_table = file.path(output_dir, "environment_table.RDS"),
+    simulation_table = file.path(output_dir, "simulation_table.RDS"),
+    community_objects = file.path(output_dir, "community_objects.RDS")
+  )
+
+  objects <- list(
+    environment_table = derive_environment_table(experiment_table),
+    simulation_table = derive_simulation_table(experiment_table),
+    community_objects = derive_community_objects(experiment_table)
+  )
+
+  for (name in names(outputs)) {
+    path <- outputs[[name]]
+    if (file.exists(path) && !isTRUE(overwrite)) {
+      stop(
+        "Output file already exists: ",
+        path,
+        "\nUse `overwrite = TRUE` to replace it.",
+        call. = FALSE
+      )
+    }
+    saveRDS(objects[[name]], path)
+    if (isTRUE(verbose)) {
+      message("Wrote ", gsub("_", " ", name), ": ", path)
+    }
+  }
+
+  invisible(outputs)
+}
+
+derive_environment_table <- function(experiment_table) {
+  environment_columns <- c(
+    "env_series_id",
+    "environment_series_id",
+    "environment_replicate",
+    "temperature_replicate",
+    "temperature_mean",
+    "temperature_sd",
+    "one_over_f_gamma",
+    "temperature_seed"
+  )
+  experiment_table |>
+    dplyr::select(dplyr::all_of(environment_columns)) |>
+    dplyr::distinct()
+}
+
+derive_simulation_table <- function(experiment_table) {
+  simulation_columns <- c(
+    "case_id",
+    "model_type",
+    "dynamics_type",
+    "treatment_id",
+    "treatment_label",
+    "interaction_treatment_label",
+    "community_replicate",
+    "environment_replicate",
+    "temperature_replicate",
+    "env_series_id",
+    "environment_series_id",
+    "temperature_mean",
+    "temperature_sd",
+    "one_over_f_gamma",
+    "temperature_seed",
+    "richness",
+    "community_id"
+  )
+  experiment_table |>
+    dplyr::select(dplyr::all_of(simulation_columns))
+}
+
+derive_community_objects <- function(experiment_table) {
+  keep <- !duplicated(experiment_table$community_id)
+  tibble::tibble(
+    community_id = experiment_table$community_id[keep],
+    model_type = experiment_table$model_type[keep],
+    richness = experiment_table$richness[keep],
+    community_object = experiment_table$community_object[keep]
+  )
 }
 
 coerce_experiment_spec <- function(spec) {
