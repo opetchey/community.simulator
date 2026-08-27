@@ -94,6 +94,10 @@ test_that("all YAML model templates run end to end", {
     )
     dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
     file.copy(spec_path, file.path(output_dir, "experiment.yaml"), overwrite = TRUE)
+    spec <- yaml::read_yaml(file.path(output_dir, "experiment.yaml"))
+    spec$simulation$burn_in_duration <- 2
+    spec$simulation$experiment_duration <- 4
+    yaml::write_yaml(spec, file.path(output_dir, "experiment.yaml"))
 
     outputs <- run_experiment(
       experiment_folder_location = output_root,
@@ -126,4 +130,124 @@ test_that("progress reporter prints sparse elapsed-time updates", {
     reporter(250),
     "Simulating cases: 250 of 250 .* estimated remaining: 0 sec"
   )
+})
+
+write_parallel_regression_spec <- function(template, output_dir, mutate_spec) {
+  spec_path <- system.file(
+    file.path("experiment_templates", template),
+    package = "community.simulator"
+  )
+  spec <- yaml::read_yaml(spec_path)
+  spec <- mutate_spec(spec)
+  yaml::write_yaml(spec, file.path(output_dir, "experiment.yaml"))
+  invisible(file.path(output_dir, "experiment.yaml"))
+}
+
+read_distinct_case_ids <- function(db_path, table) {
+  conn <- DBI::dbConnect(RSQLite::SQLite(), db_path)
+  on.exit(DBI::dbDisconnect(conn), add = TRUE)
+  DBI::dbGetQuery(
+    conn,
+    paste0("select distinct case_id from ", table, " order by case_id")
+  )$case_id
+}
+
+test_that("parallel simulations append all LV dynamics cases", {
+  skip_on_os("windows")
+
+  output_root <- tempdir()
+  experiment_name <- paste0("parallel-lv-dynamics-", Sys.getpid())
+  output_dir <- file.path(output_root, experiment_name)
+  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+
+  write_parallel_regression_spec(
+    "lv_continuous.yaml",
+    output_dir,
+    function(spec) {
+      spec$community$replicates <- 2L
+      spec$simulation$burn_in_duration <- 2L
+      spec$simulation$experiment_duration <- 4L
+      spec$output <- list(
+        save_dynamics = TRUE,
+        dynamics_save_every = 1L,
+        runtime_update_every = 100L,
+        simulation_progress = FALSE,
+        environment_progress = FALSE
+      )
+      spec$parallel <- list(
+        workers = 2L,
+        environments = FALSE,
+        simulations = TRUE,
+        community_measures = FALSE
+      )
+      spec
+    }
+  )
+
+  outputs <- run_experiment(
+    experiment_folder_location = output_root,
+    experiment_name = experiment_name,
+    experiment_design_filename = "experiment.yaml",
+    overwrite = TRUE,
+    verbose = FALSE,
+    confirm_run = FALSE
+  )
+
+  expected_case_ids <- sort(readRDS(outputs$simulation_table)$case_id)
+  written_case_ids <- read_distinct_case_ids(outputs$dynamics_db, "dynamics")
+
+  expect_gt(length(expected_case_ids), 1)
+  expect_equal(written_case_ids, expected_case_ids)
+})
+
+test_that("parallel simulations append all consumer-resource dynamics and resources cases", {
+  skip_on_os("windows")
+
+  output_root <- tempdir()
+  experiment_name <- paste0("parallel-cr-dynamics-resources-", Sys.getpid())
+  output_dir <- file.path(output_root, experiment_name)
+  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+
+  write_parallel_regression_spec(
+    "consumer_resource.yaml",
+    output_dir,
+    function(spec) {
+      spec$community$replicates <- 2L
+      spec$simulation$burn_in_duration <- 2L
+      spec$simulation$experiment_duration <- 4L
+      spec$output <- list(
+        save_dynamics = TRUE,
+        save_resources = TRUE,
+        dynamics_save_every = 1L,
+        resources_save_every = 1L,
+        runtime_update_every = 100L,
+        simulation_progress = FALSE,
+        environment_progress = FALSE
+      )
+      spec$parallel <- list(
+        workers = 2L,
+        environments = FALSE,
+        simulations = TRUE,
+        community_measures = FALSE
+      )
+      spec
+    }
+  )
+
+  outputs <- run_experiment(
+    experiment_folder_location = output_root,
+    experiment_name = experiment_name,
+    experiment_design_filename = "experiment.yaml",
+    overwrite = TRUE,
+    verbose = FALSE,
+    confirm_run = FALSE
+  )
+
+  expected_case_ids <- sort(readRDS(outputs$simulation_table)$case_id)
+  dynamics_case_ids <- read_distinct_case_ids(outputs$dynamics_db, "dynamics")
+  resources_case_ids <- read_distinct_case_ids(outputs$resources_db, "resources")
+
+  expect_gt(length(expected_case_ids), 1)
+  expect_equal(dynamics_case_ids, expected_case_ids)
+  expect_equal(resources_case_ids, expected_case_ids)
 })

@@ -11,16 +11,16 @@ community:
 
 traits:
   uptake_maximum:
-    mean: 0.06
+    mean: 0.363064
     range: 0
     distribution: random_uniform
   uptake_optimum:
-    mean: 20
-    range: 4
+    mean: 16
+    range: 0
     distribution: random_uniform
   uptake_width:
-    mean: 5
-    range: 0
+    mean: 1
+    range: 0.5
     distribution: random_uniform
   half_saturation:
     mean: 100
@@ -31,11 +31,11 @@ resources:
   use_mode: shared_to_private
   active_resource: 1
   private_use:
-    distribution: beta
-    mean: 0.7
-    precision: 10
-  consumer_death_rate: 0.03
-  renewal_rate: 1
+    distribution: constant
+    mean: 0
+    range: 0
+  consumer_death_rate: 0.181532
+  renewal_rate: 6.051066
   supply: 1000
   conversion_efficiency: 1
 
@@ -48,8 +48,8 @@ environment:
     one_over_f_gamma: 0.8
 
 simulation:
-  burn_in_duration: 10
-  experiment_duration: 20
+  burn_in_duration: 200
+  experiment_duration: 2000
   consumer_immigration_rate: 0.01
   initial_consumer_total_abundance: 30
   resource_initial_value: 1000

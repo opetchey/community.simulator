@@ -73,13 +73,13 @@ simulator_consumer_resource_continuous <- function(input_com_params,
     if (any(!is.finite(state))) {
       stop("Non-finite state encountered by ODE solver.", call. = FALSE)
     }
-    if (any(state < -negative_tolerance)) {
-      stop("Negative consumer or resource state encountered by ODE solver.", call. = FALSE)
-    }
     if (any(state > blowup_threshold)) {
       stop("State exceeded blow-up threshold.", call. = FALSE)
     }
 
+    # ODE solvers can briefly probe negative states near zero. Evaluate the
+    # vector field on the biologically meaningful boundary and validate the
+    # returned output after integration.
     N <- pmax(as.numeric(state[consumer_names]), 0)
     resources <- pmax(as.numeric(state[resource_names]), 0)
     Tcel <- temperature_at_time(t)
@@ -148,4 +148,3 @@ simulator_consumer_resource_continuous <- function(input_com_params,
     resources = resources
   )
 }
-

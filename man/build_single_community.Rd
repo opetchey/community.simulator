@@ -17,25 +17,26 @@ build_single_community(
   lv_interaction_max = 0.2,
   lv_interaction_value = 0,
   lv_interaction_diagonal = 1,
-  private_resource_use_mean = 0.7,
-  private_resource_use_distribution = "beta",
+  private_resource_use_mean = 0,
+  private_resource_use_distribution = "constant",
   private_resource_use_range = 0,
   private_resource_use_precision = 12,
   resource_use_mode = "shared_to_private",
   active_resource = 1,
   half_saturation_mean = 100,
-  consumer_death_rate = 0.03,
-  resource_renewal_rate = 1,
+  consumer_death_rate = 0.181532,
+  resource_renewal_rate = 6.051066,
   resource_supply = 1000,
   conversion_efficiency = 1,
   birth_maximum_mean = 0.3,
   birth_optimum_mean = 20,
   birth_optimum_range = 6,
   birth_width_mean = 8,
-  uptake_maximum_mean = 0.06,
-  uptake_optimum_mean = 20,
-  uptake_optimum_range = 6,
-  uptake_width_mean = 5
+  uptake_maximum_mean = 0.363064,
+  uptake_optimum_mean = 16,
+  uptake_optimum_range = 0,
+  uptake_width_mean = 1,
+  uptake_width_range = 0.5
 )
 }
 \arguments{
@@ -108,6 +109,9 @@ private-resource use fractions.}
 \item{uptake_optimum_range}{Range of uptake thermal optima for the CR model.}
 
 \item{uptake_width_mean}{Mean uptake performance-curve width for the CR model.}
+
+\item{uptake_width_range}{Range of uptake performance-curve widths for the CR
+model.}
 }
 \value{
 A list with the community object, model type, trait table,

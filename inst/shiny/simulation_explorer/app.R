@@ -119,6 +119,7 @@ collect_parameters <- function(input) {
     uptake_optimum_mean = input$thermal_optimum_mean,
     uptake_optimum_range = input$thermal_optimum_range,
     uptake_width_mean = input$performance_width_mean,
+    uptake_width_range = 0.5,
     experiment_duration = input$experiment_duration,
     temperature_mean = input$temperature_mean,
     temperature_sd = input$temperature_sd,
@@ -138,6 +139,7 @@ collect_parameters <- function(input) {
     params$uptake_optimum_mean <- input$detailed_thermal_optimum_mean
     params$uptake_optimum_range <- input$detailed_thermal_optimum_range
     params$uptake_width_mean <- input$detailed_performance_width_mean
+    params$uptake_width_range <- 0.5
     params$lv_interaction_type <- input$lv_interaction_type
     params$lv_interaction_symmetry <- input$lv_interaction_symmetry
     params$lv_interaction_distribution <- input$lv_interaction_distribution
@@ -171,7 +173,7 @@ ui <- fluidPage(
       selectInput("model_type", "Model", choices = model_choices),
       numericInput("richness", "Species richness", value = 4, min = 1, max = 30, step = 1),
       numericInput("random_seed", "Random seed", value = 1, min = 1, step = 1),
-      sliderInput("experiment_duration", "Simulation duration", min = 10, max = 300, value = 80, step = 10),
+      sliderInput("experiment_duration", "Simulation duration", min = 10, max = 3000, value = 80, step = 10),
       numericInput("temperature_mean", "Temperature mean", value = 20, step = 0.5),
       numericInput("temperature_sd", "Temperature SD", value = 1, min = 0, step = 0.1),
       sliderInput("one_over_f_gamma", "Environmental autocorrelation", min = 0, max = 2, value = 0.8, step = 0.1),
@@ -195,8 +197,8 @@ ui <- fluidPage(
         ),
         conditionalPanel(
           condition = "input.model_type == 'consumer_resource_continuous'",
-          numericInput("uptake_maximum_mean", "Uptake maximum mean", value = 0.06, min = 0, step = 0.01),
-          sliderInput("private_resource_use_mean", "Mean private resource use", min = 0.01, max = 0.99, value = 0.7, step = 0.01),
+          numericInput("uptake_maximum_mean", "Uptake maximum mean", value = 0.363064, min = 0, step = 0.01),
+          sliderInput("private_resource_use_mean", "Mean private resource use", min = 0, max = 1, value = 0, step = 0.01),
           numericInput("private_resource_use_precision", "Private resource use precision", value = 12, min = 0.1, step = 1),
           numericInput("consumer_immigration_rate", "Consumer immigration rate", value = 0.01, min = 0, step = 0.001),
           numericInput("resource_initial_value", "Initial resource value", value = 1000, min = 0, step = 50)
@@ -223,17 +225,17 @@ ui <- fluidPage(
         ),
         conditionalPanel(
           condition = "input.model_type == 'consumer_resource_continuous'",
-          numericInput("detailed_uptake_maximum_mean", "Uptake maximum mean", value = 0.06, min = 0, step = 0.01),
+          numericInput("detailed_uptake_maximum_mean", "Uptake maximum mean", value = 0.363064, min = 0, step = 0.01),
           h4("CR resource structure"),
           selectInput("resource_use_mode", "Resource-use mode", choices = resource_use_mode_choices),
           numericInput("active_resource", "Active/shared resource index", value = 1, min = 1, step = 1),
-          selectInput("private_resource_use_distribution", "Private-resource use distribution", choices = private_resource_distribution_choices),
-          sliderInput("detailed_private_resource_use_mean", "Mean private resource use", min = 0.01, max = 0.99, value = 0.7, step = 0.01),
+          selectInput("private_resource_use_distribution", "Private-resource use distribution", choices = private_resource_distribution_choices, selected = "constant"),
+          sliderInput("detailed_private_resource_use_mean", "Mean private resource use", min = 0, max = 1, value = 0, step = 0.01),
           numericInput("private_resource_use_range", "Private-resource use range", value = 0, min = 0, step = 0.05),
           numericInput("detailed_private_resource_use_precision", "Private-resource use precision", value = 12, min = 0.1, step = 1),
           numericInput("half_saturation_mean", "Half-saturation mean", value = 100, min = 0.01, step = 10),
-          numericInput("detailed_consumer_death_rate", "Consumer death rate", value = 0.03, min = 0, step = 0.005),
-          numericInput("resource_renewal_rate", "Resource renewal rate", value = 1, min = 0, step = 0.1),
+          numericInput("detailed_consumer_death_rate", "Consumer death rate", value = 0.181532, min = 0, step = 0.005),
+          numericInput("resource_renewal_rate", "Resource renewal rate", value = 6.051066, min = 0, step = 0.1),
           numericInput("detailed_resource_supply", "Resource supply", value = 1000, min = 0.01, step = 50),
           numericInput("conversion_efficiency", "Conversion efficiency", value = 1, min = 0, step = 0.1),
           numericInput("detailed_consumer_immigration_rate", "Consumer immigration rate", value = 0.01, min = 0, step = 0.001),
@@ -346,6 +348,37 @@ server <- function(input, output, session) {
   current_parameters <- reactive({
     collect_parameters(input)
   })
+
+  observeEvent(input$model_type, {
+    if (identical(input$model_type, "consumer_resource_continuous")) {
+      updateSliderInput(session, "experiment_duration", value = 2000)
+      updateNumericInput(session, "thermal_optimum_mean", value = 16)
+      updateNumericInput(session, "thermal_optimum_range", value = 0)
+      updateNumericInput(session, "performance_width_mean", value = 1)
+      updateNumericInput(session, "detailed_thermal_optimum_mean", value = 16)
+      updateNumericInput(session, "detailed_thermal_optimum_range", value = 0)
+      updateNumericInput(session, "detailed_performance_width_mean", value = 1)
+      updateNumericInput(session, "uptake_maximum_mean", value = 0.363064)
+      updateNumericInput(session, "detailed_uptake_maximum_mean", value = 0.363064)
+      updateSliderInput(session, "private_resource_use_mean", value = 0)
+      updateSelectInput(session, "private_resource_use_distribution", selected = "constant")
+      updateSliderInput(session, "detailed_private_resource_use_mean", value = 0)
+      updateNumericInput(session, "private_resource_use_range", value = 0)
+      updateNumericInput(session, "half_saturation_mean", value = 100)
+      updateNumericInput(session, "detailed_consumer_death_rate", value = 0.181532)
+      updateNumericInput(session, "resource_renewal_rate", value = 6.051066)
+      updateNumericInput(session, "detailed_resource_supply", value = 1000)
+      updateNumericInput(session, "detailed_resource_initial_value", value = 1000)
+    } else {
+      updateSliderInput(session, "experiment_duration", value = 80)
+      updateNumericInput(session, "thermal_optimum_mean", value = 20)
+      updateNumericInput(session, "thermal_optimum_range", value = 6)
+      updateNumericInput(session, "performance_width_mean", value = 8)
+      updateNumericInput(session, "detailed_thermal_optimum_mean", value = 20)
+      updateNumericInput(session, "detailed_thermal_optimum_range", value = 6)
+      updateNumericInput(session, "detailed_performance_width_mean", value = 8)
+    }
+  }, ignoreInit = TRUE)
 
   observeEvent(input$build_community, {
     params <- current_parameters()

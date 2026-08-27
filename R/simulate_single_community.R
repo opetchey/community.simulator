@@ -40,6 +40,8 @@
 #' @param uptake_optimum_mean Mean uptake thermal optimum for the CR model.
 #' @param uptake_optimum_range Range of uptake thermal optima for the CR model.
 #' @param uptake_width_mean Mean uptake performance-curve width for the CR model.
+#' @param uptake_width_range Range of uptake performance-curve widths for the CR
+#'   model.
 #'
 #' @return A list with the community object, model type, trait table,
 #'   community-structure matrix data, species performance curves, and a summed
@@ -70,25 +72,26 @@ build_single_community <- function(model_type = c(
                                    lv_interaction_max = 0.2,
                                    lv_interaction_value = 0,
                                    lv_interaction_diagonal = 1,
-                                   private_resource_use_mean = 0.7,
-                                   private_resource_use_distribution = "beta",
+                                   private_resource_use_mean = 0,
+                                   private_resource_use_distribution = "constant",
                                    private_resource_use_range = 0,
                                    private_resource_use_precision = 12,
                                    resource_use_mode = "shared_to_private",
                                    active_resource = 1,
                                    half_saturation_mean = 100,
-                                   consumer_death_rate = 0.03,
-                                   resource_renewal_rate = 1,
+                                   consumer_death_rate = 0.181532,
+                                   resource_renewal_rate = 6.051066,
                                    resource_supply = 1000,
                                    conversion_efficiency = 1,
                                    birth_maximum_mean = 0.3,
                                    birth_optimum_mean = 20,
                                    birth_optimum_range = 6,
                                    birth_width_mean = 8,
-                                   uptake_maximum_mean = 0.06,
-                                   uptake_optimum_mean = 20,
-                                   uptake_optimum_range = 6,
-                                   uptake_width_mean = 5) {
+                                   uptake_maximum_mean = 0.363064,
+                                   uptake_optimum_mean = 16,
+                                   uptake_optimum_range = 0,
+                                   uptake_width_mean = 1,
+                                   uptake_width_range = 0.5) {
   model_type <- match.arg(model_type)
   lv_interaction <- match.arg(lv_interaction)
   richness <- as.integer(richness)
@@ -183,16 +186,16 @@ build_single_community <- function(model_type = c(
       S = richness,
       u_max_mean = uptake_maximum_mean,
       u_max_range = 0,
-      u_max_distribution = "regular",
+      u_max_distribution = "random_uniform",
       u_opt_mean = uptake_optimum_mean,
       u_opt_range = uptake_optimum_range,
-      u_opt_distribution = "regular",
+      u_opt_distribution = "random_uniform",
       sd_u_mean = uptake_width_mean,
-      sd_u_range = 0,
-      sd_u_distribution = "regular",
+      sd_u_range = uptake_width_range,
+      sd_u_distribution = "random_uniform",
       half_saturation_mean = half_saturation_mean,
       half_saturation_range = 0,
-      half_saturation_distribution = "regular",
+      half_saturation_distribution = "random_uniform",
       consumer_death_rate = consumer_death_rate,
       resource_renewal_rate = resource_renewal_rate,
       resource_supply = resource_supply,
@@ -351,25 +354,26 @@ simulate_single_community <- function(model_type = c(
                                       lv_interaction_max = 0.2,
                                       lv_interaction_value = 0,
                                       lv_interaction_diagonal = 1,
-                                      private_resource_use_mean = 0.7,
-                                      private_resource_use_distribution = "beta",
+                                      private_resource_use_mean = 0,
+                                      private_resource_use_distribution = "constant",
                                       private_resource_use_range = 0,
                                       private_resource_use_precision = 12,
                                       resource_use_mode = "shared_to_private",
                                       active_resource = 1,
                                       half_saturation_mean = 100,
-                                      consumer_death_rate = 0.03,
-                                      resource_renewal_rate = 1,
+                                      consumer_death_rate = 0.181532,
+                                      resource_renewal_rate = 6.051066,
                                       resource_supply = 1000,
                                       conversion_efficiency = 1,
                                       birth_maximum_mean = 0.3,
                                       birth_optimum_mean = 20,
                                       birth_optimum_range = 6,
                                       birth_width_mean = 8,
-                                      uptake_maximum_mean = 0.06,
-                                      uptake_optimum_mean = 20,
-                                      uptake_optimum_range = 6,
-                                      uptake_width_mean = 5,
+                                      uptake_maximum_mean = 0.363064,
+                                      uptake_optimum_mean = 16,
+                                      uptake_optimum_range = 0,
+                                      uptake_width_mean = 1,
+                                      uptake_width_range = 0.5,
                                       experiment_duration = 60,
                                       temperature_mean = 20,
                                       temperature_sd = 1,
@@ -411,7 +415,8 @@ simulate_single_community <- function(model_type = c(
     uptake_maximum_mean = uptake_maximum_mean,
     uptake_optimum_mean = uptake_optimum_mean,
     uptake_optimum_range = uptake_optimum_range,
-    uptake_width_mean = uptake_width_mean
+    uptake_width_mean = uptake_width_mean,
+    uptake_width_range = uptake_width_range
   )
   community <- built$community
   temperature <- create_single_temperature_series(

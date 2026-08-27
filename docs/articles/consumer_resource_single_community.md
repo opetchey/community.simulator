@@ -23,7 +23,7 @@ theme_set(theme_minimal(base_size = 12))
 ``` r
 
 set.seed(3)
-duration <- 120
+duration <- 2000
 time <- seq_len(duration)
 temperature <- 20 +
   2 * sin(2 * pi * time / 50) +
@@ -48,27 +48,27 @@ environment.](consumer_resource_single_community_files/figure-html/environment-1
 
 community <- build_CR_community(
   S = 4,
-  uptake_maximum_mean = 0.08,
+  uptake_maximum_mean = 0.363064,
   uptake_maximum_range = 0.00,
-  uptake_maximum_distribution = "regular",
-  uptake_optimum_mean = 20,
-  uptake_optimum_range = 7,
-  uptake_optimum_distribution = "regular",
-  uptake_width_mean = 6,
-  uptake_width_range = 1.5,
-  uptake_width_distribution = "regular",
-  half_saturation_mean = 80,
-  half_saturation_range = 10,
-  half_saturation_distribution = "regular",
-  consumer_death_rate = 0.03,
-  resource_renewal_rate = 1,
-  resource_supply = 800,
+  uptake_maximum_distribution = "random_uniform",
+  uptake_optimum_mean = 16,
+  uptake_optimum_range = 0,
+  uptake_optimum_distribution = "random_uniform",
+  uptake_width_mean = 1,
+  uptake_width_range = 0.5,
+  uptake_width_distribution = "random_uniform",
+  half_saturation_mean = 100,
+  half_saturation_range = 0,
+  half_saturation_distribution = "random_uniform",
+  consumer_death_rate = 0.181532,
+  resource_renewal_rate = 6.051066,
+  resource_supply = 1000,
   conversion_efficiency = 1,
   resource_use_mode = "shared_to_private",
   active_resource = 1,
-  private_resource_use_distribution = "beta",
-  private_resource_use_mean = 0.7,
-  private_resource_use_precision = 18,
+  private_resource_use_distribution = "constant",
+  private_resource_use_mean = 0,
+  private_resource_use_range = 0,
   community_seed = 13
 )
 ```
@@ -91,10 +91,10 @@ consumer_traits
 #> # A tibble: 4 × 7
 #>   species max_uptake uptake_optimum uptake_width death_rate
 #>   <chr>        <dbl>          <dbl>        <dbl>      <dbl>
-#> 1 Spp1          0.08           16.5         5.25       0.03
-#> 2 Spp2          0.08           18.8         5.75       0.03
-#> 3 Spp3          0.08           21.2         6.25       0.03
-#> 4 Spp4          0.08           23.5         6.75       0.03
+#> 1 Spp1         0.363             16        1.11       0.182
+#> 2 Spp2         0.363             16        0.873      0.182
+#> 3 Spp3         0.363             16        0.945      0.182
+#> 4 Spp4         0.363             16        0.796      0.182
 #> # ℹ 2 more variables: private_resource_fraction <dbl>,
 #> #   shared_resource_fraction <dbl>
 ```
@@ -156,7 +156,7 @@ fractions.](consumer_resource_single_community_files/figure-html/resource-use-1.
 ``` r
 
 initial_consumer_abundances <- rep(12, community$S)
-initial_resource_values <- rep(600, community$R)
+initial_resource_values <- rep(1000, community$R)
 
 simulation <- simulator_consumer_resource_continuous(
   input_com_params = community,

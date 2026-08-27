@@ -79,7 +79,7 @@ consumer-resource simulator, and makes a few basic plots.</p>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
-<span><span class="va">duration</span> <span class="op">&lt;-</span> <span class="fl">120</span></span>
+<span><span class="va">duration</span> <span class="op">&lt;-</span> <span class="fl">2000</span></span>
 <span><span class="va">time</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">duration</span><span class="op">)</span></span>
 <span><span class="va">temperature</span> <span class="op">&lt;-</span> <span class="fl">20</span> <span class="op">+</span></span>
 <span>  <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">*</span> <span class="va">time</span> <span class="op">/</span> <span class="fl">50</span><span class="op">)</span> <span class="op">+</span></span>
@@ -101,27 +101,27 @@ consumer-resource simulator, and makes a few basic plots.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">community</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_community_constructors.html">build_CR_community</a></span><span class="op">(</span></span>
 <span>  S <span class="op">=</span> <span class="fl">4</span>,</span>
-<span>  uptake_maximum_mean <span class="op">=</span> <span class="fl">0.08</span>,</span>
+<span>  uptake_maximum_mean <span class="op">=</span> <span class="fl">0.363064</span>,</span>
 <span>  uptake_maximum_range <span class="op">=</span> <span class="fl">0.00</span>,</span>
-<span>  uptake_maximum_distribution <span class="op">=</span> <span class="st">"regular"</span>,</span>
-<span>  uptake_optimum_mean <span class="op">=</span> <span class="fl">20</span>,</span>
-<span>  uptake_optimum_range <span class="op">=</span> <span class="fl">7</span>,</span>
-<span>  uptake_optimum_distribution <span class="op">=</span> <span class="st">"regular"</span>,</span>
-<span>  uptake_width_mean <span class="op">=</span> <span class="fl">6</span>,</span>
-<span>  uptake_width_range <span class="op">=</span> <span class="fl">1.5</span>,</span>
-<span>  uptake_width_distribution <span class="op">=</span> <span class="st">"regular"</span>,</span>
-<span>  half_saturation_mean <span class="op">=</span> <span class="fl">80</span>,</span>
-<span>  half_saturation_range <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  half_saturation_distribution <span class="op">=</span> <span class="st">"regular"</span>,</span>
-<span>  consumer_death_rate <span class="op">=</span> <span class="fl">0.03</span>,</span>
-<span>  resource_renewal_rate <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  resource_supply <span class="op">=</span> <span class="fl">800</span>,</span>
+<span>  uptake_maximum_distribution <span class="op">=</span> <span class="st">"random_uniform"</span>,</span>
+<span>  uptake_optimum_mean <span class="op">=</span> <span class="fl">16</span>,</span>
+<span>  uptake_optimum_range <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  uptake_optimum_distribution <span class="op">=</span> <span class="st">"random_uniform"</span>,</span>
+<span>  uptake_width_mean <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  uptake_width_range <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  uptake_width_distribution <span class="op">=</span> <span class="st">"random_uniform"</span>,</span>
+<span>  half_saturation_mean <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  half_saturation_range <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  half_saturation_distribution <span class="op">=</span> <span class="st">"random_uniform"</span>,</span>
+<span>  consumer_death_rate <span class="op">=</span> <span class="fl">0.181532</span>,</span>
+<span>  resource_renewal_rate <span class="op">=</span> <span class="fl">6.051066</span>,</span>
+<span>  resource_supply <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  conversion_efficiency <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  resource_use_mode <span class="op">=</span> <span class="st">"shared_to_private"</span>,</span>
 <span>  active_resource <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  private_resource_use_distribution <span class="op">=</span> <span class="st">"beta"</span>,</span>
-<span>  private_resource_use_mean <span class="op">=</span> <span class="fl">0.7</span>,</span>
-<span>  private_resource_use_precision <span class="op">=</span> <span class="fl">18</span>,</span>
+<span>  private_resource_use_distribution <span class="op">=</span> <span class="st">"constant"</span>,</span>
+<span>  private_resource_use_mean <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  private_resource_use_range <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  community_seed <span class="op">=</span> <span class="fl">13</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
@@ -142,10 +142,10 @@ consumer-resource simulator, and makes a few basic plots.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 7</span></span></span>
 <span><span class="co">#&gt;   species max_uptake uptake_optimum uptake_width death_rate</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Spp1          0.08           16.5         5.25       0.03</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Spp2          0.08           18.8         5.75       0.03</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Spp3          0.08           21.2         6.25       0.03</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Spp4          0.08           23.5         6.75       0.03</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Spp1         0.363             16        1.11       0.182</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Spp2         0.363             16        0.873      0.182</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Spp3         0.363             16        0.945      0.182</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Spp4         0.363             16        0.796      0.182</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: private_resource_fraction &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   shared_resource_fraction &lt;dbl&gt;</span></span></span></code></pre></div>
 </div>
@@ -200,7 +200,7 @@ consumer-resource simulator, and makes a few basic plots.</p>
 </h2>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">initial_consumer_abundances</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">12</span>, <span class="va">community</span><span class="op">$</span><span class="va">S</span><span class="op">)</span></span>
-<span><span class="va">initial_resource_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">600</span>, <span class="va">community</span><span class="op">$</span><span class="va">R</span><span class="op">)</span></span>
+<span><span class="va">initial_resource_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="va">community</span><span class="op">$</span><span class="va">R</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">simulation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulator_consumer_resource_continuous.html">simulator_consumer_resource_continuous</a></span><span class="op">(</span></span>
 <span>  input_com_params <span class="op">=</span> <span class="va">community</span>,</span>
