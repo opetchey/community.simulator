@@ -557,12 +557,21 @@ get_community_measures_from_spec <- function(experiment_folder,
   if (!file.exists(summaries_path)) {
     stop("Cannot calculate community measures because simulation_summaries.RDS was not found.", call. = FALSE)
   }
+  if (verbose) {
+    message("Reading simulation summaries")
+  }
   comm_dynamic_measures <- readRDS(summaries_path) |>
     tibble::as_tibble()
+  if (verbose) {
+    message("Calculating performance-optimum measures")
+  }
   performance_optimum_measures <- get_community_performance_optimum_measures(
     temperatures,
     expt
   )
+  if (verbose) {
+    message("Calculating CPC measures")
+  }
   comm_cpc <- get_community_CPC_measures(
     temperatures,
     expt,
@@ -575,13 +584,19 @@ get_community_measures_from_spec <- function(experiment_folder,
     progress_update_every = settings$runtime_update_every
   )
 
+  if (verbose) {
+    message("Joining community measures")
+  }
   comm_measures <- expt |>
     dplyr::left_join(comm_dynamic_measures, by = "case_id") |>
     dplyr::left_join(performance_optimum_measures, by = "case_id") |>
     dplyr::left_join(comm_cpc, by = "case_id") |>
     standardize_community_measure_names()
 
-  saveRDS(comm_measures, output_path)
+  if (verbose) {
+    message("Saving community-measures file")
+  }
+  atomic_save_rds(comm_measures, output_path)
   announce_output_written(output_path, verbose = verbose, label = "community-measures file")
   invisible(output_path)
 }

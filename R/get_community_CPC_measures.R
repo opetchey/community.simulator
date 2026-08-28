@@ -428,7 +428,34 @@ get_community_CPC_measures <- function(temperatures,
   #DBI::dbDisconnect(conn_imbalance)
   #DBI::dbDisconnect(conn_temperatures)
 
-  # Combine and return
+  if (any(vapply(community_performance_measures, is.null, logical(1)))) {
+    missing_cases <- which(vapply(community_performance_measures, is.null, logical(1)))
+    stop(
+      "CPC measures were not returned for ",
+      length(missing_cases),
+      " case(s). First missing case index: ",
+      missing_cases[[1]],
+      ".",
+      call. = FALSE
+    )
+  }
+
+  if (verbose) {
+    message("Combining CPC measures")
+  }
   final_measures <- dplyr::bind_rows(community_performance_measures)
+  if (nrow(final_measures) != length(case_indices)) {
+    stop(
+      "Expected ",
+      length(case_indices),
+      " rows of CPC measures, but got ",
+      nrow(final_measures),
+      ".",
+      call. = FALSE
+    )
+  }
+  if (verbose) {
+    message("Combined CPC measures: ", nrow(final_measures), " cases")
+  }
   return(final_measures)
 }
