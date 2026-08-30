@@ -31,12 +31,20 @@ integer_spec_setting <- function(value, name) {
 }
 
 worker_spec_setting <- function(value, name) {
+  detected_cores <- function() {
+    cores <- parallel::detectCores(logical = FALSE)
+    if (length(cores) != 1L || is.na(cores) || !is.finite(cores) || cores < 1L) {
+      return(1L)
+    }
+    as.integer(cores)
+  }
+
   if (is.character(value) && length(value) == 1) {
     value <- switch(
       value,
-      available_cores_minus_1 = max(1L, parallel::detectCores(logical = FALSE) - 1L),
-      available_cores = max(1L, parallel::detectCores(logical = FALSE)),
-      auto = max(1L, parallel::detectCores(logical = FALSE) - 1L),
+      available_cores_minus_1 = max(1L, detected_cores() - 1L),
+      available_cores = max(1L, detected_cores()),
+      auto = max(1L, detected_cores() - 1L),
       stop(
         "`",
         name,
@@ -585,13 +593,22 @@ get_community_measures_from_spec <- function(experiment_folder,
   )
 
   if (verbose) {
+    message("Preparing compact community-measures metadata")
+  }
+  community_measure_metadata <- expt |>
+    dplyr::select(-dplyr::any_of(c("community_object", "case_spec")))
+
+  if (verbose) {
     message("Joining community measures")
   }
-  comm_measures <- expt |>
+  comm_measures <- community_measure_metadata |>
     dplyr::left_join(comm_dynamic_measures, by = "case_id") |>
     dplyr::left_join(performance_optimum_measures, by = "case_id") |>
     dplyr::left_join(comm_cpc, by = "case_id") |>
     standardize_community_measure_names()
+
+  rm(expt, community_measure_metadata, comm_dynamic_measures, performance_optimum_measures, comm_cpc)
+  gc()
 
   if (verbose) {
     message("Saving community-measures file")
