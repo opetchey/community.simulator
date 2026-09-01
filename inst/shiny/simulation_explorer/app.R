@@ -177,7 +177,7 @@ ui <- fluidPage(
       numericInput("random_seed", "Random seed", value = 1, min = 1, step = 1),
       sliderInput("experiment_duration", "Simulation duration", min = 10, max = 3000, value = 80, step = 10),
       numericInput("temperature_mean", "Temperature mean", value = 20, step = 0.5),
-      numericInput("temperature_sd", "Temperature SD", value = 1, min = 0, step = 0.1),
+      numericInput("temperature_sd", "Temperature SD", value = 4, min = 0, step = 0.1),
       sliderInput("one_over_f_gamma", "Environmental autocorrelation", min = 0, max = 2, value = 0.8, step = 0.1),
       radioButtons(
         "specification_mode",
