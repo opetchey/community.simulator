@@ -36,6 +36,8 @@
 #' @param birth_optimum_mean Mean birth thermal optimum for LV models.
 #' @param birth_optimum_range Range of birth thermal optima for LV models.
 #' @param birth_width_mean Mean birth performance-curve width for LV models.
+#' @param birth_width_range Range of birth performance-curve widths for LV
+#'   models.
 #' @param uptake_maximum_mean Mean maximum uptake rate for the CR model.
 #' @param uptake_optimum_mean Mean uptake thermal optimum for the CR model.
 #' @param uptake_optimum_range Range of uptake thermal optima for the CR model.
@@ -87,11 +89,12 @@ build_single_community <- function(model_type = c(
                                    birth_optimum_mean = 20,
                                    birth_optimum_range = 6,
                                    birth_width_mean = 8,
+                                   birth_width_range = 0,
                                    uptake_maximum_mean = 0.363064,
                                    uptake_optimum_mean = 16,
                                    uptake_optimum_range = 0,
                                    uptake_width_mean = 1,
-                                   uptake_width_range = 0.5) {
+                                   uptake_width_range = 0) {
   model_type <- match.arg(model_type)
   lv_interaction <- match.arg(lv_interaction)
   richness <- as.integer(richness)
@@ -159,7 +162,7 @@ build_single_community <- function(model_type = c(
       b_opt_distribution = "regular",
       sd_perf_distribution = "regular",
       sd_perf_mean = birth_width_mean,
-      sd_perf_range = 0,
+      sd_perf_range = birth_width_range,
       community_seed = random_seed,
       a_d = 0,
       z = 0.05,
@@ -369,11 +372,12 @@ simulate_single_community <- function(model_type = c(
                                       birth_optimum_mean = 20,
                                       birth_optimum_range = 6,
                                       birth_width_mean = 8,
+                                      birth_width_range = 0,
                                       uptake_maximum_mean = 0.363064,
                                       uptake_optimum_mean = 16,
                                       uptake_optimum_range = 0,
                                       uptake_width_mean = 1,
-                                      uptake_width_range = 0.5,
+                                      uptake_width_range = 0,
                                       experiment_duration = 60,
                                       temperature_mean = 20,
                                       temperature_sd = 1,
@@ -412,6 +416,7 @@ simulate_single_community <- function(model_type = c(
     birth_optimum_mean = birth_optimum_mean,
     birth_optimum_range = birth_optimum_range,
     birth_width_mean = birth_width_mean,
+    birth_width_range = birth_width_range,
     uptake_maximum_mean = uptake_maximum_mean,
     uptake_optimum_mean = uptake_optimum_mean,
     uptake_optimum_range = uptake_optimum_range,

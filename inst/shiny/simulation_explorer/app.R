@@ -115,11 +115,12 @@ collect_parameters <- function(input) {
     birth_optimum_mean = input$thermal_optimum_mean,
     birth_optimum_range = input$thermal_optimum_range,
     birth_width_mean = input$performance_width_mean,
+    birth_width_range = 0,
     uptake_maximum_mean = input$uptake_maximum_mean,
     uptake_optimum_mean = input$thermal_optimum_mean,
     uptake_optimum_range = input$thermal_optimum_range,
     uptake_width_mean = input$performance_width_mean,
-    uptake_width_range = 0.5,
+    uptake_width_range = 0,
     experiment_duration = input$experiment_duration,
     temperature_mean = input$temperature_mean,
     temperature_sd = input$temperature_sd,
@@ -135,11 +136,12 @@ collect_parameters <- function(input) {
     params$birth_optimum_mean <- input$detailed_thermal_optimum_mean
     params$birth_optimum_range <- input$detailed_thermal_optimum_range
     params$birth_width_mean <- input$detailed_performance_width_mean
+    params$birth_width_range <- input$detailed_performance_width_range
     params$uptake_maximum_mean <- input$detailed_uptake_maximum_mean
     params$uptake_optimum_mean <- input$detailed_thermal_optimum_mean
     params$uptake_optimum_range <- input$detailed_thermal_optimum_range
     params$uptake_width_mean <- input$detailed_performance_width_mean
-    params$uptake_width_range <- 0.5
+    params$uptake_width_range <- input$detailed_performance_width_range
     params$lv_interaction_type <- input$lv_interaction_type
     params$lv_interaction_symmetry <- input$lv_interaction_symmetry
     params$lv_interaction_distribution <- input$lv_interaction_distribution
@@ -210,6 +212,7 @@ ui <- fluidPage(
         numericInput("detailed_thermal_optimum_mean", "Thermal optimum mean", value = 20, step = 0.5),
         numericInput("detailed_thermal_optimum_range", "Thermal optimum range", value = 6, min = 0, step = 0.5),
         numericInput("detailed_performance_width_mean", "Performance width mean", value = 8, min = 0.1, step = 0.5),
+        numericInput("detailed_performance_width_range", "Performance width range", value = 0, min = 0, step = 0.5),
         conditionalPanel(
           condition = "input.model_type != 'consumer_resource_continuous'",
           numericInput("detailed_birth_maximum_mean", "Birth maximum mean", value = 0.3, min = 0, step = 0.05),
@@ -358,6 +361,7 @@ server <- function(input, output, session) {
       updateNumericInput(session, "detailed_thermal_optimum_mean", value = 16)
       updateNumericInput(session, "detailed_thermal_optimum_range", value = 0)
       updateNumericInput(session, "detailed_performance_width_mean", value = 1)
+      updateNumericInput(session, "detailed_performance_width_range", value = 0)
       updateNumericInput(session, "uptake_maximum_mean", value = 0.363064)
       updateNumericInput(session, "detailed_uptake_maximum_mean", value = 0.363064)
       updateSliderInput(session, "private_resource_use_mean", value = 0)
@@ -377,6 +381,7 @@ server <- function(input, output, session) {
       updateNumericInput(session, "detailed_thermal_optimum_mean", value = 20)
       updateNumericInput(session, "detailed_thermal_optimum_range", value = 6)
       updateNumericInput(session, "detailed_performance_width_mean", value = 8)
+      updateNumericInput(session, "detailed_performance_width_range", value = 0)
     }
   }, ignoreInit = TRUE)
 

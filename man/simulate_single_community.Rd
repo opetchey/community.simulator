@@ -32,11 +32,12 @@ simulate_single_community(
   birth_optimum_mean = 20,
   birth_optimum_range = 6,
   birth_width_mean = 8,
+  birth_width_range = 0,
   uptake_maximum_mean = 0.363064,
   uptake_optimum_mean = 16,
   uptake_optimum_range = 0,
   uptake_width_mean = 1,
-  uptake_width_range = 0.5,
+  uptake_width_range = 0,
   experiment_duration = 60,
   temperature_mean = 20,
   temperature_sd = 1,
@@ -109,6 +110,9 @@ private-resource use fractions.}
 \item{birth_optimum_range}{Range of birth thermal optima for LV models.}
 
 \item{birth_width_mean}{Mean birth performance-curve width for LV models.}
+
+\item{birth_width_range}{Range of birth performance-curve widths for LV
+models.}
 
 \item{uptake_maximum_mean}{Mean maximum uptake rate for the CR model.}
 
