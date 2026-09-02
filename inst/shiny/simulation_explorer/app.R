@@ -76,6 +76,7 @@ plot_performance_curves <- function(performance_curves) {
     colour = species
   )) +
     geom_line() +
+    coord_cartesian(xlim = c(0, 30)) +
     labs(
       x = "Temperature",
       y = "Performance",
@@ -147,7 +148,9 @@ power_spectrum <- function(temperature) {
     frequency = frequency,
     angular_frequency = angular_frequency,
     power = power,
-    smoothed_power = smoothed_power
+    smoothed_power = smoothed_power,
+    log10_frequency = log10(frequency),
+    log10_power = log10(power)
   )
 }
 
@@ -183,38 +186,79 @@ spectral_diagnostic <- function(params, community) {
   list(
     spectrum = spectrum,
     intrinsic_rate = rate,
+    system_frequency = rate / (2 * pi),
     fast_fraction = fast_fraction
   )
 }
 
 plot_spectral_diagnostic <- function(diagnostic) {
-  spectrum <- diagnostic$spectrum
+  spectrum <- subset(
+    diagnostic$spectrum,
+    is.finite(log10_frequency) & is.finite(log10_power)
+  )
   validate(need(nrow(spectrum) > 0, "Temperature SD must be greater than zero to show an environmental spectrum."))
+  validate(need(is.finite(diagnostic$system_frequency) && diagnostic$system_frequency > 0, "The community intrinsic rate must be positive to show the spectral comparison."))
 
-  ggplot(spectrum, aes(x = angular_frequency, y = smoothed_power)) +
-    geom_area(
-      data = subset(spectrum, angular_frequency > diagnostic$intrinsic_rate),
-      fill = "#E69F00",
-      alpha = 0.35
+  log10_system_frequency <- log10(diagnostic$system_frequency)
+  x_min <- min(spectrum$log10_frequency, na.rm = TRUE)
+  x_max <- max(spectrum$log10_frequency, na.rm = TRUE)
+  y_min <- min(spectrum$log10_power, na.rm = TRUE)
+  y_max <- max(spectrum$log10_power, na.rm = TRUE)
+  region_shading <- data.frame(
+    exposure_region = factor(
+      c("Slower than system", "Faster than system"),
+      levels = c("Slower than system", "Faster than system")
+    ),
+    xmin = c(x_min, log10_system_frequency),
+    xmax = c(log10_system_frequency, x_max),
+    ymin = y_min,
+    ymax = y_max
+  )
+  fast_exposure_label <- data.frame(
+    x = x_min,
+    y = -5.95,
+    label = paste0(
+      "Fast environment exposure = ",
+      round(100 * diagnostic$fast_fraction, 1),
+      "%"
+    )
+  )
+
+  ggplot(spectrum, aes(x = log10_frequency, y = log10_power)) +
+    geom_rect(
+      data = region_shading,
+      aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = exposure_region),
+      inherit.aes = FALSE,
+      alpha = 0.18
     ) +
-    geom_line(linewidth = 0.8, colour = "#0072B2") +
-    geom_vline(xintercept = diagnostic$intrinsic_rate, linetype = "dashed") +
-    annotate(
-      "label",
-      x = Inf,
-      y = Inf,
-      hjust = 1.02,
-      vjust = 1.2,
-      label = paste0(
-        "Fast variance: ",
-        round(100 * diagnostic$fast_fraction, 1),
-        "%"
-      )
+    geom_line(linewidth = 0.35, colour = "grey20") +
+    geom_vline(
+      xintercept = log10_system_frequency,
+      linetype = "dashed",
+      linewidth = 0.6,
+      colour = "black"
+    ) +
+    geom_label(
+      data = fast_exposure_label,
+      aes(x = x, y = y, label = label),
+      inherit.aes = FALSE,
+      hjust = 0,
+      vjust = 0,
+      size = 3.2,
+      linewidth = 0.2,
+      fill = "white",
+      alpha = 0.9
+    ) +
+    scale_fill_manual(
+      values = c("Slower than system" = "#56B4E9", "Faster than system" = "#D55E00")
     ) +
     labs(
-      x = "Angular frequency",
-      y = "Smoothed proportional power"
+      x = "log10(frequency)",
+      y = "log10(power)",
+      fill = "Spectral region",
+      title = "Fast environment exposure from log-log temperature power spectra"
     ) +
+    coord_cartesian(ylim = c(-6, 0)) +
     theme_minimal(base_size = 12)
 }
 
@@ -232,7 +276,7 @@ preset_definitions <- data.frame(
   model_label = rep(c("Discrete-time LV", "Continuous-time LV", "Consumer-resource"), 7),
   model_type = rep(c("lv_discrete", "lv_continuous", "consumer_resource_continuous"), 7),
   richness = c(4, 4, 4, 4, 4, 4, 4, 4, 4, 8, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4),
-  experiment_duration = c(300, 300, 2000, 300, 300, 2000, 300, 300, 2000, 300, 300, 2000, 300, 300, 2000, 300, 300, 2000, 300, 300, 2000),
+  experiment_duration = 2000,
   temperature_mean = rep(c(20, 20, 16), 7),
   temperature_sd = 4,
   one_over_f_gamma = c(0.8, 0.8, 0.8, 0, 0, 0, 1.5, 1.5, 1.5, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8),
@@ -527,7 +571,6 @@ server <- function(input, output, session) {
       return()
     }
     if (identical(input$model_type, "consumer_resource_continuous")) {
-      updateSliderInput(session, "experiment_duration", value = 2000)
       updateNumericInput(session, "thermal_optimum_mean", value = 16)
       updateNumericInput(session, "thermal_optimum_range", value = 0)
       updateNumericInput(session, "performance_width_mean", value = 1)
@@ -547,7 +590,6 @@ server <- function(input, output, session) {
       updateNumericInput(session, "detailed_resource_supply", value = 1000)
       updateNumericInput(session, "detailed_resource_initial_value", value = 1000)
     } else {
-      updateSliderInput(session, "experiment_duration", value = 80)
       updateNumericInput(session, "thermal_optimum_mean", value = 20)
       updateNumericInput(session, "thermal_optimum_range", value = 6)
       updateNumericInput(session, "performance_width_mean", value = 8)
@@ -595,7 +637,12 @@ server <- function(input, output, session) {
 
   apply_preset <- function(preset) {
     applying_preset(TRUE)
-    session$onFlushed(function() applying_preset(FALSE), once = TRUE)
+    session$onFlushed(function() {
+      updateSliderInput(session, "experiment_duration", value = preset$experiment_duration)
+      session$onFlushed(function() {
+        applying_preset(FALSE)
+      }, once = TRUE)
+    }, once = TRUE)
 
     updateSelectInput(session, "model_type", selected = preset$model_type)
     updateRadioButtons(session, "specification_mode", selected = "detailed")
