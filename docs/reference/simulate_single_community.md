@@ -35,15 +35,17 @@ simulate_single_community(
   birth_optimum_mean = 20,
   birth_optimum_range = 6,
   birth_width_mean = 8,
+  birth_width_range = 0,
   uptake_maximum_mean = 0.363064,
   uptake_optimum_mean = 16,
   uptake_optimum_range = 0,
   uptake_width_mean = 1,
-  uptake_width_range = 0.5,
+  uptake_width_range = 0,
   experiment_duration = 60,
   temperature_mean = 20,
   temperature_sd = 1,
   one_over_f_gamma = 0.8,
+  environment_sampling_interval = 1,
   initial_total_abundance = 100,
   resource_initial_value = 1000,
   immigration_rate = 0.1,
@@ -164,6 +166,10 @@ simulate_single_community(
 
   Mean birth performance-curve width for LV models.
 
+- birth_width_range:
+
+  Range of birth performance-curve widths for LV models.
+
 - uptake_maximum_mean:
 
   Mean maximum uptake rate for the CR model.
@@ -186,7 +192,8 @@ simulate_single_community(
 
 - experiment_duration:
 
-  Number of time points to simulate.
+  Simulation duration. For discrete LV this is the number of discrete
+  time steps; for continuous LV and CR this is the model-time duration.
 
 - temperature_mean:
 
@@ -199,6 +206,13 @@ simulate_single_community(
 - one_over_f_gamma:
 
   Slope parameter for the `1/f` temperature process.
+
+- environment_sampling_interval:
+
+  Time between consecutive generated environmental temperature values.
+  Continuous-time LV and CR simulations use this to place environmental
+  samples in model time; discrete-time LV simulations always use an
+  interval of 1.
 
 - initial_total_abundance:
 

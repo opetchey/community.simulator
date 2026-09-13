@@ -251,3 +251,60 @@ test_that("parallel simulations append all consumer-resource dynamics and resour
   expect_equal(dynamics_case_ids, expected_case_ids)
   expect_equal(resources_case_ids, expected_case_ids)
 })
+
+test_that("continuous experiments use full environmental sampling interval time series", {
+  output_root <- tempdir()
+  experiment_name <- paste0("continuous-environment-interval-", Sys.getpid())
+  output_dir <- file.path(output_root, experiment_name)
+  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+
+  write_parallel_regression_spec(
+    "lv_continuous.yaml",
+    output_dir,
+    function(spec) {
+      spec$community$replicates <- 1L
+      spec$simulation$burn_in_duration <- 2L
+      spec$simulation$experiment_duration <- 4L
+      spec$simulation$environment_sampling_interval <- 0.5
+      spec$output <- list(
+        save_dynamics = TRUE,
+        dynamics_save_every = 1L,
+        runtime_update_every = 100L,
+        simulation_progress = FALSE,
+        environment_progress = FALSE
+      )
+      spec$parallel <- list(
+        workers = 1L,
+        environments = FALSE,
+        simulations = FALSE,
+        community_measures = FALSE
+      )
+      spec
+    }
+  )
+
+  outputs <- run_experiment(
+    experiment_folder_location = output_root,
+    experiment_name = experiment_name,
+    experiment_design_filename = "experiment.yaml",
+    overwrite = TRUE,
+    verbose = FALSE,
+    confirm_run = FALSE
+  )
+
+  conn_temperatures <- DBI::dbConnect(RSQLite::SQLite(), outputs$temperatures_db)
+  on.exit(DBI::dbDisconnect(conn_temperatures), add = TRUE)
+  temperature_times <- DBI::dbGetQuery(
+    conn_temperatures,
+    "select time from temperatures order by time"
+  )$time
+  expect_equal(temperature_times, seq(2.5, 6, by = 0.5))
+
+  conn_dynamics <- DBI::dbConnect(RSQLite::SQLite(), outputs$dynamics_db)
+  on.exit(DBI::dbDisconnect(conn_dynamics), add = TRUE)
+  dynamics_times <- DBI::dbGetQuery(
+    conn_dynamics,
+    "select distinct time from dynamics order by time"
+  )$time
+  expect_equal(dynamics_times, temperature_times)
+})

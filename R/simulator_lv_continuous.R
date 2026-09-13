@@ -70,7 +70,7 @@ simulator_lv_continuous <- function(input_com_params,
 
   state_names <- paste0("Spp", seq_len(S))
   state <- stats::setNames(as.numeric(initial_abundances), state_names)
-  integration_times <- sort(unique(c(min(times) - 1, output_times)))
+  integration_times <- sort(unique(c(0, output_times)))
 
   temperature_at_time <- stats::approxfun(
     x = times,

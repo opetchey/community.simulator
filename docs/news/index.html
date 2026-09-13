@@ -32,7 +32,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.0" id="communitysimulator-090">community.simulator 0.9.0<a class="anchor" aria-label="anchor" href="#communitysimulator-090"></a></h2>
-<ul><li>Made YAML experiment specifications the main workflow for reading, expanding, running, and measuring simulation experiments.</li>
+<ul><li>Added <code>simulation.environment_sampling_interval</code> for continuous LV and consumer-resource experiments, so generated environmental series can be sampled more finely than one model-time unit and written in full to <code>temperatures.db</code>.</li>
+<li>Made YAML experiment specifications the main workflow for reading, expanding, running, and measuring simulation experiments.</li>
 <li>Added schema validation, richer YAML examples, and clearer error messages for experiment specifications.</li>
 <li>Standardised user-facing parameter names across LV and consumer-resource model specifications.</li>
 <li>Cleaned the community-builder API around <code><a href="../reference/build_community_constructors.html">build_LV_community()</a></code>, <code><a href="../reference/build_community_constructors.html">build_CR_community()</a></code>, <code><a href="../reference/build_community_from_spec.html">build_community_from_spec()</a></code>, <code><a href="../reference/build_community_from_spec.html">build_LV_community_from_spec()</a></code>, and <code><a href="../reference/build_community_from_spec.html">build_CR_community_from_spec()</a></code>.</li>

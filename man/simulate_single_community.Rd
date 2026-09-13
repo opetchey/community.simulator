@@ -42,6 +42,7 @@ simulate_single_community(
   temperature_mean = 20,
   temperature_sd = 1,
   one_over_f_gamma = 0.8,
+  environment_sampling_interval = 1,
   initial_total_abundance = 100,
   resource_initial_value = 1000,
   immigration_rate = 0.1,
@@ -125,13 +126,20 @@ models.}
 \item{uptake_width_range}{Range of uptake performance-curve widths for the CR
 model.}
 
-\item{experiment_duration}{Number of time points to simulate.}
+\item{experiment_duration}{Simulation duration. For discrete LV this is
+the number of discrete time steps; for continuous LV and CR this is the
+model-time duration.}
 
 \item{temperature_mean}{Mean temperature.}
 
 \item{temperature_sd}{Standard deviation of the temperature series.}
 
 \item{one_over_f_gamma}{Slope parameter for the \code{1/f} temperature process.}
+
+\item{environment_sampling_interval}{Time between consecutive generated
+environmental temperature values. Continuous-time LV and CR simulations use
+this to place environmental samples in model time; discrete-time LV
+simulations always use an interval of 1.}
 
 \item{initial_total_abundance}{Initial total abundance distributed evenly
 across species or consumers.}

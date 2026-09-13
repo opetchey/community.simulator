@@ -71,15 +71,17 @@ case, and returns tidy data frames for plotting.</p>
 <span>  birth_optimum_mean <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  birth_optimum_range <span class="op">=</span> <span class="fl">6</span>,</span>
 <span>  birth_width_mean <span class="op">=</span> <span class="fl">8</span>,</span>
+<span>  birth_width_range <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  uptake_maximum_mean <span class="op">=</span> <span class="fl">0.363064</span>,</span>
 <span>  uptake_optimum_mean <span class="op">=</span> <span class="fl">16</span>,</span>
 <span>  uptake_optimum_range <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  uptake_width_mean <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  uptake_width_range <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  uptake_width_range <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  experiment_duration <span class="op">=</span> <span class="fl">60</span>,</span>
 <span>  temperature_mean <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>  temperature_sd <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  one_over_f_gamma <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  environment_sampling_interval <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  initial_total_abundance <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  resource_initial_value <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  immigration_rate <span class="op">=</span> <span class="fl">0.1</span>,</span>
@@ -205,6 +207,11 @@ private-resource use fractions.</p></dd>
 <dd><p>Mean birth performance-curve width for LV models.</p></dd>
 
 
+<dt id="arg-birth-width-range">birth_width_range<a class="anchor" aria-label="anchor" href="#arg-birth-width-range"></a></dt>
+<dd><p>Range of birth performance-curve widths for LV
+models.</p></dd>
+
+
 <dt id="arg-uptake-maximum-mean">uptake_maximum_mean<a class="anchor" aria-label="anchor" href="#arg-uptake-maximum-mean"></a></dt>
 <dd><p>Mean maximum uptake rate for the CR model.</p></dd>
 
@@ -227,7 +234,9 @@ model.</p></dd>
 
 
 <dt id="arg-experiment-duration">experiment_duration<a class="anchor" aria-label="anchor" href="#arg-experiment-duration"></a></dt>
-<dd><p>Number of time points to simulate.</p></dd>
+<dd><p>Simulation duration. For discrete LV this is
+the number of discrete time steps; for continuous LV and CR this is the
+model-time duration.</p></dd>
 
 
 <dt id="arg-temperature-mean">temperature_mean<a class="anchor" aria-label="anchor" href="#arg-temperature-mean"></a></dt>
@@ -240,6 +249,13 @@ model.</p></dd>
 
 <dt id="arg-one-over-f-gamma">one_over_f_gamma<a class="anchor" aria-label="anchor" href="#arg-one-over-f-gamma"></a></dt>
 <dd><p>Slope parameter for the <code>1/f</code> temperature process.</p></dd>
+
+
+<dt id="arg-environment-sampling-interval">environment_sampling_interval<a class="anchor" aria-label="anchor" href="#arg-environment-sampling-interval"></a></dt>
+<dd><p>Time between consecutive generated
+environmental temperature values. Continuous-time LV and CR simulations use
+this to place environmental samples in model time; discrete-time LV
+simulations always use an interval of 1.</p></dd>
 
 
 <dt id="arg-initial-total-abundance">initial_total_abundance<a class="anchor" aria-label="anchor" href="#arg-initial-total-abundance"></a></dt>

@@ -55,6 +55,7 @@ environment:
 
 simulation:
   burn_in_duration: 100
+  environment_sampling_interval: 1
   experiment_duration: 200
   temperature_interpolation: linear
   immigration_rate: 0.05

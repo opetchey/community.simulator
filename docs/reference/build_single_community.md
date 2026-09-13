@@ -33,11 +33,12 @@ build_single_community(
   birth_optimum_mean = 20,
   birth_optimum_range = 6,
   birth_width_mean = 8,
+  birth_width_range = 0,
   uptake_maximum_mean = 0.363064,
   uptake_optimum_mean = 16,
   uptake_optimum_range = 0,
   uptake_width_mean = 1,
-  uptake_width_range = 0.5
+  uptake_width_range = 0
 )
 ```
 
@@ -153,6 +154,10 @@ build_single_community(
 - birth_width_mean:
 
   Mean birth performance-curve width for LV models.
+
+- birth_width_range:
+
+  Range of birth performance-curve widths for LV models.
 
 - uptake_maximum_mean:
 

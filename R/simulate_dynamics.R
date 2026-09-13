@@ -204,25 +204,31 @@ simulate_one_dynamics_case <- function(i,
 
   burn_in_temps <- tibble::tibble(
     phase = rep("burn_in", expt_def$burn_in_duration),
-    time = 1:expt_def$burn_in_duration,
+    time = seq_len(expt_def$burn_in_duration),
     temperature = rep(
       expt$temperature_mean[i] %||% expt_def$temperature_mean,
       expt_def$burn_in_duration
     ),
     env_series_id = rep(env_series_oi, expt_def$burn_in_duration)
   )
-  temperature_series <- dplyr::bind_rows(burn_in_temps, temperatures_oi)
+  temperature_series <- dplyr::bind_rows(burn_in_temps, temperatures_oi) |>
+    dplyr::arrange(.data$time)
 
   Tcel_control <- temperature_series$temperature
   Tcel_controlm <- matrix(Tcel_control, nrow = 1)
-  integration_times <- seq_len(ncol(Tcel_controlm))
+  temperature_times <- temperature_series$time
+  integration_times <- if (identical(dynamics_type, "discrete")) {
+    seq_len(ncol(Tcel_controlm))
+  } else {
+    temperature_times
+  }
   output_times <- integration_times[
-    ((integration_times - 1L) %% dynamics_save_every) == 0L |
-      integration_times == max(integration_times)
+    ((seq_along(integration_times) - 1L) %% dynamics_save_every) == 0L |
+      seq_along(integration_times) == length(integration_times)
   ]
   resource_output_times <- integration_times[
-    ((integration_times - 1L) %% resources_save_every) == 0L |
-      integration_times == max(integration_times)
+    ((seq_along(integration_times) - 1L) %% resources_save_every) == 0L |
+      seq_along(integration_times) == length(integration_times)
   ]
   solver_output_times <- sort(unique(c(output_times, resource_output_times)))
 
@@ -249,7 +255,7 @@ simulate_one_dynamics_case <- function(i,
       input_com_params = community,
       TcelSeries = Tcel_controlm,
       initial_abundances = initial_abundances,
-      times = integration_times,
+      times = temperature_times,
       output_times = output_times,
       temperature_interpolation = temperature_interpolation,
       immigration_rate = immigration_rate,
@@ -270,7 +276,7 @@ simulate_one_dynamics_case <- function(i,
       TcelSeries = Tcel_controlm,
       initial_consumer_abundances = initial_abundances,
       initial_resource_values = initial_resources,
-      times = integration_times,
+      times = temperature_times,
       output_times = solver_output_times,
       temperature_interpolation = temperature_interpolation,
       consumer_immigration_rate = consumer_immigration_rate,

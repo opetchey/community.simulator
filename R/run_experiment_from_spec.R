@@ -30,6 +30,39 @@ integer_spec_setting <- function(value, name) {
   value
 }
 
+positive_numeric_spec_setting <- function(value, name) {
+  value <- numeric_spec_setting(value, name)
+  if (value <= 0) {
+    stop("`", name, "` must be greater than 0.", call. = FALSE)
+  }
+  value
+}
+
+environment_sample_times <- function(settings, include_burn_in = FALSE) {
+  sampling_interval <- settings$environment_sampling_interval %||% 1
+  if (identical(settings$dynamics_type, "discrete")) {
+    expt_times <- seq.int(
+      from = settings$burn_in_duration + 1L,
+      length.out = settings$experiment_duration
+    )
+  } else {
+    expt_end <- settings$burn_in_duration + settings$experiment_duration
+    expt_times <- seq(
+      from = settings$burn_in_duration + sampling_interval,
+      to = expt_end,
+      by = sampling_interval
+    )
+    if (length(expt_times) == 0L || tail(expt_times, 1) < expt_end) {
+      expt_times <- c(expt_times, expt_end)
+    }
+  }
+
+  if (!isTRUE(include_burn_in) || settings$burn_in_duration == 0L) {
+    return(expt_times)
+  }
+  c(seq_len(settings$burn_in_duration), expt_times)
+}
+
 worker_spec_setting <- function(value, name) {
   detected_cores <- function() {
     cores <- parallel::detectCores(logical = FALSE)
@@ -67,6 +100,7 @@ flatten_spec_settings <- function(spec) {
     temperature_mean = numeric_spec_setting(spec$environment$temperature$mean, "environment.temperature.mean"),
     temperature_sd = numeric_spec_setting(spec$environment$temperature$sd, "environment.temperature.sd"),
     one_over_f_gamma = numeric_spec_setting(spec$environment$temperature$one_over_f_gamma, "environment.temperature.one_over_f_gamma"),
+    environment_sampling_interval = positive_numeric_spec_setting(spec_setting(spec, "simulation", "environment_sampling_interval", 1), "simulation.environment_sampling_interval"),
     temperature_interpolation = spec_setting(spec, "simulation", "temperature_interpolation", "linear"),
     immigration_rate = numeric_spec_setting(spec_setting(spec, "simulation", "immigration_rate", 0.1), "simulation.immigration_rate"),
     consumer_immigration_rate = numeric_spec_setting(spec_setting(spec, "simulation", "consumer_immigration_rate", spec_setting(spec, "simulation", "immigration_rate", 0.1)), "simulation.consumer_immigration_rate"),
@@ -308,14 +342,12 @@ create_environments_from_spec <- function(experiment_folder,
     temperature_sd <- environments$temperature_sd[i]
     one_over_f_gamma <- environments$one_over_f_gamma[i]
 
+    sample_times <- environment_sample_times(settings)
     tibble::tibble(
       phase = "expt",
-      time = seq.int(
-        from = settings$burn_in_duration + 1L,
-        length.out = settings$experiment_duration
-      ),
+      time = sample_times,
       temperature = generate_one_over_f_temperature(
-        n = settings$experiment_duration,
+        n = length(sample_times),
         mean = temperature_mean,
         sd = temperature_sd,
         gamma = one_over_f_gamma

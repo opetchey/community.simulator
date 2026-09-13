@@ -351,6 +351,21 @@ validate_simulation_spec <- function(simulation, model_type) {
       call. = FALSE
     )
   }
+  if (!is.null(simulation$environment_sampling_interval)) {
+    require_positive_number(
+      simulation$environment_sampling_interval,
+      "simulation.environment_sampling_interval"
+    )
+    if (!identical(model_type, "lv_discrete") &&
+        as.numeric(simulation$environment_sampling_interval) >
+          as.numeric(simulation$experiment_duration)) {
+      stop(
+        "`simulation.environment_sampling_interval` must be less than or equal to ",
+        "`simulation.experiment_duration` for continuous models.",
+        call. = FALSE
+      )
+    }
+  }
   if (!is.null(simulation$temperature_interpolation)) {
     require_one_of(
       simulation$temperature_interpolation,

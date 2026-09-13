@@ -239,11 +239,11 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
   community_objects <- read_community_objects_for_runtime(experiment_folder)
   settings <- flatten_spec_settings(spec)
 
-  integration_steps <- settings$burn_in_duration + settings$experiment_duration
-  output_times <- seq_len(integration_steps)
-  output_times <- output_times[
-    ((output_times - 1L) %% settings$dynamics_save_every) == 0L |
-      output_times == max(output_times)
+  integration_times <- environment_sample_times(settings, include_burn_in = TRUE)
+  integration_steps <- length(integration_times)
+  output_times <- integration_times[
+    ((seq_along(integration_times) - 1L) %% settings$dynamics_save_every) == 0L |
+      seq_along(integration_times) == length(integration_times)
   ]
   saved_time_points <- sum(output_times > settings$burn_in_duration)
 
@@ -264,10 +264,9 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
     )
   }
 
-  resource_output_times <- seq_len(integration_steps)
-  resource_output_times <- resource_output_times[
-    ((resource_output_times - 1L) %% settings$resources_save_every) == 0L |
-      resource_output_times == max(resource_output_times)
+  resource_output_times <- integration_times[
+    ((seq_along(integration_times) - 1L) %% settings$resources_save_every) == 0L |
+      seq_along(integration_times) == length(integration_times)
   ]
   saved_resource_time_points <- sum(resource_output_times > settings$burn_in_duration)
 
@@ -285,7 +284,7 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
   }
 
   env_series_count <- nrow(environment_table)
-  temperature_rows <- env_series_count * settings$experiment_duration
+  temperature_rows <- env_series_count * length(environment_sample_times(settings))
 
   estimated_dynamics_db_bytes <- dynamics_rows * 45
   estimated_resources_db_bytes <- resource_rows * 45

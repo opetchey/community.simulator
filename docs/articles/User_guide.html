@@ -630,6 +630,10 @@ set to <code>"lv_discrete"</code>.</p>
 <code><a href="https://rdrr.io/pkg/deSolve/man/ode.html" class="external-link">deSolve::ode()</a></code> and adds ODE-specific controls:</p>
 <ul>
 <li>
+<code>environment_sampling_interval</code>: time between generated
+environmental temperature values in model-time units. The default is
+<code>1</code>.</li>
+<li>
 <code>temperature_interpolation</code>: <code>"linear"</code> or
 <code>"constant"</code>.</li>
 <li>
@@ -687,7 +691,10 @@ continuous simulation time.</li>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>T</mi><mi>t</mi></msub><annotation encoding="application/x-tex">T_t</annotation></semantics></math>:
 environmental temperature at time
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
-obtained from the generated temperature series using
+obtained from the generated temperature series. For continuous models,
+the series is generated at
+<code>simulation.environment_sampling_interval</code> spacing and then
+interpolated using
 <code>simulation.temperature_interpolation</code>.</li>
 <li>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">N_i(t)</annotation></semantics></math>:
@@ -1493,73 +1500,80 @@ process.</td>
 experiment.</td>
 </tr>
 <tr class="odd">
+<td><code>simulation.environment_sampling_interval</code></td>
+<td>Continuous LV, CR</td>
+<td>Time between generated environmental temperature values, in
+model-time units. Default is <code>1</code>. Discrete LV always uses one
+environmental value per discrete time step.</td>
+</tr>
+<tr class="even">
 <td><code>simulation.temperature_interpolation</code></td>
 <td>Continuous LV, CR</td>
 <td>How the continuous-time simulator interpolates temperature between
 generated values. Options are <code>linear</code> and
 <code>constant</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>simulation.immigration_rate</code></td>
 <td>Discrete LV, continuous LV</td>
 <td>Immigration rate per species. This field is required for discrete LV
 experiments.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>simulation.immigration_mode</code></td>
 <td>Continuous LV</td>
 <td>How immigration is applied. Options are <code>continuous</code> and
 <code>pulse</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>simulation.consumer_immigration_rate</code></td>
 <td>CR</td>
 <td>Immigration rate for consumers.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>simulation.initial_consumer_total_abundance</code></td>
 <td>CR</td>
 <td>Initial total consumer abundance distributed across consumers.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>simulation.resource_initial_value</code></td>
 <td>CR</td>
 <td>Initial concentration for each resource.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>simulation.ode.method</code></td>
 <td>Continuous LV, CR</td>
 <td>ODE solver method passed to <code><a href="https://rdrr.io/pkg/deSolve/man/ode.html" class="external-link">deSolve::ode()</a></code>, commonly
 <code>lsoda</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>simulation.ode.rtol</code></td>
 <td>Continuous LV, CR</td>
 <td>Relative tolerance for the ODE solver.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>simulation.ode.atol</code></td>
 <td>Continuous LV, CR</td>
 <td>Absolute tolerance for the ODE solver.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>simulation.ode.max_step</code></td>
 <td>Continuous LV, CR</td>
 <td>Maximum ODE solver step size.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>simulation.blowup_threshold</code></td>
 <td>Continuous LV, CR</td>
 <td>Abundance threshold above which a simulation is treated as having
 blown up.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>simulation.negative_tolerance</code></td>
 <td>CR</td>
 <td>Small numerical tolerance used when checking negative values in ODE
 output.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Fixed LV constants</td>
 <td>Discrete LV, continuous LV</td>
 <td>
@@ -1567,35 +1581,35 @@ output.</td>
 <code>net_growth_offset = 1e-6</code> are fixed internally and are not
 currently YAML options.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>traits.birth_maximum.*</code></td>
 <td>LV</td>
 <td>Mean, range, and distribution for maximum birth-rate
 performance.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>traits.birth_optimum.*</code></td>
 <td>LV</td>
 <td>Mean, range, and distribution for birth-rate thermal optima.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>traits.birth_width.*</code></td>
 <td>LV</td>
 <td>Mean, range, and distribution for Gaussian birth-rate
 performance-curve widths.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>traits.death.intercept</code></td>
 <td>LV</td>
 <td>Intercept of the death-rate curve, shared across species.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>traits.death.temperature_slope</code></td>
 <td>LV</td>
 <td>Temperature sensitivity of the death-rate curve, shared across
 species.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>interactions.treatments</code></td>
 <td>LV</td>
 <td>List of LV interaction-matrix treatments. Each treatment can include
@@ -1603,61 +1617,61 @@ species.</td>
 <code>distribution</code>, <code>parameters</code>, and
 <code>diagonal</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>traits.uptake_maximum.*</code></td>
 <td>CR</td>
 <td>Mean, range, and distribution for maximum consumer uptake.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>traits.uptake_optimum.*</code></td>
 <td>CR</td>
 <td>Mean, range, and distribution for uptake thermal optima.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>traits.uptake_width.*</code></td>
 <td>CR</td>
 <td>Mean, range, and distribution for Gaussian uptake-curve widths.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>traits.half_saturation.*</code></td>
 <td>CR</td>
 <td>Mean, range, and distribution for Monod half-saturation
 constants.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>resources.use_mode</code></td>
 <td>CR</td>
 <td>Resource-use structure. Options are
 <code>one_resource_all_consumers</code>, <code>diagonal</code>, and
 <code>shared_to_private</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>resources.private_use.*</code></td>
 <td>CR</td>
 <td>Distribution, mean, range or precision for species-level
 private-resource use.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>resources.consumer_death_rate</code></td>
 <td>CR</td>
 <td>Consumer death rate, shared across consumers.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>resources.renewal_rate</code></td>
 <td>CR</td>
 <td>Chemostat resource renewal rate.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>resources.supply</code></td>
 <td>CR</td>
 <td>Resource supply concentration.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>resources.conversion_efficiency</code></td>
 <td>CR</td>
 <td>Conversion efficiency from resource uptake to consumer growth.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>parallel.workers</code></td>
 <td>All</td>
 <td>Number of worker processes for parallel steps. Use a positive
@@ -1666,69 +1680,69 @@ integer, <code>available_cores</code>,
 (<code>auto</code> is equivalent to
 <code>available_cores_minus_1</code>).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>parallel.environments</code></td>
 <td>All</td>
 <td>Logical. If <code>TRUE</code>, generate environmental time series in
 parallel where supported.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>parallel.simulations</code></td>
 <td>All</td>
 <td>Logical. If <code>TRUE</code>, simulate cases in parallel where
 supported.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>parallel.community_measures</code></td>
 <td>All</td>
 <td>Logical. If <code>TRUE</code>, calculate community performance curve
 measures in parallel where supported.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>output.dynamics_save_every</code></td>
 <td>All</td>
 <td>Interval between saved population-dynamics output time points.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>output.resources_save_every</code></td>
 <td>CR</td>
 <td>Interval between saved resource output time points.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>output.save_dynamics</code></td>
 <td>All</td>
 <td>Logical. If <code>TRUE</code>, write <code>dynamics.db</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>output.save_resources</code></td>
 <td>CR</td>
 <td>Logical. If <code>TRUE</code>, write <code>resources.db</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>output.runtime_update_every</code></td>
 <td>All</td>
 <td>Number of completed cases between sparse progress updates. Defaults
 to 100.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>output.environment_progress</code></td>
 <td>All</td>
 <td>Logical. If <code>TRUE</code>, print elapsed-time progress while
 environments are generated.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>output.simulation_progress</code></td>
 <td>All</td>
 <td>Logical. If <code>TRUE</code>, print elapsed-time progress while
 simulations and community-performance measures are calculated.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>treatments.mode</code></td>
 <td>All</td>
 <td>Treatment expansion mode. Defaults to <code>factorial</code>; use
 <code>paired</code> for explicit treatment rows.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>treatments.values</code></td>
 <td>All</td>
 <td>Named dotted paths and treatment values to apply to the baseline
@@ -1761,8 +1775,11 @@ object, keyed by <code>community_id</code>.</li>
 describing the experiment specification, workflow events, output paths,
 and elapsed time for each step.</li>
 <li>
-<code>temperatures.db</code>: SQLite database containing generated
-environmental temperature series.</li>
+<code>temperatures.db</code>: SQLite database containing the full
+generated environmental temperature series. For continuous models this
+includes every environmental sample generated at
+<code>simulation.environment_sampling_interval</code>, independent of
+the saved dynamics interval.</li>
 <li>
 <code>dynamics.db</code>: SQLite database containing saved
 population dynamics, when dynamic output is enabled.</li>

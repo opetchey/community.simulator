@@ -60,7 +60,7 @@ simulator_consumer_resource_continuous <- function(input_com_params,
     c(consumer_names, resource_names)
   )
 
-  integration_times <- sort(unique(c(min(times) - 1, output_times)))
+  integration_times <- sort(unique(c(0, output_times)))
   temperature_at_time <- stats::approxfun(
     x = times,
     y = temperatures,

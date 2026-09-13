@@ -16,7 +16,6 @@ BugReports: https://github.com/opetchey/community.simulator/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Depends: 
     R (>= 4.1.0)
 Suggests: 
@@ -47,3 +46,4 @@ Imports:
     tidyr,
     yaml
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

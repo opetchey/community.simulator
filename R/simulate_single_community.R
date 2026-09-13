@@ -290,17 +290,41 @@ create_single_temperature_series <- function(experiment_duration,
                                              temperature_mean,
                                              temperature_sd,
                                              one_over_f_gamma,
-                                             random_seed) {
-  experiment_duration <- as.integer(experiment_duration)
-  if (is.na(experiment_duration) || experiment_duration < 2) {
+                                             random_seed,
+                                             environment_sampling_interval = 1,
+                                             continuous_time = FALSE) {
+  experiment_duration <- as.numeric(experiment_duration)
+  if (length(experiment_duration) != 1 ||
+      is.na(experiment_duration) ||
+      !is.finite(experiment_duration) ||
+      experiment_duration < 2) {
     stop("`experiment_duration` must be at least 2.", call. = FALSE)
+  }
+  environment_sampling_interval <- as.numeric(environment_sampling_interval)
+  if (length(environment_sampling_interval) != 1 ||
+      is.na(environment_sampling_interval) ||
+      !is.finite(environment_sampling_interval) ||
+      environment_sampling_interval <= 0) {
+    stop("`environment_sampling_interval` must be a positive finite number.", call. = FALSE)
+  }
+
+  sample_times <- if (isTRUE(continuous_time)) {
+    times <- seq(environment_sampling_interval, experiment_duration,
+      by = environment_sampling_interval
+    )
+    if (length(times) == 0L || tail(times, 1) < experiment_duration) {
+      times <- c(times, experiment_duration)
+    }
+    times
+  } else {
+    seq_len(as.integer(experiment_duration))
   }
 
   set.seed(random_seed)
   tibble::tibble(
-    time = seq_len(experiment_duration),
+    time = sample_times,
     temperature = generate_one_over_f_temperature(
-      n = experiment_duration,
+      n = length(sample_times),
       mean = temperature_mean,
       sd = temperature_sd,
       gamma = one_over_f_gamma
@@ -315,10 +339,16 @@ create_single_temperature_series <- function(experiment_duration,
 #' case, and returns tidy data frames for plotting.
 #'
 #' @inheritParams build_single_community
-#' @param experiment_duration Number of time points to simulate.
+#' @param experiment_duration Simulation duration. For discrete LV this is
+#'   the number of discrete time steps; for continuous LV and CR this is the
+#'   model-time duration.
 #' @param temperature_mean Mean temperature.
 #' @param temperature_sd Standard deviation of the temperature series.
 #' @param one_over_f_gamma Slope parameter for the `1/f` temperature process.
+#' @param environment_sampling_interval Time between consecutive generated
+#'   environmental temperature values. Continuous-time LV and CR simulations use
+#'   this to place environmental samples in model time; discrete-time LV
+#'   simulations always use an interval of 1.
 #' @param initial_total_abundance Initial total abundance distributed evenly
 #'   across species or consumers.
 #' @param resource_initial_value Initial value for each resource in the CR
@@ -382,12 +412,29 @@ simulate_single_community <- function(model_type = c(
                                       temperature_mean = 20,
                                       temperature_sd = 1,
                                       one_over_f_gamma = 0.8,
+                                      environment_sampling_interval = 1,
                                       initial_total_abundance = 100,
                                       resource_initial_value = 1000,
                                       immigration_rate = 0.1,
                                       consumer_immigration_rate = 0.01) {
   model_type <- match.arg(model_type)
   lv_interaction <- match.arg(lv_interaction)
+  environment_sampling_interval <- as.numeric(environment_sampling_interval)
+  if (length(environment_sampling_interval) != 1 ||
+      is.na(environment_sampling_interval) ||
+      !is.finite(environment_sampling_interval) ||
+      environment_sampling_interval <= 0) {
+    stop("`environment_sampling_interval` must be a positive finite number.", call. = FALSE)
+  }
+  if (identical(model_type, "lv_discrete")) {
+    environment_sampling_interval <- 1
+  } else if (environment_sampling_interval > experiment_duration) {
+    stop(
+      "`environment_sampling_interval` must be less than or equal to ",
+      "`experiment_duration` for continuous models.",
+      call. = FALSE
+    )
+  }
 
   built <- build_single_community(
     model_type = model_type,
@@ -429,7 +476,9 @@ simulate_single_community <- function(model_type = c(
     temperature_mean = temperature_mean,
     temperature_sd = temperature_sd,
     one_over_f_gamma = one_over_f_gamma,
-    random_seed = random_seed + 1
+    random_seed = random_seed + 1,
+    environment_sampling_interval = environment_sampling_interval,
+    continuous_time = !identical(model_type, "lv_discrete")
   )
   temperature_matrix <- matrix(temperature$temperature, nrow = 1)
   output_times <- temperature$time

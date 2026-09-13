@@ -112,6 +112,30 @@ test_that("YAML validation rejects invalid runtime controls", {
     "experiment_templates/lv_continuous.yaml",
     package = "community.simulator"
   ))
+  spec$simulation$environment_sampling_interval <- 0
+
+  expect_error(
+    validate_experiment_spec(spec),
+    "`simulation.environment_sampling_interval` must be greater than 0",
+    fixed = TRUE
+  )
+
+  spec <- read_experiment_spec(system.file(
+    "experiment_templates/lv_continuous.yaml",
+    package = "community.simulator"
+  ))
+  spec$simulation$environment_sampling_interval <- spec$simulation$experiment_duration + 1
+
+  expect_error(
+    validate_experiment_spec(spec),
+    "`simulation.environment_sampling_interval` must be less than or equal to",
+    fixed = TRUE
+  )
+
+  spec <- read_experiment_spec(system.file(
+    "experiment_templates/lv_continuous.yaml",
+    package = "community.simulator"
+  ))
   spec$parallel$workers <- 1.5
 
   expect_error(
