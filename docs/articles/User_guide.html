@@ -632,7 +632,8 @@ set to <code>"lv_discrete"</code>.</p>
 <li>
 <code>environment.temperature.sample_interval</code>: time between
 generated environmental temperature values in model-time units. The
-default is <code>1</code>.</li>
+default is <code>1</code>. For continuous models this controls the
+forcing resolution, not the saved dynamics or summary resolution.</li>
 <li>
 <code>temperature_interpolation</code>: <code>"linear"</code> or
 <code>"constant"</code>.</li>
@@ -694,8 +695,9 @@ environmental temperature at time
 obtained from the generated temperature series. For continuous models,
 the series is generated at
 <code>environment.temperature.sample_interval</code> spacing and then
-interpolated using
-<code>simulation.temperature_interpolation</code>.</li>
+interpolated using <code>simulation.temperature_interpolation</code>;
+ODE states used for saved dynamics and simulation summaries are reported
+on the model-time-unit grid by default.</li>
 <li>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">N_i(t)</annotation></semantics></math>:
 abundance of species
@@ -1503,8 +1505,10 @@ experiment.</td>
 <td><code>environment.temperature.sample_interval</code></td>
 <td>Continuous LV, CR</td>
 <td>Time between generated environmental temperature values, in
-model-time units. Default is <code>1</code>. Discrete LV always uses one
-environmental value per discrete time step.</td>
+model-time units. Default is <code>1</code>. This controls forcing
+resolution; saved dynamics and simulation summaries use model-time-unit
+output times by default. Discrete LV always uses one environmental value
+per discrete time step.</td>
 </tr>
 <tr class="even">
 <td><code>simulation.temperature_interpolation</code></td>

@@ -222,13 +222,17 @@ simulate_one_dynamics_case <- function(i,
   } else {
     temperature_times
   }
-  output_times <- integration_times[
-    ((seq_along(integration_times) - 1L) %% dynamics_save_every) == 0L |
-      seq_along(integration_times) == length(integration_times)
+  reporting_times <- seq.int(
+    from = expt_def$burn_in_duration + 1L,
+    length.out = expt_def$experiment_duration
+  )
+  output_times <- reporting_times[
+    ((seq_along(reporting_times) - 1L) %% dynamics_save_every) == 0L |
+      seq_along(reporting_times) == length(reporting_times)
   ]
-  resource_output_times <- integration_times[
-    ((seq_along(integration_times) - 1L) %% resources_save_every) == 0L |
-      seq_along(integration_times) == length(integration_times)
+  resource_output_times <- reporting_times[
+    ((seq_along(reporting_times) - 1L) %% resources_save_every) == 0L |
+      seq_along(reporting_times) == length(reporting_times)
   ]
   solver_output_times <- sort(unique(c(output_times, resource_output_times)))
 

@@ -241,9 +241,10 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
 
   integration_times <- environment_sample_times(settings, include_burn_in = TRUE)
   integration_steps <- length(integration_times)
-  output_times <- integration_times[
-    ((seq_along(integration_times) - 1L) %% settings$dynamics_save_every) == 0L |
-      seq_along(integration_times) == length(integration_times)
+  reporting_times <- model_time_output_times(settings, include_burn_in = TRUE)
+  output_times <- reporting_times[
+    ((seq_along(reporting_times) - 1L) %% settings$dynamics_save_every) == 0L |
+      seq_along(reporting_times) == length(reporting_times)
   ]
   saved_time_points <- sum(output_times > settings$burn_in_duration)
 
@@ -264,9 +265,9 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
     )
   }
 
-  resource_output_times <- integration_times[
-    ((seq_along(integration_times) - 1L) %% settings$resources_save_every) == 0L |
-      seq_along(integration_times) == length(integration_times)
+  resource_output_times <- reporting_times[
+    ((seq_along(reporting_times) - 1L) %% settings$resources_save_every) == 0L |
+      seq_along(reporting_times) == length(reporting_times)
   ]
   saved_resource_time_points <- sum(resource_output_times > settings$burn_in_duration)
 

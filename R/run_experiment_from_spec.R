@@ -41,10 +41,7 @@ positive_numeric_spec_setting <- function(value, name) {
 environment_sample_times <- function(settings, include_burn_in = FALSE) {
   sampling_interval <- settings$environment_sampling_interval %||% 1
   if (identical(settings$dynamics_type, "discrete")) {
-    expt_times <- seq.int(
-      from = settings$burn_in_duration + 1L,
-      length.out = settings$experiment_duration
-    )
+    expt_times <- model_time_output_times(settings)
   } else {
     expt_end <- settings$burn_in_duration + settings$experiment_duration
     expt_times <- seq(
@@ -57,6 +54,17 @@ environment_sample_times <- function(settings, include_burn_in = FALSE) {
     }
   }
 
+  if (!isTRUE(include_burn_in) || settings$burn_in_duration == 0L) {
+    return(expt_times)
+  }
+  c(seq_len(settings$burn_in_duration), expt_times)
+}
+
+model_time_output_times <- function(settings, include_burn_in = FALSE) {
+  expt_times <- seq.int(
+    from = settings$burn_in_duration + 1L,
+    length.out = settings$experiment_duration
+  )
   if (!isTRUE(include_burn_in) || settings$burn_in_duration == 0L) {
     return(expt_times)
   }

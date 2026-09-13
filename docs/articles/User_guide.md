@@ -363,7 +363,8 @@ adds ODE-specific controls:
 
 - `environment.temperature.sample_interval`: time between generated
   environmental temperature values in model-time units. The default is
-  `1`.
+  `1`. For continuous models this controls the forcing resolution, not
+  the saved dynamics or summary resolution.
 - `temperature_interpolation`: `"linear"` or `"constant"`.
 - `immigration_rate`: immigration rate per species.
 - `immigration_mode`: `"continuous"` or `"pulse"`.
@@ -406,7 +407,9 @@ Symbols in these equations are:
 - $`T_t`$: environmental temperature at time $`t`$, obtained from the
   generated temperature series. For continuous models, the series is
   generated at `environment.temperature.sample_interval` spacing and
-  then interpolated using `simulation.temperature_interpolation`.
+  then interpolated using `simulation.temperature_interpolation`; ODE
+  states used for saved dynamics and simulation summaries are reported
+  on the model-time-unit grid by default.
 - $`N_i(t)`$: abundance of species $`i`$ at time $`t`$.
 - $`N_j(t)`$: abundance of species $`j`$ at time $`t`$.
 - $`dN_i/dt`$: instantaneous rate of change in abundance for species
@@ -919,7 +922,7 @@ used by the bundled example experiments.
 | `environment.temperature.one_over_f_gamma` | All | Slope parameter for the `1/f` environmental noise process. |
 | `simulation.burn_in_duration` | All | Number of initial time steps or time units treated as burn-in. |
 | `simulation.experiment_duration` | All | Number of post-burn-in time steps or time units used for the experiment. |
-| `environment.temperature.sample_interval` | Continuous LV, CR | Time between generated environmental temperature values, in model-time units. Default is `1`. Discrete LV always uses one environmental value per discrete time step. |
+| `environment.temperature.sample_interval` | Continuous LV, CR | Time between generated environmental temperature values, in model-time units. Default is `1`. This controls forcing resolution; saved dynamics and simulation summaries use model-time-unit output times by default. Discrete LV always uses one environmental value per discrete time step. |
 | `simulation.temperature_interpolation` | Continuous LV, CR | How the continuous-time simulator interpolates temperature between generated values. Options are `linear` and `constant`. |
 | `simulation.immigration_rate` | Discrete LV, continuous LV | Immigration rate per species. This field is required for discrete LV experiments. |
 | `simulation.immigration_mode` | Continuous LV | How immigration is applied. Options are `continuous` and `pulse`. |

@@ -252,7 +252,7 @@ test_that("parallel simulations append all consumer-resource dynamics and resour
   expect_equal(resources_case_ids, expected_case_ids)
 })
 
-test_that("continuous experiments use full environmental sampling interval time series", {
+test_that("continuous experiments decouple environmental sampling from dynamics output times", {
   output_root <- tempdir()
   experiment_name <- paste0("continuous-environment-interval-", Sys.getpid())
   output_dir <- file.path(output_root, experiment_name)
@@ -306,5 +306,6 @@ test_that("continuous experiments use full environmental sampling interval time 
     conn_dynamics,
     "select distinct time from dynamics order by time"
   )$time
-  expect_equal(dynamics_times, temperature_times)
+  expect_equal(dynamics_times, 3:6)
+  expect_lt(length(dynamics_times), length(temperature_times))
 })
