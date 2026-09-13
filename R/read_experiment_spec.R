@@ -98,6 +98,16 @@ validate_experiment_spec <- function(spec, path = NULL) {
   require_positive_integer(spec$environment$replicates, "environment.replicates")
   validate_environment_spec(spec$environment)
   validate_simulation_spec(spec$simulation, model_type)
+  if (!identical(model_type, "lv_discrete") &&
+      !is.null(spec$environment$temperature$sample_interval) &&
+      as.numeric(spec$environment$temperature$sample_interval) >
+        as.numeric(spec$simulation$experiment_duration)) {
+    stop(
+      "`environment.temperature.sample_interval` must be less than or equal to ",
+      "`simulation.experiment_duration` for continuous models.",
+      call. = FALSE
+    )
+  }
 
   if (startsWith(model_type, "lv_")) {
     validate_lv_spec(spec)
@@ -339,6 +349,12 @@ validate_environment_spec <- function(environment) {
     environment$temperature$one_over_f_gamma,
     "environment.temperature.one_over_f_gamma"
   )
+  if (!is.null(environment$temperature$sample_interval)) {
+    require_positive_number(
+      environment$temperature$sample_interval,
+      "environment.temperature.sample_interval"
+    )
+  }
   invisible(TRUE)
 }
 
@@ -350,21 +366,6 @@ validate_simulation_spec <- function(simulation, model_type) {
       "`simulation.immigration_rate` is required when `model.type` is `lv_discrete`.",
       call. = FALSE
     )
-  }
-  if (!is.null(simulation$environment_sampling_interval)) {
-    require_positive_number(
-      simulation$environment_sampling_interval,
-      "simulation.environment_sampling_interval"
-    )
-    if (!identical(model_type, "lv_discrete") &&
-        as.numeric(simulation$environment_sampling_interval) >
-          as.numeric(simulation$experiment_duration)) {
-      stop(
-        "`simulation.environment_sampling_interval` must be less than or equal to ",
-        "`simulation.experiment_duration` for continuous models.",
-        call. = FALSE
-      )
-    }
   }
   if (!is.null(simulation$temperature_interpolation)) {
     require_one_of(

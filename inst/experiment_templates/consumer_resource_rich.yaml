@@ -46,10 +46,10 @@ environment:
     mean: 20
     sd: 1
     one_over_f_gamma: 0.8
+    sample_interval: 1
 
 simulation:
   burn_in_duration: 200
-  environment_sampling_interval: 1
   experiment_duration: 2000
   consumer_immigration_rate: 0.01
   initial_consumer_total_abundance: 30

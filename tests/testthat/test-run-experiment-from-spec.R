@@ -265,7 +265,7 @@ test_that("continuous experiments use full environmental sampling interval time 
       spec$community$replicates <- 1L
       spec$simulation$burn_in_duration <- 2L
       spec$simulation$experiment_duration <- 4L
-      spec$simulation$environment_sampling_interval <- 0.5
+      spec$environment$temperature$sample_interval <- 0.5
       spec$output <- list(
         save_dynamics = TRUE,
         dynamics_save_every = 1L,

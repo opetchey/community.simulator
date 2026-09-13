@@ -361,8 +361,9 @@ The continuous-time LV simulator is
 It uses [`deSolve::ode()`](https://rdrr.io/pkg/deSolve/man/ode.html) and
 adds ODE-specific controls:
 
-- `environment_sampling_interval`: time between generated environmental
-  temperature values in model-time units. The default is `1`.
+- `environment.temperature.sample_interval`: time between generated
+  environmental temperature values in model-time units. The default is
+  `1`.
 - `temperature_interpolation`: `"linear"` or `"constant"`.
 - `immigration_rate`: immigration rate per species.
 - `immigration_mode`: `"continuous"` or `"pulse"`.
@@ -404,7 +405,7 @@ Symbols in these equations are:
 - $`t`$: continuous simulation time.
 - $`T_t`$: environmental temperature at time $`t`$, obtained from the
   generated temperature series. For continuous models, the series is
-  generated at `simulation.environment_sampling_interval` spacing and
+  generated at `environment.temperature.sample_interval` spacing and
   then interpolated using `simulation.temperature_interpolation`.
 - $`N_i(t)`$: abundance of species $`i`$ at time $`t`$.
 - $`N_j(t)`$: abundance of species $`j`$ at time $`t`$.
@@ -918,7 +919,7 @@ used by the bundled example experiments.
 | `environment.temperature.one_over_f_gamma` | All | Slope parameter for the `1/f` environmental noise process. |
 | `simulation.burn_in_duration` | All | Number of initial time steps or time units treated as burn-in. |
 | `simulation.experiment_duration` | All | Number of post-burn-in time steps or time units used for the experiment. |
-| `simulation.environment_sampling_interval` | Continuous LV, CR | Time between generated environmental temperature values, in model-time units. Default is `1`. Discrete LV always uses one environmental value per discrete time step. |
+| `environment.temperature.sample_interval` | Continuous LV, CR | Time between generated environmental temperature values, in model-time units. Default is `1`. Discrete LV always uses one environmental value per discrete time step. |
 | `simulation.temperature_interpolation` | Continuous LV, CR | How the continuous-time simulator interpolates temperature between generated values. Options are `linear` and `constant`. |
 | `simulation.immigration_rate` | Discrete LV, continuous LV | Immigration rate per species. This field is required for discrete LV experiments. |
 | `simulation.immigration_mode` | Continuous LV | How immigration is applied. Options are `continuous` and `pulse`. |
@@ -981,7 +982,7 @@ outputs are:
 - `temperatures.db`: SQLite database containing the full generated
   environmental temperature series. For continuous models this includes
   every environmental sample generated at
-  `simulation.environment_sampling_interval`, independent of the saved
+  `environment.temperature.sample_interval`, independent of the saved
   dynamics interval.
 - `dynamics.db`: SQLite database containing saved population dynamics,
   when dynamic output is enabled.

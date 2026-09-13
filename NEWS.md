@@ -1,6 +1,6 @@
 # community.simulator 0.9.0
 
-- Added `simulation.environment_sampling_interval` for continuous LV and
+- Added `environment.temperature.sample_interval` for continuous LV and
   consumer-resource experiments, so generated environmental series can be
   sampled more finely than one model-time unit and written in full to
   `temperatures.db`.

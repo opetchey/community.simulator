@@ -630,9 +630,9 @@ set to <code>"lv_discrete"</code>.</p>
 <code><a href="https://rdrr.io/pkg/deSolve/man/ode.html" class="external-link">deSolve::ode()</a></code> and adds ODE-specific controls:</p>
 <ul>
 <li>
-<code>environment_sampling_interval</code>: time between generated
-environmental temperature values in model-time units. The default is
-<code>1</code>.</li>
+<code>environment.temperature.sample_interval</code>: time between
+generated environmental temperature values in model-time units. The
+default is <code>1</code>.</li>
 <li>
 <code>temperature_interpolation</code>: <code>"linear"</code> or
 <code>"constant"</code>.</li>
@@ -693,7 +693,7 @@ environmental temperature at time
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
 obtained from the generated temperature series. For continuous models,
 the series is generated at
-<code>simulation.environment_sampling_interval</code> spacing and then
+<code>environment.temperature.sample_interval</code> spacing and then
 interpolated using
 <code>simulation.temperature_interpolation</code>.</li>
 <li>
@@ -1500,7 +1500,7 @@ process.</td>
 experiment.</td>
 </tr>
 <tr class="odd">
-<td><code>simulation.environment_sampling_interval</code></td>
+<td><code>environment.temperature.sample_interval</code></td>
 <td>Continuous LV, CR</td>
 <td>Time between generated environmental temperature values, in
 model-time units. Default is <code>1</code>. Discrete LV always uses one
@@ -1778,8 +1778,8 @@ and elapsed time for each step.</li>
 <code>temperatures.db</code>: SQLite database containing the full
 generated environmental temperature series. For continuous models this
 includes every environmental sample generated at
-<code>simulation.environment_sampling_interval</code>, independent of
-the saved dynamics interval.</li>
+<code>environment.temperature.sample_interval</code>, independent of the
+saved dynamics interval.</li>
 <li>
 <code>dynamics.db</code>: SQLite database containing saved
 population dynamics, when dynamic output is enabled.</li>

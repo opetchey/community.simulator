@@ -100,7 +100,10 @@ flatten_spec_settings <- function(spec) {
     temperature_mean = numeric_spec_setting(spec$environment$temperature$mean, "environment.temperature.mean"),
     temperature_sd = numeric_spec_setting(spec$environment$temperature$sd, "environment.temperature.sd"),
     one_over_f_gamma = numeric_spec_setting(spec$environment$temperature$one_over_f_gamma, "environment.temperature.one_over_f_gamma"),
-    environment_sampling_interval = positive_numeric_spec_setting(spec_setting(spec, "simulation", "environment_sampling_interval", 1), "simulation.environment_sampling_interval"),
+    environment_sampling_interval = positive_numeric_spec_setting(
+      spec$environment$temperature$sample_interval %||% 1,
+      "environment.temperature.sample_interval"
+    ),
     temperature_interpolation = spec_setting(spec, "simulation", "temperature_interpolation", "linear"),
     immigration_rate = numeric_spec_setting(spec_setting(spec, "simulation", "immigration_rate", 0.1), "simulation.immigration_rate"),
     consumer_immigration_rate = numeric_spec_setting(spec_setting(spec, "simulation", "consumer_immigration_rate", spec_setting(spec, "simulation", "immigration_rate", 0.1)), "simulation.consumer_immigration_rate"),
