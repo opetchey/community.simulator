@@ -136,6 +136,35 @@ test_that("YAML validation rejects invalid runtime controls", {
     "experiment_templates/lv_continuous.yaml",
     package = "community.simulator"
   ))
+  spec <- read_experiment_spec(system.file(
+    "experiment_templates/lv_continuous.yaml",
+    package = "community.simulator"
+  ))
+  expect_equal(
+    community.simulator:::flatten_spec_settings(spec)$ode_maxsteps,
+    5000L
+  )
+
+  spec$simulation$ode$maxsteps <- NULL
+  expect_null(community.simulator:::flatten_spec_settings(spec)$ode_maxsteps)
+
+  spec$simulation$ode$maxsteps <- 50000
+  expect_equal(
+    community.simulator:::flatten_spec_settings(spec)$ode_maxsteps,
+    50000L
+  )
+
+  spec$simulation$ode$maxsteps <- 0
+  expect_error(
+    validate_experiment_spec(spec),
+    "`simulation.ode.maxsteps` must be an integer >= 1",
+    fixed = TRUE
+  )
+
+  spec <- read_experiment_spec(system.file(
+    "experiment_templates/lv_continuous.yaml",
+    package = "community.simulator"
+  ))
   spec$parallel$workers <- 1.5
 
   expect_error(

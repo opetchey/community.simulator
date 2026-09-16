@@ -416,6 +416,9 @@ validate_ode_spec <- function(ode, model_type) {
       require_positive_number(ode[[field]], paste0("simulation.ode.", field))
     }
   }
+  if (!is.null(ode$maxsteps)) {
+    require_positive_integer(ode$maxsteps, "simulation.ode.maxsteps")
+  }
   invisible(TRUE)
 }
 

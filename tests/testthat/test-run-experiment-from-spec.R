@@ -252,6 +252,117 @@ test_that("parallel simulations append all consumer-resource dynamics and resour
   expect_equal(resources_case_ids, expected_case_ids)
 })
 
+
+test_that("consumer-resource simulator passes maxsteps to deSolve", {
+  community <- build_CR_community(
+    S = 2,
+    uptake_maximum_mean = 0.363064,
+    uptake_maximum_range = 0,
+    uptake_maximum_distribution = "random_uniform",
+    uptake_optimum_mean = 16,
+    uptake_optimum_range = 0,
+    uptake_optimum_distribution = "random_uniform",
+    uptake_width_mean = 1,
+    uptake_width_range = 0.5,
+    uptake_width_distribution = "random_uniform",
+    half_saturation_mean = 100,
+    half_saturation_range = 0,
+    half_saturation_distribution = "random_uniform",
+    consumer_death_rate = 0.181532,
+    resource_renewal_rate = 6.051066,
+    resource_supply = 1000,
+    conversion_efficiency = 1,
+    resource_use_mode = "shared_to_private",
+    active_resource = 1,
+    private_resource_use_distribution = "constant",
+    private_resource_use_mean = 0,
+    private_resource_use_range = 0,
+    community_seed = 1
+  )
+
+  if (exists(".community_simulator_test_maxsteps", envir = .GlobalEnv, inherits = FALSE)) {
+    rm(".community_simulator_test_maxsteps", envir = .GlobalEnv)
+  }
+  trace(
+    deSolve::ode,
+    tracer = quote({
+      assign(
+        ".community_simulator_test_maxsteps",
+        as.list(match.call())$maxsteps,
+        envir = .GlobalEnv
+      )
+    }),
+    print = FALSE
+  )
+  on.exit(untrace(deSolve::ode), add = TRUE)
+  on.exit(rm(".community_simulator_test_maxsteps", envir = .GlobalEnv), add = TRUE)
+
+  simulator_consumer_resource_continuous(
+    input_com_params = community,
+    TcelSeries = matrix(c(16, 16), nrow = 1),
+    initial_consumer_abundances = c(10, 10),
+    initial_resource_values = rep(1000, community$R),
+    times = c(1, 2),
+    output_times = c(1, 2),
+    maxsteps = 12345
+  )
+
+  expect_equal(
+    get(".community_simulator_test_maxsteps", envir = .GlobalEnv),
+    12345
+  )
+})
+
+test_that("dense consumer-resource experiments accept YAML ode maxsteps", {
+  output_root <- tempdir()
+  experiment_name <- paste0("dense-cr-maxsteps-", Sys.getpid())
+  output_dir <- file.path(output_root, experiment_name)
+  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+
+  write_parallel_regression_spec(
+    "consumer_resource.yaml",
+    output_dir,
+    function(spec) {
+      spec$community$replicates <- 1L
+      spec$simulation$burn_in_duration <- 1L
+      spec$simulation$experiment_duration <- 3L
+      spec$environment$temperature$sample_interval <- 0.1
+      spec$simulation$ode$maxsteps <- 50000L
+      spec$output <- list(
+        save_dynamics = TRUE,
+        save_resources = TRUE,
+        dynamics_save_every = 1L,
+        resources_save_every = 1L,
+        runtime_update_every = 100L,
+        simulation_progress = FALSE,
+        environment_progress = FALSE
+      )
+      spec$parallel <- list(
+        workers = 1L,
+        environments = FALSE,
+        simulations = FALSE,
+        community_measures = FALSE
+      )
+      spec
+    }
+  )
+
+  spec <- read_experiment_spec(file.path(output_dir, "experiment.yaml"))
+  expect_equal(community.simulator:::flatten_spec_settings(spec)$ode_maxsteps, 50000L)
+
+  outputs <- run_experiment(
+    experiment_folder_location = output_root,
+    experiment_name = experiment_name,
+    experiment_design_filename = "experiment.yaml",
+    overwrite = TRUE,
+    verbose = FALSE,
+    confirm_run = FALSE
+  )
+
+  expect_true(file.exists(outputs$community_measures))
+  expect_gt(nrow(readRDS(outputs$community_measures)), 0)
+})
+
 test_that("continuous experiments decouple environmental sampling from dynamics output times", {
   output_root <- tempdir()
   experiment_name <- paste0("continuous-environment-interval-", Sys.getpid())

@@ -18,6 +18,8 @@
 #' @param rtol Relative tolerance passed to `deSolve::ode()`.
 #' @param atol Absolute tolerance passed to `deSolve::ode()`.
 #' @param max_step Maximum solver step size.
+#' @param maxsteps Optional maximum number of internal solver steps before
+#'   reaching the next output time. Passed to `deSolve::ode()` when supplied.
 #' @param blowup_threshold Abundance threshold above which the run stops.
 #'
 #' @return Time series of population abundances for each species.
@@ -36,6 +38,7 @@ simulator_lv_continuous <- function(input_com_params,
                                     rtol = 1e-6,
                                     atol = 1e-8,
                                     max_step = 1,
+                                    maxsteps = NULL,
                                     blowup_threshold = 1e12) {
 
   temperature_interpolation <- match.arg(
@@ -123,18 +126,23 @@ simulator_lv_continuous <- function(input_com_params,
     event_data$method <- "add"
   }
 
+  ode_args <- list(
+    y = state,
+    times = integration_times,
+    func = derivative,
+    parms = NULL,
+    method = ode_method,
+    rtol = rtol,
+    atol = atol,
+    hmax = max_step,
+    events = if (is.null(event_data)) NULL else list(data = event_data)
+  )
+  if (!is.null(maxsteps)) {
+    ode_args$maxsteps <- maxsteps
+  }
+
   ode_output <- tryCatch(
-    deSolve::ode(
-      y = state,
-      times = integration_times,
-      func = derivative,
-      parms = NULL,
-      method = ode_method,
-      rtol = rtol,
-      atol = atol,
-      hmax = max_step,
-      events = if (is.null(event_data)) NULL else list(data = event_data)
-    ),
+    do.call(deSolve::ode, ode_args),
     error = function(e) {
       stop("Continuous-time ODE solve failed: ", conditionMessage(e), call. = FALSE)
     }
@@ -145,7 +153,7 @@ simulator_lv_continuous <- function(input_com_params,
   rownames(output) <- NULL
 
   if (nrow(output) != length(output_times)) {
-    stop("ODE solver did not return all requested output times.", call. = FALSE)
+    stop("ODE solver did not return all requested output times. If deSolve reported excessive work or MXSTEP, try increasing `simulation.ode.maxsteps`.", call. = FALSE)
   }
   if (any(output < -sqrt(.Machine$double.eps), na.rm = TRUE)) {
     stop("Continuous-time simulation returned negative abundances.", call. = FALSE)

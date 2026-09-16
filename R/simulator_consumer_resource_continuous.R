@@ -12,6 +12,8 @@
 #' @param rtol Relative tolerance passed to `deSolve::ode()`.
 #' @param atol Absolute tolerance passed to `deSolve::ode()`.
 #' @param max_step Maximum solver step size.
+#' @param maxsteps Optional maximum number of internal solver steps before
+#'   reaching the next output time. Passed to `deSolve::ode()` when supplied.
 #' @param blowup_threshold State-value threshold above which the run stops.
 #' @param negative_tolerance Negative tolerance for numerical error.
 #'
@@ -31,6 +33,7 @@ simulator_consumer_resource_continuous <- function(input_com_params,
                                                    rtol = 1e-6,
                                                    atol = 1e-8,
                                                    max_step = 1,
+                                                   maxsteps = NULL,
                                                    blowup_threshold = 1e12,
                                                    negative_tolerance = 1e-8) {
 
@@ -104,17 +107,22 @@ simulator_consumer_resource_continuous <- function(input_com_params,
     list(derivs)
   }
 
+  ode_args <- list(
+    y = state,
+    times = integration_times,
+    func = derivative,
+    parms = NULL,
+    method = ode_method,
+    rtol = rtol,
+    atol = atol,
+    hmax = max_step
+  )
+  if (!is.null(maxsteps)) {
+    ode_args$maxsteps <- maxsteps
+  }
+
   ode_output <- tryCatch(
-    deSolve::ode(
-      y = state,
-      times = integration_times,
-      func = derivative,
-      parms = NULL,
-      method = ode_method,
-      rtol = rtol,
-      atol = atol,
-      hmax = max_step
-    ),
+    do.call(deSolve::ode, ode_args),
     error = function(e) {
       stop("Consumer-resource ODE solve failed: ", conditionMessage(e), call. = FALSE)
     }
@@ -125,7 +133,7 @@ simulator_consumer_resource_continuous <- function(input_com_params,
   rownames(output) <- NULL
 
   if (nrow(output) != length(output_times)) {
-    stop("ODE solver did not return all requested output times.", call. = FALSE)
+    stop("ODE solver did not return all requested output times. If deSolve reported excessive work or MXSTEP, try increasing `simulation.ode.maxsteps`.", call. = FALSE)
   }
   state_matrix <- as.matrix(output[, c(consumer_names, resource_names), drop = FALSE])
   if (any(state_matrix < -negative_tolerance, na.rm = TRUE)) {

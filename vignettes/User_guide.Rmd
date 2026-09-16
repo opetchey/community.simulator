@@ -364,6 +364,7 @@ The continuous-time LV simulator is `simulator_lv_continuous()`. It uses
 - `ode_method`: ODE solver method passed to `deSolve::ode()`.
 - `ode_rtol`, `ode_atol`: relative and absolute tolerances.
 - `ode_max_step`: maximum solver step.
+- `ode_maxsteps`: maximum number of internal solver steps before reaching the next output time. Increase this for dense or fast environmental forcing when `lsoda` reports excessive work or `MXSTEP`.
 - `blowup_threshold`: abundance threshold above which the run stops.
 
 Use `model.type: lv_continuous` in the YAML file to select this model.
@@ -898,6 +899,7 @@ the bundled example experiments.
 | `simulation.ode.rtol` | Continuous LV, CR | Relative tolerance for the ODE solver. |
 | `simulation.ode.atol` | Continuous LV, CR | Absolute tolerance for the ODE solver. |
 | `simulation.ode.max_step` | Continuous LV, CR | Maximum ODE solver step size. |
+| `simulation.ode.maxsteps` | Continuous LV, CR | Optional maximum number of internal solver steps before reaching the next output time. Increase this if `lsoda` reports excessive work or `MXSTEP`. |
 | `simulation.blowup_threshold` | Continuous LV, CR | Abundance threshold above which a simulation is treated as having blown up. |
 | `simulation.negative_tolerance` | CR | Small numerical tolerance used when checking negative values in ODE output. |
 | Fixed LV constants | Discrete LV, continuous LV | `bet = 0.001`, `delt = 0.001`, and `net_growth_offset = 1e-6` are fixed internally and are not currently YAML options. |

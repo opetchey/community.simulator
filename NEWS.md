@@ -1,5 +1,6 @@
 # community.simulator 0.9.0
 
+- Added `simulation.ode.maxsteps` for continuous LV and consumer-resource simulations, allowing dense environmental forcing runs to raise the `lsoda` internal work limit from YAML.
 - Added `environment.temperature.sample_interval` for continuous LV and
   consumer-resource experiments, so generated environmental series can be
   sampled more finely than one model-time unit and written in full to

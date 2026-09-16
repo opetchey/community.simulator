@@ -60,6 +60,7 @@ simulation:
     rtol: 1e-6
     atol: 1e-8
     max_step: 1
+    maxsteps: 5000
   blowup_threshold: 1e12
   negative_tolerance: 1e-8
 

@@ -19,6 +19,7 @@ simulator_lv_continuous(
   rtol = 1e-06,
   atol = 1e-08,
   max_step = 1,
+  maxsteps = NULL,
   blowup_threshold = 1e+12
 )
 ```
@@ -77,6 +78,13 @@ simulator_lv_continuous(
 - max_step:
 
   Maximum solver step size.
+
+- maxsteps:
+
+  Optional maximum number of internal solver steps before reaching the
+  next output time. Passed to
+  [`deSolve::ode()`](https://rdrr.io/pkg/deSolve/man/ode.html) when
+  supplied.
 
 - blowup_threshold:
 

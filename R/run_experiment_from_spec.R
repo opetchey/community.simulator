@@ -30,6 +30,14 @@ integer_spec_setting <- function(value, name) {
   value
 }
 
+positive_integer_spec_setting <- function(value, name) {
+  value <- integer_spec_setting(value, name)
+  if (value < 1L) {
+    stop("`", name, "` must be an integer >= 1.", call. = FALSE)
+  }
+  value
+}
+
 positive_numeric_spec_setting <- function(value, name) {
   value <- numeric_spec_setting(value, name)
   if (value <= 0) {
@@ -122,6 +130,11 @@ flatten_spec_settings <- function(spec) {
     ode_rtol = numeric_spec_setting(spec_ode_setting(spec, "rtol", 1e-6), "simulation.ode.rtol"),
     ode_atol = numeric_spec_setting(spec_ode_setting(spec, "atol", 1e-8), "simulation.ode.atol"),
     ode_max_step = numeric_spec_setting(spec_ode_setting(spec, "max_step", 1), "simulation.ode.max_step"),
+    ode_maxsteps = if (is.null(spec$simulation$ode$maxsteps)) {
+      NULL
+    } else {
+      positive_integer_spec_setting(spec$simulation$ode$maxsteps, "simulation.ode.maxsteps")
+    },
     blowup_threshold = numeric_spec_setting(spec_setting(spec, "simulation", "blowup_threshold", 1e12), "simulation.blowup_threshold"),
     negative_tolerance = numeric_spec_setting(spec_setting(spec, "simulation", "negative_tolerance", 1e-8), "simulation.negative_tolerance"),
     dynamics_save_every = integer_spec_setting(spec_setting(spec, "output", "dynamics_save_every", 1), "output.dynamics_save_every"),
@@ -515,6 +528,7 @@ simulate_dynamics_from_spec <- function(experiment_folder,
       ode_rtol = settings$ode_rtol,
       ode_atol = settings$ode_atol,
       ode_max_step = settings$ode_max_step,
+      ode_maxsteps = settings$ode_maxsteps,
       blowup_threshold = settings$blowup_threshold,
       negative_tolerance = settings$negative_tolerance,
       dynamics_save_every = settings$dynamics_save_every,

@@ -17,6 +17,7 @@ simulator_consumer_resource_continuous(
   rtol = 1e-06,
   atol = 1e-08,
   max_step = 1,
+  maxsteps = NULL,
   blowup_threshold = 1e+12,
   negative_tolerance = 1e-08
 )
@@ -45,6 +46,9 @@ simulator_consumer_resource_continuous(
 \item{atol}{Absolute tolerance passed to \code{deSolve::ode()}.}
 
 \item{max_step}{Maximum solver step size.}
+
+\item{maxsteps}{Optional maximum number of internal solver steps before
+reaching the next output time. Passed to \code{deSolve::ode()} when supplied.}
 
 \item{blowup_threshold}{State-value threshold above which the run stops.}
 

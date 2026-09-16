@@ -179,6 +179,7 @@ simulate_one_dynamics_case <- function(i,
                                        ode_rtol,
                                        ode_atol,
                                        ode_max_step,
+                                       ode_maxsteps,
                                        blowup_threshold,
                                        negative_tolerance,
                                        dynamics_save_every,
@@ -255,41 +256,53 @@ simulate_one_dynamics_case <- function(i,
   }
 
   if (dynamics_type == "continuous") {
-    spts <- simulator_lv_continuous(
-      input_com_params = community,
-      TcelSeries = Tcel_controlm,
-      initial_abundances = initial_abundances,
-      times = temperature_times,
-      output_times = output_times,
-      temperature_interpolation = temperature_interpolation,
-      immigration_rate = immigration_rate,
-      immigration_mode = immigration_mode,
-      ode_method = ode_method,
-      rtol = ode_rtol,
-      atol = ode_atol,
-      max_step = ode_max_step,
-      blowup_threshold = blowup_threshold
+    spts <- tryCatch(
+      simulator_lv_continuous(
+        input_com_params = community,
+        TcelSeries = Tcel_controlm,
+        initial_abundances = initial_abundances,
+        times = temperature_times,
+        output_times = output_times,
+        temperature_interpolation = temperature_interpolation,
+        immigration_rate = immigration_rate,
+        immigration_mode = immigration_mode,
+        ode_method = ode_method,
+        rtol = ode_rtol,
+        atol = ode_atol,
+        max_step = ode_max_step,
+        maxsteps = ode_maxsteps,
+        blowup_threshold = blowup_threshold
+      ),
+      error = function(e) {
+        stop("Simulation case ", expt$case_id[i], " failed: ", conditionMessage(e), call. = FALSE)
+      }
     )
     returned_times <- output_times
   }
 
   if (dynamics_type == "consumer_resource_continuous") {
     initial_resources <- rep(resource_initial_value, community$R)
-    cr_output <- simulator_consumer_resource_continuous(
-      input_com_params = community,
-      TcelSeries = Tcel_controlm,
-      initial_consumer_abundances = initial_abundances,
-      initial_resource_values = initial_resources,
-      times = temperature_times,
-      output_times = solver_output_times,
-      temperature_interpolation = temperature_interpolation,
-      consumer_immigration_rate = consumer_immigration_rate,
-      ode_method = ode_method,
-      rtol = ode_rtol,
-      atol = ode_atol,
-      max_step = ode_max_step,
-      blowup_threshold = blowup_threshold,
-      negative_tolerance = negative_tolerance
+    cr_output <- tryCatch(
+      simulator_consumer_resource_continuous(
+        input_com_params = community,
+        TcelSeries = Tcel_controlm,
+        initial_consumer_abundances = initial_abundances,
+        initial_resource_values = initial_resources,
+        times = temperature_times,
+        output_times = solver_output_times,
+        temperature_interpolation = temperature_interpolation,
+        consumer_immigration_rate = consumer_immigration_rate,
+        ode_method = ode_method,
+        rtol = ode_rtol,
+        atol = ode_atol,
+        max_step = ode_max_step,
+        maxsteps = ode_maxsteps,
+        blowup_threshold = blowup_threshold,
+        negative_tolerance = negative_tolerance
+      ),
+      error = function(e) {
+        stop("Simulation case ", expt$case_id[i], " failed: ", conditionMessage(e), call. = FALSE)
+      }
     )
     spts <- cr_output$consumers
     resources_ts <- cr_output$resources
