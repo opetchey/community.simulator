@@ -141,19 +141,22 @@ simulator_lv_continuous <- function(input_com_params,
     ode_args$maxsteps <- maxsteps
   }
 
-  ode_output <- tryCatch(
-    do.call(deSolve::ode, ode_args),
-    error = function(e) {
-      stop("Continuous-time ODE solve failed: ", conditionMessage(e), call. = FALSE)
-    }
+  ode_output <- run_ode_with_captured_output(
+    ode_args,
+    failure_prefix = "Continuous-time ODE solve failed: "
   )
+  solver_output <- attr(ode_output, "community.simulator.ode_solver_output")
 
   output <- as.data.frame(ode_output)
   output <- output[output$time %in% output_times, state_names, drop = FALSE]
   rownames(output) <- NULL
 
   if (nrow(output) != length(output_times)) {
-    stop("ODE solver did not return all requested output times. If deSolve reported excessive work or MXSTEP, try increasing `simulation.ode.maxsteps`.", call. = FALSE)
+    stop(
+      "ODE solver did not return all requested output times. If deSolve reported excessive work or MXSTEP, try increasing `simulation.ode.maxsteps`.",
+      format_ode_solver_output(solver_output),
+      call. = FALSE
+    )
   }
   if (any(output < -sqrt(.Machine$double.eps), na.rm = TRUE)) {
     stop("Continuous-time simulation returned negative abundances.", call. = FALSE)

@@ -313,6 +313,69 @@ test_that("consumer-resource simulator passes maxsteps to deSolve", {
   )
 })
 
+test_that("raw ODE solver output is written to the experiment log on failure", {
+  output_root <- tempdir()
+  experiment_name <- paste0("ode-log-failure-", Sys.getpid())
+  output_dir <- file.path(output_root, experiment_name)
+  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+
+  write_parallel_regression_spec(
+    "consumer_resource.yaml",
+    output_dir,
+    function(spec) {
+      spec$community$replicates <- 1L
+      spec$simulation$burn_in_duration <- 1L
+      spec$simulation$experiment_duration <- 2L
+      spec$output <- list(
+        save_dynamics = FALSE,
+        save_resources = FALSE,
+        runtime_update_every = 100L,
+        simulation_progress = FALSE,
+        environment_progress = FALSE
+      )
+      spec$parallel <- list(
+        workers = 1L,
+        environments = FALSE,
+        simulations = FALSE,
+        community_measures = FALSE
+      )
+      spec
+    }
+  )
+
+  trace(
+    deSolve::ode,
+    tracer = quote({
+      cat("DLSODA- test MXSTEP message from solver\n")
+      stop("forced ode failure")
+    }),
+    print = FALSE
+  )
+  on.exit(untrace(deSolve::ode), add = TRUE)
+
+  expect_error(
+    run_experiment(
+      experiment_folder_location = output_root,
+      experiment_name = experiment_name,
+      experiment_design_filename = "experiment.yaml",
+      overwrite = TRUE,
+      verbose = FALSE,
+      confirm_run = FALSE
+    ),
+    "DLSODA- test MXSTEP message from solver",
+    fixed = TRUE
+  )
+
+  log_text <- readLines(file.path(output_dir, "experiment_log.txt"), warn = FALSE)
+  expect_true(any(grepl("DLSODA- test MXSTEP message from solver", log_text, fixed = TRUE)))
+  expect_true(any(grepl("forced ode failure", log_text, fixed = TRUE)))
+
+  log_entries <- lapply(log_text, jsonlite::fromJSON)
+  failed_steps <- Filter(function(entry) identical(entry$event, "step_failed"), log_entries)
+  expect_length(failed_steps, 1)
+  expect_true("DLSODA- test MXSTEP message from solver" %in% failed_steps[[1]]$ode_solver_output)
+})
+
 test_that("dense consumer-resource experiments accept YAML ode maxsteps", {
   output_root <- tempdir()
   experiment_name <- paste0("dense-cr-maxsteps-", Sys.getpid())

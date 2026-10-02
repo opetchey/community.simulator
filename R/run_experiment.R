@@ -123,6 +123,19 @@ append_experiment_log_entry <- function(log_path, event, fields = list()) {
   invisible(log_path)
 }
 
+ode_solver_output_from_error <- function(error) {
+  marker <- "\nODE solver output:\n"
+  message <- conditionMessage(error)
+  if (!grepl(marker, message, fixed = TRUE)) {
+    return(NULL)
+  }
+
+  output <- strsplit(message, marker, fixed = TRUE)[[1]]
+  output <- output[[length(output)]]
+  output <- strsplit(output, "\n", fixed = TRUE)[[1]]
+  output[nzchar(trimws(output))]
+}
+
 read_experiment_specification_for_log <- function(design_path) {
   parsed <- try(
     yaml::read_yaml(design_path),
@@ -227,7 +240,8 @@ run_logged_experiment_step <- function(step_name, log_path, code) {
       message = paste0("Failed ", step_name, "."),
       elapsed_seconds = elapsed_seconds,
       elapsed = format_duration(elapsed_seconds),
-      error = conditionMessage(error)
+      error = conditionMessage(error),
+      ode_solver_output = ode_solver_output_from_error(error)
     )
   )
   stop(conditionMessage(error), call. = FALSE)
@@ -571,7 +585,8 @@ run_experiment <- function(experiment_folder_location,
       elapsed_seconds = workflow_elapsed_seconds,
       elapsed = format_duration(workflow_elapsed_seconds),
       outputs = outputs,
-      error = if (is.null(workflow_error)) NULL else conditionMessage(workflow_error)
+      error = if (is.null(workflow_error)) NULL else conditionMessage(workflow_error),
+      ode_solver_output = if (is.null(workflow_error)) NULL else ode_solver_output_from_error(workflow_error)
     )
   )
 
