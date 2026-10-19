@@ -60,6 +60,8 @@ Time series of population abundances for each species.
 \description{
 The LV carrying-capacity scaling constants are fixed internally at
 \code{bet = delt = 0.001}, and net growth includes a small offset of \code{1e-6}.
+For a community built with \code{simulation.rate_scale}, this offset is also
+multiplied by that scale to preserve exact biological time rescaling.
 }
 \examples{
 NULL

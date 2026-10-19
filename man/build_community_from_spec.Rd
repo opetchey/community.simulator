@@ -26,6 +26,8 @@ A model-specific community parameter object.
 \description{
 Builds the model-specific community parameter object for one resolved
 \code{case_spec} from the canonical YAML experiment-table workflow.
+\code{simulation.rate_scale} (default 1) scales realised biological rates after
+random draws for continuous models, including performance-curve aliases.
 }
 \examples{
 template <- system.file(

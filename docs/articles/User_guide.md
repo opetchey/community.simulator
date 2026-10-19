@@ -650,6 +650,53 @@ The duration of each run is controlled by:
 The workflow creates temperature series long enough to include both
 burn-in and experiment periods.
 
+## Biological Rate Scaling
+
+For continuous LV and CR experiments, `simulation.rate_scale` multiplies
+all biological rates by a positive number (default 1). For example:
+
+``` yaml
+simulation:
+  rate_scale: 1
+  # Other simulation settings go here.
+treatments:
+  values:
+    simulation.rate_scale: [0.25, 0.5, 1, 2, 4]
+```
+
+In continuous LV this scales maximum birth rates, death intercepts, the
+whole interaction matrix (including the diagonal), and continuous
+immigration. The internal `1e-6` net-growth offset is scaled too; the
+death temperature slope and the constants `bet = delt = 0.001` stay
+fixed. In CR this scales maximum uptake, consumer death, resource
+renewal, and consumer immigration. All rate aliases stored in community
+objects and used for CPC calculations are scaled. At constant
+temperature the resulting vector field is multiplied by the scale, so
+equilibria stay fixed and a scale of 2 gives the baseline trajectory
+twice as fast.
+
+Scaling happens after draws. Within each otherwise identical treatment
+and replicate, rate levels share trait and interaction draws,
+initial-abundance draws, temperature seeds, and `env_series_id`. This
+matching also applies when `environment.sharing` is `all_different`:
+environments differ among the other cases but are matched across rate
+levels. The multiplier is retained in `treatment_values` as
+`simulation.rate_scale` and displayed in preflight.
+
+Durations, environmental sampling, output stride, initial values,
+thermal optima and widths, resource half-saturation, supply, conversion
+efficiency, solver settings, and abundance thresholds stay fixed.
+Summary measures use the same post-burn-in output times; CPC measures
+continue to sample integer model-time points. No measure window or time
+lag is rescaled. The optional soft-viability transform retains its fixed
+`measures.soft_viability_scale` (default 0.01), so soft viability can
+change when rates change. Binary viability uses the sign of performance
+and is unchanged by positive rate scaling.
+
+Non-unit scaling is rejected for discrete LV and for continuous LV with
+pulse immigration: pulses at fixed times cannot give pure continuous
+time rescaling.
+
 ## Experiment Workflow
 
 The usual workflow is:
@@ -928,6 +975,7 @@ used by the bundled example experiments.
 | `environment.temperature.sample_interval` | Continuous LV, CR | Time between generated environmental temperature values, in model-time units. Default is `1`. This controls forcing resolution; saved dynamics and simulation summaries use model-time-unit output times by default. Discrete LV always uses one environmental value per discrete time step. |
 | `simulation.temperature_interpolation` | Continuous LV, CR | How the continuous-time simulator interpolates temperature between generated values. Options are `linear` and `constant`. |
 | `simulation.immigration_rate` | Discrete LV, continuous LV | Immigration rate per species. This field is required for discrete LV experiments. |
+| `simulation.rate_scale` | Continuous LV, CR | Positive finite biological rate multiplier, default 1. May be varied with the dotted treatment path `simulation.rate_scale`. Rates are scaled after random draws; matched levels share communities, initial draws, and environments. Durations and numerical/output settings stay fixed. Non-unit values require a continuous model and continuous LV immigration. |
 | `simulation.immigration_mode` | Continuous LV | How immigration is applied. Options are `continuous` and `pulse`. |
 | `simulation.consumer_immigration_rate` | CR | Immigration rate for consumers. |
 | `simulation.initial_consumer_total_abundance` | CR | Initial total consumer abundance distributed across consumers. |

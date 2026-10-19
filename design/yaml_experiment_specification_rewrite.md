@@ -6,6 +6,20 @@ protocols, remove embedded R expressions from user-facing specifications, and
 use one set of names in specifications, internal objects, outputs, reports, and
 documentation.
 
+## Implemented: biological rate treatment (2026-10-19)
+
+- Added validated `simulation.rate_scale` (default 1) for continuous LV and CR.
+- Applied scaling after community draws, including rate aliases used by CPC.
+- Matched community seeds, initial-abundance draws and environment identities
+  across rate treatment levels, retaining the old seeds for other experiments.
+- Scaled immigration per case; also scaled the LV numerical growth offset for
+  exact time-rescaling equivalence. Non-unit discrete LV and pulse immigration
+  are rejected explicitly.
+- Added preflight display, templates, guide documentation and regression tests
+  for time rescaling, equilibria, fields, validation and factorial workflows.
+- Kept durations, measure sampling/windows, thresholds and soft viability scale
+  fixed; documented the consequences for measures.
+
 ## Design goals
 
 - Use YAML as the experiment specification format.

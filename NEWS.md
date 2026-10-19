@@ -1,3 +1,11 @@
+# community.simulator 0.9.0.9000
+
+- Added `simulation.rate_scale` as a continuous-model treatment. Biological
+  rates are scaled after draws, including CPC aliases; matched levels share
+  trait, interaction, initial-abundance and environment draws.
+- Preflight summaries display the biological rate multipliers. Non-unit scales
+  reject discrete LV and fixed-time LV immigration pulses.
+
 # community.simulator 0.9.0
 
 - Added `simulation.ode.maxsteps` for continuous LV and consumer-resource simulations, allowing dense environmental forcing runs to raise the `lsoda` internal work limit from YAML.

@@ -2,6 +2,8 @@
 #'
 #' The LV carrying-capacity scaling constants are fixed internally at
 #' `bet = delt = 0.001`, and net growth includes a small offset of `1e-6`.
+#' For a community built with `simulation.rate_scale`, this offset is also
+#' multiplied by that scale to preserve exact biological time rescaling.
 #'
 #' @param input_com_params Community object, containing all species and
 #'   community parameters.
@@ -99,7 +101,7 @@ simulator_lv_continuous <- function(input_com_params,
 
     b0 <- ab * exp(-0.5 * ((Tcel - bopt) / spread)^2)
     d0 <- ad * exp(z * Tcel)
-    rms <- b0 - d0 + 1e-6
+    rms <- b0 - d0 + 1e-6 * (input_com_params$rate_scale %||% 1)
     K <- rms / (bet + delt)
 
     myrate <- rms * (1 - as.numeric(al %*% Nt) / K)

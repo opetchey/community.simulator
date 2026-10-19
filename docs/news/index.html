@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">community.simulator</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,6 +30,11 @@
       <small>Source: <a href="https://github.com/opetchey/community.simulator/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.9.0.9000" id="communitysimulator-0909000">community.simulator 0.9.0.9000<a class="anchor" aria-label="anchor" href="#communitysimulator-0909000"></a></h2>
+<ul><li>Added <code>simulation.rate_scale</code> as a continuous-model treatment. Biological rates are scaled after draws, including CPC aliases; matched levels share trait, interaction, initial-abundance and environment draws.</li>
+<li>Preflight summaries display the biological rate multipliers. Non-unit scales reject discrete LV and fixed-time LV immigration pulses.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.0" id="communitysimulator-090">community.simulator 0.9.0<a class="anchor" aria-label="anchor" href="#communitysimulator-090"></a></h2>
 <ul><li>Added <code>simulation.ode.maxsteps</code> for continuous LV and consumer-resource simulations, allowing dense environmental forcing runs to raise the <code>lsoda</code> internal work limit from YAML.</li>

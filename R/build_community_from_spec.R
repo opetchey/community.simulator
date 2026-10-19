@@ -2,6 +2,8 @@
 #'
 #' Builds the model-specific community parameter object for one resolved
 #' `case_spec` from the canonical YAML experiment-table workflow.
+#' `simulation.rate_scale` (default 1) scales realised biological rates after
+#' random draws for continuous models, including performance-curve aliases.
 #'
 #' @param case_spec A resolved case specification, usually from the `case_spec`
 #'   list-column produced by [create_experiment_table_from_spec()].
@@ -41,10 +43,11 @@ build_community_from_spec <- function(case_spec, community_seed = NULL) {
 #' @rdname build_community_from_spec
 #' @export
 build_LV_community_from_spec <- function(case_spec, community_seed = NULL) {
+  validate_simulation_spec(case_spec$simulation, case_spec$model$type)
   community_seed <- resolve_community_seed(case_spec, community_seed)
   traits <- case_spec$traits
 
-  build_LV_community(
+  community <- build_LV_community(
     S = as.integer(case_spec$community$richness),
     birth_maximum_mean = traits$birth_maximum$mean,
     birth_maximum_range = traits$birth_maximum$range,
@@ -60,11 +63,13 @@ build_LV_community_from_spec <- function(case_spec, community_seed = NULL) {
     death_temperature_slope = traits$death$temperature_slope,
     lv_interaction_spec = case_spec$interactions$selected
   )
+  scale_community_rates(community, simulation_rate_scale(case_spec$simulation), case_spec$model$type)
 }
 
 #' @rdname build_community_from_spec
 #' @export
 build_CR_community_from_spec <- function(case_spec, community_seed = NULL) {
+  validate_simulation_spec(case_spec$simulation, case_spec$model$type)
   community_seed <- resolve_community_seed(case_spec, community_seed)
   traits <- case_spec$traits
   resources <- case_spec$resources
@@ -75,7 +80,7 @@ build_CR_community_from_spec <- function(case_spec, community_seed = NULL) {
     precision = 10
   )
 
-  build_CR_community(
+  community <- build_CR_community(
     S = as.integer(case_spec$community$richness),
     uptake_maximum_mean = traits$uptake_maximum$mean,
     uptake_maximum_range = traits$uptake_maximum$range,
@@ -101,6 +106,7 @@ build_CR_community_from_spec <- function(case_spec, community_seed = NULL) {
     private_resource_use_precision = private_use$precision %||% 10,
     community_seed = community_seed
   )
+  scale_community_rates(community, simulation_rate_scale(case_spec$simulation), case_spec$model$type)
 }
 
 #' Build an LV community object

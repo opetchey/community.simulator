@@ -238,7 +238,9 @@ simulate_one_dynamics_case <- function(i,
   solver_output_times <- sort(unique(c(output_times, resource_output_times)))
 
   S <- community$S
-  if (!is.null(initial_abundance_seed_base)) {
+  if ("initial_abundance_seed" %in% names(expt)) {
+    set.seed(expt$initial_abundance_seed[[i]])
+  } else if (!is.null(initial_abundance_seed_base)) {
     set.seed(initial_abundance_seed_for_case(initial_abundance_seed_base, expt, i))
   }
   initial_abundances <- (dirmult::rdirichlet(1, rep(1, S)) *

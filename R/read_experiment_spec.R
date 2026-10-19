@@ -359,6 +359,25 @@ validate_environment_spec <- function(environment) {
 }
 
 validate_simulation_spec <- function(simulation, model_type) {
+  allowed_fields <- c(
+    "burn_in_duration", "experiment_duration", "rate_scale",
+    "temperature_interpolation", "immigration_rate", "consumer_immigration_rate",
+    "initial_consumer_total_abundance", "resource_initial_value", "immigration_mode",
+    "ode", "blowup_threshold", "negative_tolerance", "initial_abundance_seed_base"
+  )
+  unknown <- setdiff(names(simulation), allowed_fields)
+  if (length(unknown) > 0L) {
+    stop("Unknown simulation option(s): ", paste0("simulation.", unknown, collapse = ", "),
+         ". See the YAML parameter reference.", call. = FALSE)
+  }
+  rate_scale <- simulation_rate_scale(simulation)
+  if (rate_scale != 1 && identical(model_type, "lv_discrete")) {
+    stop("`simulation.rate_scale` must be 1 for `lv_discrete`; time rescaling requires a continuous model.", call. = FALSE)
+  }
+  if (rate_scale != 1 && identical(model_type, "lv_continuous") &&
+      identical(simulation$immigration_mode, "pulse")) {
+    stop("Non-unit `simulation.rate_scale` requires continuous LV immigration; fixed-time pulses do not rescale time.", call. = FALSE)
+  }
   require_nonnegative_integer(simulation$burn_in_duration, "simulation.burn_in_duration")
   require_positive_integer(simulation$experiment_duration, "simulation.experiment_duration")
   if (identical(model_type, "lv_discrete") && is.null(simulation$immigration_rate)) {

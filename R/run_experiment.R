@@ -59,6 +59,7 @@ confirm_experiment_run <- function(summary) {
   message("----------------------------")
   message("Cases: ", summary$n_cases)
   message("Dynamics type: ", summary$dynamics_type)
+  message("Biological rate scale: ", paste(summary$rate_scales, collapse = ", "))
   message("Integration time points per case: ", summary$integration_steps)
   message("Saved dynamics/resource time points per case: ", summary$saved_time_points)
   if (summary$save_resources) {
@@ -354,6 +355,7 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
 
   list(
     n_cases = nrow(simulation_table),
+    rate_scales = sort(unique(simulation_table$rate_scale %||% settings$rate_scale)),
     dynamics_type = settings$dynamics_type,
     integration_steps = integration_steps,
     saved_time_points = saved_time_points,

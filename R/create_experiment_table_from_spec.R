@@ -34,6 +34,18 @@ create_experiment_table_from_spec <- function(spec,
   spec <- coerce_experiment_spec(spec)
   treatment_table <- expand_experiment_treatments(spec)
   interaction_treatments <- expand_interaction_treatments(spec)
+  # Collapse only the rate treatment when assigning random-draw identities.
+  draw_values <- lapply(treatment_table$treatment_values, function(x) {
+    x[setdiff(names(x), "simulation.rate_scale")]
+  })
+  draw_labels <- vapply(draw_values, create_treatment_label, character(1))
+  draw_keys <- vapply(draw_values, function(x) {
+    paste(as.integer(serialize(x, NULL, version = 2)), collapse = ",")
+  }, character(1))
+  draw_rows <- match(draw_keys, unique(draw_keys))
+  rate_treatment <- any(vapply(treatment_table$treatment_values, function(x) {
+    "simulation.rate_scale" %in% names(x)
+  }, logical(1)))
 
   community_replicates <- seq_len(as.integer(spec$community$replicates))
   environment_replicates <- seq_len(as.integer(spec$environment$replicates))
@@ -60,7 +72,7 @@ create_experiment_table_from_spec <- function(spec,
     case_spec$environment$replicate <- row$environment_replicate
     case_spec$community$seed <- create_case_seed(
       case_spec$experiment$random_seed,
-      row$treatment_row,
+      if (rate_treatment) draw_rows[[row$treatment_row]] else row$treatment_row,
       row$interaction_treatment_row,
       row$community_replicate
     )
@@ -71,14 +83,19 @@ create_experiment_table_from_spec <- function(spec,
     env_series_id <- create_environment_series_id(
       case_spec,
       row$environment_replicate,
-      i
+      if (rate_treatment) {
+        draw_rows[[row$treatment_row]] + length(unique(draw_rows)) *
+          ((row$interaction_treatment_row - 1L) + nrow(interaction_treatments) *
+             ((row$community_replicate - 1L) + length(community_replicates) *
+                (row$environment_replicate - 1L)))
+      } else i
     )
     case_spec$environment$seed <- create_environment_seed(
       case_spec$experiment$random_seed,
       env_series_id
     )
 
-    data.frame(
+    result <- data.frame(
       case_id = paste0("case_", i),
       model_type = model_type,
       dynamics_type = model_type,
@@ -95,6 +112,7 @@ create_experiment_table_from_spec <- function(spec,
       one_over_f_gamma = case_spec$environment$temperature$one_over_f_gamma,
       temperature_seed = case_spec$environment$seed,
       richness = case_spec$community$richness,
+      rate_scale = simulation_rate_scale(case_spec$simulation),
       community_id = create_canonical_community_id(
         case_spec,
         treatment_label,
@@ -109,6 +127,18 @@ create_experiment_table_from_spec <- function(spec,
         community_object = list(community_object),
         case_spec = list(case_spec)
       )
+    if (rate_treatment) {
+      draw_id <- create_canonical_community_id(
+        case_spec, draw_labels[[row$treatment_row]], interaction_label,
+        row$community_replicate
+      )
+      result$initial_abundance_draw_id <- draw_id
+      result$initial_abundance_seed <- as.integer(
+        case_spec$simulation$initial_abundance_seed_base %||%
+          case_spec$experiment$random_seed
+      ) + stable_integer_from_character(draw_id)
+    }
+    result
   })
 
   out <- dplyr::bind_rows(rows)
@@ -205,7 +235,8 @@ derive_simulation_table <- function(experiment_table) {
     "community_id"
   )
   experiment_table |>
-    dplyr::select(dplyr::all_of(simulation_columns))
+    dplyr::select(dplyr::all_of(simulation_columns),
+                  dplyr::any_of(c("rate_scale", "initial_abundance_seed")))
 }
 
 derive_community_objects <- function(experiment_table) {

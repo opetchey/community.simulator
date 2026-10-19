@@ -111,6 +111,7 @@ flatten_spec_settings <- function(spec) {
   list(
     model_type = spec$model$type,
     dynamics_type = normalize_model_type(spec$model$type),
+    rate_scale = simulation_rate_scale(spec$simulation),
     burn_in_duration = integer_spec_setting(spec$simulation$burn_in_duration, "simulation.burn_in_duration"),
     experiment_duration = integer_spec_setting(spec$simulation$experiment_duration, "simulation.experiment_duration"),
     temperature_mean = numeric_spec_setting(spec$environment$temperature$mean, "environment.temperature.mean"),
@@ -511,6 +512,7 @@ simulate_dynamics_from_spec <- function(experiment_folder,
   )
 
   simulate_case <- function(i) {
+    rate_scale <- if ("rate_scale" %in% names(expt)) expt$rate_scale[[i]] else settings$rate_scale
     simulate_one_dynamics_case(
       i = i,
       expt = expt,
@@ -519,8 +521,8 @@ simulate_dynamics_from_spec <- function(experiment_folder,
       expt_def = expt_def,
       dynamics_type = settings$dynamics_type,
       temperature_interpolation = settings$temperature_interpolation,
-      immigration_rate = settings$immigration_rate,
-      consumer_immigration_rate = settings$consumer_immigration_rate,
+      immigration_rate = settings$immigration_rate * rate_scale,
+      consumer_immigration_rate = settings$consumer_immigration_rate * rate_scale,
       initial_consumer_total_abundance = settings$initial_consumer_total_abundance,
       resource_initial_value = settings$resource_initial_value,
       immigration_mode = settings$immigration_mode,
