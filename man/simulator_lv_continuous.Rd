@@ -56,11 +56,14 @@ reaching the next output time. Passed to \code{deSolve::ode()} when supplied.}
 \item{blowup_threshold}{Abundance threshold above which the run stops.}
 
 \item{negative_tolerance}{Nonnegative tolerance for numerical negative
-abundances. Internal states and returned values below its negative cause
-failure; tolerated negatives are treated as zero.}
+returned abundances. Output below its negative causes failure; tolerated
+negative output is clipped to zero. Negative internal trial states are
+evaluated at zero, allowing the solver to recover.}
 }
 \value{
-Time series of population abundances for each species.
+Time series of population abundances for each species. If negative
+internal trials occurred, the \code{ode_negative_trials} attribute records their
+evaluation count, minimum abundance and time of that minimum.
 }
 \description{
 The LV carrying-capacity scaling constants are fixed internally at

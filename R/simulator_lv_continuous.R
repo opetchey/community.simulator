@@ -24,10 +24,13 @@
 #'   reaching the next output time. Passed to `deSolve::ode()` when supplied.
 #' @param blowup_threshold Abundance threshold above which the run stops.
 #' @param negative_tolerance Nonnegative tolerance for numerical negative
-#'   abundances. Internal states and returned values below its negative cause
-#'   failure; tolerated negatives are treated as zero.
+#'   returned abundances. Output below its negative causes failure; tolerated
+#'   negative output is clipped to zero. Negative internal trial states are
+#'   evaluated at zero, allowing the solver to recover.
 #'
-#' @return Time series of population abundances for each species.
+#' @return Time series of population abundances for each species. If negative
+#'   internal trials occurred, the `ode_negative_trials` attribute records their
+#'   evaluation count, minimum abundance and time of that minimum.
 #' @export
 #'
 #' @examples NULL
@@ -79,6 +82,9 @@ simulator_lv_continuous <- function(input_com_params,
   if (length(initial_abundances) != S) {
     stop("`initial_abundances` must have one value per species.", call. = FALSE)
   }
+  if (any(!is.finite(initial_abundances)) || any(initial_abundances < 0)) {
+    stop("`initial_abundances` must be finite and nonnegative.", call. = FALSE)
+  }
 
   state_names <- paste0("Spp", seq_len(S))
   state <- stats::setNames(as.numeric(initial_abundances), state_names)
@@ -92,17 +98,28 @@ simulator_lv_continuous <- function(input_com_params,
     f = 0
   )
 
+  negative_trial_evaluations <- 0L
+  minimum_trial_abundance <- 0
+  time_of_minimum_trial <- NA_real_
+
   derivative <- function(t, state, parms) {
     if (any(!is.finite(state))) {
       stop("Non-finite abundance encountered by ODE solver.", call. = FALSE)
-    }
-    if (any(state < -negative_tolerance)) {
-      stop("Negative abundance encountered by ODE solver.", call. = FALSE)
     }
     if (any(state > blowup_threshold)) {
       stop("Abundance exceeded blow-up threshold.", call. = FALSE)
     }
 
+    if (any(state < 0)) {
+      negative_trial_evaluations <<- negative_trial_evaluations + 1L
+      minimum_state <- min(state)
+      if (minimum_state < minimum_trial_abundance) {
+        minimum_trial_abundance <<- minimum_state
+        time_of_minimum_trial <<- t
+      }
+    }
+    # Evaluate trial states at the boundary without changing solver state.
+    # Validate the solver's returned abundances separately below.
     Nt <- pmax(as.numeric(state), 0)
     Tcel <- temperature_at_time(t)
 
@@ -175,5 +192,12 @@ simulator_lv_continuous <- function(input_com_params,
   }
 
   output[] <- lapply(output, function(x) pmax(x, 0))
+  if (negative_trial_evaluations > 0L) {
+    attr(output, "ode_negative_trials") <- list(
+      negative_trial_evaluations = negative_trial_evaluations,
+      minimum_trial_abundance = minimum_trial_abundance,
+      time_of_minimum_trial = time_of_minimum_trial
+    )
+  }
   output
 }

@@ -22,10 +22,14 @@ documentation.
 
 ## Design goals
 
-Implemented on 2026-10-19: continuous LV now receives
-`simulation.negative_tolerance` from YAML and uses it for internal trial-state
-and returned-output checks. The shared default is `1e-8`. CR retains its
-existing boundary evaluation and output validation behaviour.
+Implemented on 2026-10-19: continuous LV receives
+`simulation.negative_tolerance` from YAML for returned-output checks (default
+`1e-8`). Internal trial states now use nonnegative boundary evaluation, matching
+CR, with per-case negative-trial diagnostics written by the parent process to
+the experiment log. Non-finite states, blow-ups and materially negative output
+still fail. The four external `repro_master/simulations2` specifications now use
+`rtol: 1e-4`, `atol: 1e-6`, `max_step: 0.01` and `maxsteps: 500000`, following
+the case-218 numerical convergence investigation.
 
 - Use YAML as the experiment specification format.
 - Do not support JSON experiment specifications in the rewritten interface.

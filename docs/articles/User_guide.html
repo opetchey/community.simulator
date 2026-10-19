@@ -660,9 +660,13 @@ environmental forcing when <code>lsoda</code> reports excessive work or
 run stops.</li>
 <li>
 <code>negative_tolerance</code>: nonnegative numerical tolerance
-(default <code>1e-8</code>). LV stops if an internal solver state or
-returned abundance is below its negative; tolerated negative values are
-treated as zero.</li>
+(default <code>1e-8</code>). Returned abundances below its negative
+cause failure; tolerated negative output is clipped to zero. As in CR,
+negative internal solver trials are evaluated at zero so the solver can
+recover. These trials are recorded in the experiment log as
+<code>ode_negative_trials</code> events with the case ID, evaluation
+count, minimum trial abundance and its time. They are not accepted
+negative outputs.</li>
 </ul>
 <p>Use <code>model.type: lv_continuous</code> in the YAML file to select
 this model.</p>
@@ -1644,11 +1648,10 @@ blown up.</td>
 <tr class="odd">
 <td><code>simulation.negative_tolerance</code></td>
 <td>Continuous LV, CR</td>
-<td>Nonnegative tolerance for negative numerical values, default
-<code>1e-8</code>. Returned values below its negative cause failure;
-smaller negatives are clipped to zero. LV also applies this threshold to
-internal solver states. CR evaluates internal trial states at zero when
-negative and checks the tolerance on returned output.</td>
+<td>Nonnegative tolerance for returned negative numerical values,
+default <code>1e-8</code>. Output below its negative causes failure;
+smaller negatives are clipped to zero. Both models evaluate negative
+internal trial states at zero, allowing solver recovery.</td>
 </tr>
 <tr class="even">
 <td>Fixed LV constants</td>

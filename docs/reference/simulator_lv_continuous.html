@@ -131,13 +131,16 @@ reaching the next output time. Passed to <code><a href="https://rdrr.io/pkg/deSo
 
 <dt id="arg-negative-tolerance">negative_tolerance<a class="anchor" aria-label="anchor" href="#arg-negative-tolerance"></a></dt>
 <dd><p>Nonnegative tolerance for numerical negative
-abundances. Internal states and returned values below its negative cause
-failure; tolerated negatives are treated as zero.</p></dd>
+returned abundances. Output below its negative causes failure; tolerated
+negative output is clipped to zero. Negative internal trial states are
+evaluated at zero, allowing the solver to recover.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Time series of population abundances for each species.</p>
+    <p>Time series of population abundances for each species. If negative
+internal trials occurred, the <code>ode_negative_trials</code> attribute records their
+evaluation count, minimum abundance and time of that minimum.</p>
     </div>
 
     <div class="section level2">

@@ -247,6 +247,7 @@ simulate_one_dynamics_case <- function(i,
                            initial_consumer_total_abundance)[1, ]
 
   resources_ts <- NULL
+  solver_diagnostics <- NULL
   returned_times <- integration_times
   if (dynamics_type == "discrete") {
     spts <- simulator_lv_discrete(
@@ -280,6 +281,7 @@ simulate_one_dynamics_case <- function(i,
         stop("Simulation case ", expt$case_id[i], " failed: ", conditionMessage(e), call. = FALSE)
       }
     )
+    solver_diagnostics <- attr(spts, "ode_negative_trials")
     returned_times <- output_times
   }
 
@@ -366,6 +368,7 @@ simulate_one_dynamics_case <- function(i,
     dynamics = spts,
     resources = resources_ts,
     case_summary = online_summaries$case_summary,
-    population_summary = online_summaries$population_summary
+    population_summary = online_summaries$population_summary,
+    solver_diagnostics = solver_diagnostics
   )
 }

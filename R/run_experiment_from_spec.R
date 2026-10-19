@@ -543,6 +543,14 @@ simulate_dynamics_from_spec <- function(experiment_folder,
   }
 
   write_simulation_result <- function(i, case_result) {
+    if (!is.null(case_result$solver_diagnostics)) {
+      append_experiment_log_entry(
+        file.path(experiment_folder, "experiment_log.txt"),
+        "ode_negative_trials",
+        c(list(case_id = expt$case_id[[i]], model_type = settings$model_type),
+          case_result$solver_diagnostics)
+      )
+    }
     case_summaries[[i]] <<- case_result$case_summary
     population_summaries[[i]] <<- case_result$population_summary
     if (!is.null(conn_dynamics) && !is.null(case_result$dynamics)) {

@@ -32,7 +32,7 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.0.9000" id="communitysimulator-0909000">community.simulator 0.9.0.9000<a class="anchor" aria-label="anchor" href="#communitysimulator-0909000"></a></h2>
-<ul><li><p>Continuous LV now honours <code>simulation.negative_tolerance</code> for internal solver states and returned abundances, using the shared YAML default of <code>1e-8</code> instead of its previous fixed threshold of approximately <code>1.49e-8</code>.</p></li>
+<ul><li><p>Continuous LV now evaluates negative internal solver trials at zero, as CR already does, and logs their count, minimum and time per case. Returned abundances still honour <code>simulation.negative_tolerance</code> (default <code>1e-8</code>); non-finite values and blow-ups remain errors.</p></li>
 <li><p>Added <code>simulation.rate_scale</code> as a continuous-model treatment. Biological rates are scaled after draws, including CPC aliases; matched levels share trait, interaction, initial-abundance and environment draws.</p></li>
 <li><p>Preflight summaries display the biological rate multipliers. Non-unit scales reject discrete LV and fixed-time LV immigration pulses.</p></li>
 </ul></div>

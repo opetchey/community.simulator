@@ -95,13 +95,16 @@ simulator_lv_continuous(
 
 - negative_tolerance:
 
-  Nonnegative tolerance for numerical negative abundances. Internal
-  states and returned values below its negative cause failure; tolerated
-  negatives are treated as zero.
+  Nonnegative tolerance for numerical negative returned abundances.
+  Output below its negative causes failure; tolerated negative output is
+  clipped to zero. Negative internal trial states are evaluated at zero,
+  allowing the solver to recover.
 
 ## Value
 
-Time series of population abundances for each species.
+Time series of population abundances for each species. If negative
+internal trials occurred, the `ode_negative_trials` attribute records
+their evaluation count, minimum abundance and time of that minimum.
 
 ## Examples
 
