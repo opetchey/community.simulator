@@ -60,7 +60,8 @@ multiplied by that scale to preserve exact biological time rescaling.</p>
 <span>  atol <span class="op">=</span> <span class="fl">1e-08</span>,</span>
 <span>  max_step <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  maxsteps <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  blowup_threshold <span class="op">=</span> <span class="fl">1e+12</span></span>
+<span>  blowup_threshold <span class="op">=</span> <span class="fl">1e+12</span>,</span>
+<span>  negative_tolerance <span class="op">=</span> <span class="fl">1e-08</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -126,6 +127,12 @@ reaching the next output time. Passed to <code><a href="https://rdrr.io/pkg/deSo
 
 <dt id="arg-blowup-threshold">blowup_threshold<a class="anchor" aria-label="anchor" href="#arg-blowup-threshold"></a></dt>
 <dd><p>Abundance threshold above which the run stops.</p></dd>
+
+
+<dt id="arg-negative-tolerance">negative_tolerance<a class="anchor" aria-label="anchor" href="#arg-negative-tolerance"></a></dt>
+<dd><p>Nonnegative tolerance for numerical negative
+abundances. Internal states and returned values below its negative cause
+failure; tolerated negatives are treated as zero.</p></dd>
 
 </dl></div>
     <div class="section level2">

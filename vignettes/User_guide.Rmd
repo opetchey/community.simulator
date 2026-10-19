@@ -366,6 +366,9 @@ The continuous-time LV simulator is `simulator_lv_continuous()`. It uses
 - `ode_max_step`: maximum solver step.
 - `ode_maxsteps`: maximum number of internal solver steps before reaching the next output time. Increase this for dense or fast environmental forcing when `lsoda` reports excessive work or `MXSTEP`.
 - `blowup_threshold`: abundance threshold above which the run stops.
+- `negative_tolerance`: nonnegative numerical tolerance (default `1e-8`). LV stops
+  if an internal solver state or returned abundance is below its negative;
+  tolerated negative values are treated as zero.
 
 Use `model.type: lv_continuous` in the YAML file to select this model.
 
@@ -945,7 +948,7 @@ the bundled example experiments.
 | `simulation.ode.max_step` | Continuous LV, CR | Maximum ODE solver step size. |
 | `simulation.ode.maxsteps` | Continuous LV, CR | Optional maximum number of internal solver steps before reaching the next output time. Increase this if `lsoda` reports excessive work or `MXSTEP`. |
 | `simulation.blowup_threshold` | Continuous LV, CR | Abundance threshold above which a simulation is treated as having blown up. |
-| `simulation.negative_tolerance` | CR | Small numerical tolerance used when checking negative values in ODE output. |
+| `simulation.negative_tolerance` | Continuous LV, CR | Nonnegative tolerance for negative numerical values, default `1e-8`. Returned values below its negative cause failure; smaller negatives are clipped to zero. LV also applies this threshold to internal solver states. CR evaluates internal trial states at zero when negative and checks the tolerance on returned output. |
 | Fixed LV constants | Discrete LV, continuous LV | `bet = 0.001`, `delt = 0.001`, and `net_growth_offset = 1e-6` are fixed internally and are not currently YAML options. |
 | `traits.birth_maximum.*` | LV | Mean, range, and distribution for maximum birth-rate performance. |
 | `traits.birth_optimum.*` | LV | Mean, range, and distribution for birth-rate thermal optima. |

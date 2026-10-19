@@ -658,6 +658,11 @@ environmental forcing when <code>lsoda</code> reports excessive work or
 <li>
 <code>blowup_threshold</code>: abundance threshold above which the
 run stops.</li>
+<li>
+<code>negative_tolerance</code>: nonnegative numerical tolerance
+(default <code>1e-8</code>). LV stops if an internal solver state or
+returned abundance is below its negative; tolerated negative values are
+treated as zero.</li>
 </ul>
 <p>Use <code>model.type: lv_continuous</code> in the YAML file to select
 this model.</p>
@@ -1638,9 +1643,12 @@ blown up.</td>
 </tr>
 <tr class="odd">
 <td><code>simulation.negative_tolerance</code></td>
-<td>CR</td>
-<td>Small numerical tolerance used when checking negative values in ODE
-output.</td>
+<td>Continuous LV, CR</td>
+<td>Nonnegative tolerance for negative numerical values, default
+<code>1e-8</code>. Returned values below its negative cause failure;
+smaller negatives are clipped to zero. LV also applies this threshold to
+internal solver states. CR evaluates internal trial states at zero when
+negative and checks the tolerance on returned output.</td>
 </tr>
 <tr class="even">
 <td>Fixed LV constants</td>

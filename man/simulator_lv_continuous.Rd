@@ -18,7 +18,8 @@ simulator_lv_continuous(
   atol = 1e-08,
   max_step = 1,
   maxsteps = NULL,
-  blowup_threshold = 1e+12
+  blowup_threshold = 1e+12,
+  negative_tolerance = 1e-08
 )
 }
 \arguments{
@@ -53,6 +54,10 @@ between supplied time points. One of \code{"linear"} or \code{"constant"}.}
 reaching the next output time. Passed to \code{deSolve::ode()} when supplied.}
 
 \item{blowup_threshold}{Abundance threshold above which the run stops.}
+
+\item{negative_tolerance}{Nonnegative tolerance for numerical negative
+abundances. Internal states and returned values below its negative cause
+failure; tolerated negatives are treated as zero.}
 }
 \value{
 Time series of population abundances for each species.

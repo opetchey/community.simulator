@@ -23,6 +23,9 @@
 #' @param maxsteps Optional maximum number of internal solver steps before
 #'   reaching the next output time. Passed to `deSolve::ode()` when supplied.
 #' @param blowup_threshold Abundance threshold above which the run stops.
+#' @param negative_tolerance Nonnegative tolerance for numerical negative
+#'   abundances. Internal states and returned values below its negative cause
+#'   failure; tolerated negatives are treated as zero.
 #'
 #' @return Time series of population abundances for each species.
 #' @export
@@ -41,7 +44,11 @@ simulator_lv_continuous <- function(input_com_params,
                                     atol = 1e-8,
                                     max_step = 1,
                                     maxsteps = NULL,
-                                    blowup_threshold = 1e12) {
+                                    blowup_threshold = 1e12,
+                                    negative_tolerance = 1e-8) {
+
+  require_nonnegative_number(negative_tolerance, "negative_tolerance")
+  negative_tolerance <- as.numeric(negative_tolerance)
 
   temperature_interpolation <- match.arg(
     temperature_interpolation,
@@ -89,7 +96,7 @@ simulator_lv_continuous <- function(input_com_params,
     if (any(!is.finite(state))) {
       stop("Non-finite abundance encountered by ODE solver.", call. = FALSE)
     }
-    if (any(state < -sqrt(.Machine$double.eps))) {
+    if (any(state < -negative_tolerance)) {
       stop("Negative abundance encountered by ODE solver.", call. = FALSE)
     }
     if (any(state > blowup_threshold)) {
@@ -160,7 +167,7 @@ simulator_lv_continuous <- function(input_com_params,
       call. = FALSE
     )
   }
-  if (any(output < -sqrt(.Machine$double.eps), na.rm = TRUE)) {
+  if (any(output < -negative_tolerance, na.rm = TRUE)) {
     stop("Continuous-time simulation returned negative abundances.", call. = FALSE)
   }
   if (any(!is.finite(as.matrix(output)))) {

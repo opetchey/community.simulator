@@ -273,7 +273,8 @@ simulate_one_dynamics_case <- function(i,
         atol = ode_atol,
         max_step = ode_max_step,
         maxsteps = ode_maxsteps,
-        blowup_threshold = blowup_threshold
+        blowup_threshold = blowup_threshold,
+        negative_tolerance = negative_tolerance
       ),
       error = function(e) {
         stop("Simulation case ", expt$case_id[i], " failed: ", conditionMessage(e), call. = FALSE)

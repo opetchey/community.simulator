@@ -63,6 +63,7 @@ simulation:
     max_step: 1
     maxsteps: 5000
   blowup_threshold: 1e12
+  negative_tolerance: 1e-8
 
 parallel:
   workers: 1

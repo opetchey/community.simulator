@@ -2,10 +2,16 @@
 
 ## community.simulator 0.9.0.9000
 
+- Continuous LV now honours `simulation.negative_tolerance` for internal
+  solver states and returned abundances, using the shared YAML default
+  of `1e-8` instead of its previous fixed threshold of approximately
+  `1.49e-8`.
+
 - Added `simulation.rate_scale` as a continuous-model treatment.
   Biological rates are scaled after draws, including CPC aliases;
   matched levels share trait, interaction, initial-abundance and
   environment draws.
+
 - Preflight summaries display the biological rate multipliers. Non-unit
   scales reject discrete LV and fixed-time LV immigration pulses.
 

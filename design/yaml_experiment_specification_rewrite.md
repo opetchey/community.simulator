@@ -22,6 +22,11 @@ documentation.
 
 ## Design goals
 
+Implemented on 2026-10-19: continuous LV now receives
+`simulation.negative_tolerance` from YAML and uses it for internal trial-state
+and returned-output checks. The shared default is `1e-8`. CR retains its
+existing boundary evaluation and output validation behaviour.
+
 - Use YAML as the experiment specification format.
 - Do not support JSON experiment specifications in the rewritten interface.
 - Do not evaluate R expressions from experiment files.

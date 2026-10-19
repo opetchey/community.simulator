@@ -22,7 +22,8 @@ simulator_lv_continuous(
   atol = 1e-08,
   max_step = 1,
   maxsteps = NULL,
-  blowup_threshold = 1e+12
+  blowup_threshold = 1e+12,
+  negative_tolerance = 1e-08
 )
 ```
 
@@ -91,6 +92,12 @@ simulator_lv_continuous(
 - blowup_threshold:
 
   Abundance threshold above which the run stops.
+
+- negative_tolerance:
+
+  Nonnegative tolerance for numerical negative abundances. Internal
+  states and returned values below its negative cause failure; tolerated
+  negatives are treated as zero.
 
 ## Value
 
