@@ -976,6 +976,7 @@ the bundled example experiments.
 | `output.dynamics_save_every` | All | Interval between saved population-dynamics output time points. |
 | `output.resources_save_every` | CR | Interval between saved resource output time points. |
 | `output.save_dynamics` | All | Logical. If `TRUE`, write `dynamics.db`. |
+| `output.record_dynamics_wall_time` | All | Logical, default `FALSE`. Record per-case elapsed seconds as `dynamics_wall_time_seconds` in `simulation_summaries.RDS`. Includes burn-in and experimental dynamics; excludes case preparation, summary calculation and file writing. Works with sequential and parallel simulations, even when dynamics are not saved. |
 | `output.save_resources` | CR | Logical. If `TRUE`, write `resources.db`. |
 | `output.runtime_update_every` | All | Number of completed cases between sparse progress updates. Defaults to 100. |
 | `output.environment_progress` | All | Logical. If `TRUE`, print elapsed-time progress while environments are generated. |
@@ -1118,3 +1119,19 @@ handled by the parent process. Parallel processing is intended for macOS/Linux.
 The experiment log records elapsed time for the main workflow steps. It is
 plain text newline-delimited JSON, so it is readable by humans and easy to parse
 from R or other tools.
+
+
+## Unknown YAML settings
+
+Unknown setting names are rejected when an experiment specification is read,
+before simulations start. This includes top-level sections, nested settings,
+interaction treatments and their parameters, and dotted paths in factorial or
+paired treatments. Errors identify the full setting path and, when reading a
+file, its filename. They list the allowed settings and suggest a close spelling
+when one is available. For example, `output.record_dynamics_wall_tim` suggests
+`output.record_dynamics_wall_time` rather than silently leaving timing disabled.
+Treatment paths must also exist in the baseline specification.
+
+Existing specifications containing unused custom settings must remove those
+settings; use YAML comments for annotations instead. Supported interaction
+parameter aliases remain accepted.

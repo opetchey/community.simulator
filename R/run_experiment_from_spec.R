@@ -141,6 +141,7 @@ flatten_spec_settings <- function(spec) {
     dynamics_save_every = integer_spec_setting(spec_setting(spec, "output", "dynamics_save_every", 1), "output.dynamics_save_every"),
     resources_save_every = integer_spec_setting(spec_setting(spec, "output", "resources_save_every", spec_setting(spec, "output", "dynamics_save_every", 1)), "output.resources_save_every"),
     save_dynamics = isTRUE(spec_setting(spec, "output", "save_dynamics", TRUE)),
+    record_dynamics_wall_time = isTRUE(spec_setting(spec, "output", "record_dynamics_wall_time", FALSE)),
     save_resources = isTRUE(spec_setting(spec, "output", "save_resources", TRUE)),
     extinction_threshold = numeric_spec_setting(spec_setting(spec, "measures", "extinction_threshold", 1e-8), "measures.extinction_threshold"),
     summary_checkpoint_every = integer_spec_setting(spec_setting(spec, "output", "summary_checkpoint_every", 1), "output.summary_checkpoint_every"),
@@ -537,6 +538,7 @@ simulate_dynamics_from_spec <- function(experiment_folder,
       resources_save_every = settings$resources_save_every,
       save_dynamics = settings$save_dynamics,
       save_resources = save_resources,
+      record_dynamics_wall_time = settings$record_dynamics_wall_time,
       extinction_threshold = settings$extinction_threshold,
       initial_abundance_seed_base = settings$initial_abundance_seed_base
     )

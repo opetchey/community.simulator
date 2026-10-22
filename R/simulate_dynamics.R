@@ -187,7 +187,8 @@ simulate_one_dynamics_case <- function(i,
                                        save_dynamics,
                                        save_resources,
                                        extinction_threshold,
-                                       initial_abundance_seed_base) {
+                                       initial_abundance_seed_base,
+                                       record_dynamics_wall_time = FALSE) {
 
   env_series_oi <- expt$env_series_id[i]
   community <- if (!is.null(community_objects)) {
@@ -249,6 +250,8 @@ simulate_one_dynamics_case <- function(i,
   resources_ts <- NULL
   solver_diagnostics <- NULL
   returned_times <- integration_times
+  # Measure elapsed time locally in this worker; exclude preparation and summaries.
+  if (record_dynamics_wall_time) dynamics_started_at <- proc.time()[["elapsed"]]
   if (dynamics_type == "discrete") {
     spts <- simulator_lv_discrete(
       input_com_params = community,
@@ -314,6 +317,10 @@ simulate_one_dynamics_case <- function(i,
     returned_times <- solver_output_times
   }
 
+  if (record_dynamics_wall_time) {
+    dynamics_wall_time_seconds <- proc.time()[["elapsed"]] - dynamics_started_at
+  }
+
   online_summaries <- summarise_case_dynamics(
     case_id = expt$case_id[i],
     spts = spts,
@@ -323,6 +330,10 @@ simulate_one_dynamics_case <- function(i,
     burn_in_duration = expt_def$burn_in_duration,
     extinction_threshold = extinction_threshold
   )
+
+  if (record_dynamics_wall_time) {
+    online_summaries$case_summary$dynamics_wall_time_seconds <- dynamics_wall_time_seconds
+  }
 
   if (save_dynamics) {
     spts <- spts |>

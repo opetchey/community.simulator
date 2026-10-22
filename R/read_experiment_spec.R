@@ -59,6 +59,8 @@ validate_experiment_spec <- function(spec, path = NULL) {
     stop("Experiment specification must be a named mapping.", call. = FALSE)
   }
 
+  validate_experiment_setting_names(spec, path)
+
   required_sections <- c(
     "experiment",
     "model",
@@ -359,17 +361,7 @@ validate_environment_spec <- function(environment) {
 }
 
 validate_simulation_spec <- function(simulation, model_type) {
-  allowed_fields <- c(
-    "burn_in_duration", "experiment_duration", "rate_scale",
-    "temperature_interpolation", "immigration_rate", "consumer_immigration_rate",
-    "initial_consumer_total_abundance", "resource_initial_value", "immigration_mode",
-    "ode", "blowup_threshold", "negative_tolerance", "initial_abundance_seed_base"
-  )
-  unknown <- setdiff(names(simulation), allowed_fields)
-  if (length(unknown) > 0L) {
-    stop("Unknown simulation option(s): ", paste0("simulation.", unknown, collapse = ", "),
-         ". See the YAML parameter reference.", call. = FALSE)
-  }
+  reject_unknown_settings(simulation, names(experiment_settings_schema()$simulation), "simulation")
   rate_scale <- simulation_rate_scale(simulation)
   if (rate_scale != 1 && identical(model_type, "lv_discrete")) {
     stop("`simulation.rate_scale` must be 1 for `lv_discrete`; time rescaling requires a continuous model.", call. = FALSE)
@@ -464,7 +456,7 @@ validate_optional_runtime_sections <- function(spec) {
         require_positive_integer(spec$output[[field]], paste0("output.", field))
       }
     }
-    for (field in c("save_dynamics", "save_resources", "simulation_progress", "environment_progress")) {
+    for (field in c("save_dynamics", "save_resources", "record_dynamics_wall_time", "simulation_progress", "environment_progress")) {
       if (!is.null(spec$output[[field]])) {
         require_scalar_logical(spec$output[[field]], paste0("output.", field))
       }

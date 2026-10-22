@@ -1,5 +1,12 @@
 # community.simulator 0.9.0.9000
 
+- Experiment YAML validation now rejects unknown settings at every mapping level,
+  including interaction parameters and treatment paths, with full setting paths,
+  allowed settings and suggestions for likely typos.
+
+- Added `output.record_dynamics_wall_time` (default `false`) to record per-case
+  dynamics elapsed seconds in `simulation_summaries.RDS`.
+
 - Continuous LV now evaluates negative internal solver trials at zero, as CR
   already does, and logs their count, minimum and time per case. Returned
   abundances still honour `simulation.negative_tolerance` (default `1e-8`);
