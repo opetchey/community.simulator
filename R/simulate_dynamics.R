@@ -188,7 +188,8 @@ simulate_one_dynamics_case <- function(i,
                                        save_resources,
                                        extinction_threshold,
                                        initial_abundance_seed_base,
-                                       record_dynamics_wall_time = FALSE) {
+                                       record_dynamics_wall_time = FALSE,
+                                       ode_rhs = "r") {
 
   env_series_oi <- expt$env_series_id[i]
   community <- if (!is.null(community_objects)) {
@@ -277,6 +278,7 @@ simulate_one_dynamics_case <- function(i,
         atol = ode_atol,
         max_step = ode_max_step,
         maxsteps = ode_maxsteps,
+        rhs = ode_rhs,
         blowup_threshold = blowup_threshold,
         negative_tolerance = negative_tolerance
       ),
@@ -305,6 +307,7 @@ simulate_one_dynamics_case <- function(i,
         atol = ode_atol,
         max_step = ode_max_step,
         maxsteps = ode_maxsteps,
+        rhs = ode_rhs,
         blowup_threshold = blowup_threshold,
         negative_tolerance = negative_tolerance
       ),

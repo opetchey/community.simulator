@@ -23,7 +23,7 @@ experiment_settings_schema <- function() {
       "temperature_interpolation", "immigration_rate", "consumer_immigration_rate",
       "initial_consumer_total_abundance", "resource_initial_value", "immigration_mode",
       "blowup_threshold", "negative_tolerance", "initial_abundance_seed_base"),
-      list(ode = fields("method", "rtol", "atol", "max_step", "maxsteps"))),
+      list(ode = fields("rhs", "method", "rtol", "atol", "max_step", "maxsteps"))),
     output = fields("save_dynamics", "save_resources", "record_dynamics_wall_time",
       "dynamics_save_every", "resources_save_every", "summary_checkpoint_every",
       "runtime_update_every", "simulation_progress", "environment_progress"),

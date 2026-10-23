@@ -312,7 +312,7 @@ create_single_temperature_series <- function(experiment_duration,
     times <- seq(environment_sampling_interval, experiment_duration,
       by = environment_sampling_interval
     )
-    if (length(times) == 0L || tail(times, 1) < experiment_duration) {
+    if (length(times) == 0L || utils::tail(times, 1) < experiment_duration) {
       times <- c(times, experiment_duration)
     }
     times

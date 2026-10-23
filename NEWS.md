@@ -1,3 +1,9 @@
+# community.simulator 0.9.0.9001
+
+- Added an optional compiled C RHS for continuous consumer-resource and LV
+  models, selected with `simulation.ode.rhs: compiled`. The reference R RHS
+  remains the default.
+
 # community.simulator 0.9.0.9000
 
 - Experiment YAML validation now rejects unknown settings at every mapping level,

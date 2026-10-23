@@ -19,7 +19,8 @@ simulator_lv_continuous(
   max_step = 1,
   maxsteps = NULL,
   blowup_threshold = 1e+12,
-  negative_tolerance = 1e-08
+  negative_tolerance = 1e-08,
+  rhs = "r"
 )
 }
 \arguments{
@@ -59,6 +60,8 @@ reaching the next output time. Passed to \code{deSolve::ode()} when supplied.}
 returned abundances. Output below its negative causes failure; tolerated
 negative output is clipped to zero. Negative internal trial states are
 evaluated at zero, allowing the solver to recover.}
+
+\item{rhs}{RHS implementation: \code{"r"} (default) or \code{"compiled"}.}
 }
 \value{
 Time series of population abundances for each species. If negative

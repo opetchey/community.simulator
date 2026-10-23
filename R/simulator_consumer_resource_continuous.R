@@ -15,6 +15,7 @@
 #' @param maxsteps Optional maximum number of internal solver steps before
 #'   reaching the next output time. Passed to `deSolve::ode()` when supplied.
 #' @param blowup_threshold State-value threshold above which the run stops.
+#' @param rhs RHS implementation: `"r"` (default) or `"compiled"`.
 #' @param negative_tolerance Negative tolerance for numerical error.
 #'
 #' @return A named list with `consumers` and `resources` data frames.
@@ -35,7 +36,10 @@ simulator_consumer_resource_continuous <- function(input_com_params,
                                                    max_step = 1,
                                                    maxsteps = NULL,
                                                    blowup_threshold = 1e12,
-                                                   negative_tolerance = 1e-8) {
+                                                   negative_tolerance = 1e-8,
+                                    rhs = "r") {
+
+  rhs <- match.arg(rhs, c("r", "compiled"))
 
   temperature_interpolation <- match.arg(
     temperature_interpolation,
@@ -119,6 +123,16 @@ simulator_consumer_resource_continuous <- function(input_com_params,
   )
   if (!is.null(maxsteps)) {
     ode_args$maxsteps <- maxsteps
+  }
+
+  if (rhs == "compiled") {
+    parameters <- c(S, R, consumer_immigration_rate, blowup_threshold,
+      unlist(input_com_params[c("a_u_ij", "u_opt_ij", "sd_u_ij", "resource_use_ij",
+                                "h_ij", "e_i", "d_i", "rho_j", "K_R_j")], use.names = FALSE))
+    expected <- 4 + 5*S*R + 2*S + 2*R
+    if (length(parameters) != expected) stop("Invalid compiled RHS parameter dimensions.")
+    ode_args <- compiled_rhs_args(ode_args, "cr", parameters,
+                                  times, temperatures, temperature_interpolation)
   }
 
   ode_output <- run_ode_with_captured_output(

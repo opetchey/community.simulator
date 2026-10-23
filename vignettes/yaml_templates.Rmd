@@ -65,3 +65,54 @@ setup_example_experiment(
 
 Then run the copied YAML specification with `run_experiment()`.
 
+
+## Optional compiled continuous-time RHS
+
+Both continuous-time models accept `simulation.ode.rhs`. The default is `r`,
+which keeps the reference R derivative and existing numerical settings.
+To use the C derivative, add:
+
+```yaml
+simulation:
+  ode:
+    rhs: compiled
+```
+
+The direct simulator functions also accept `rhs = "compiled"`. Installing the
+package requires a normal R-compatible C compiler toolchain. A request for the
+compiled RHS fails explicitly if the package DLL is unavailable; it never falls
+back silently. The selected RHS is recorded in the experiment specification log
+(including the implicit `r` default) and preflight summary. Runtime estimates
+are still based on the existing reference calibration.
+
+The solver, tolerances, time grids, output validation and clipping are shared.
+Temperature uses deSolve forcings with the selected `linear` or `constant`
+interpolation, `rule = 2`, and `f = 0`; endpoints are held. Duplicate times are
+averaged and inputs sorted as in the R reference. Pulse immigration remains a
+solver event. State finiteness, blow-up and derivative finiteness checks run
+inside C on every RHS evaluation, with the same messages as R. LV negative
+internal trials are counted in C and returned in `ode_negative_trials` using
+the same fields. Returned-state negative and non-finite checks remain in R.
+
+### Parameter vector layout
+
+Each solve sends one double vector to `cs_initmod`. Matrices are flattened in
+R column-major order (species index varies fastest). In the following table,
+fields appear in packing order; scalar fields have length one.
+
+| Model | Ordered fields |
+|:--|:--|
+| Consumer-resource | `S`, `R`, prepared immigration, blow-up threshold, `a_u_ij` (S×R), `u_opt_ij` (S×R), `sd_u_ij` (S×R), `resource_use_ij` (S×R), `h_ij` (S×R), `e_i` (S), `d_i` (S), `rho_j` (R), `K_R_j` (R) |
+| LV | `S`, `0` (resource count), prepared continuous immigration (zero for pulses), blow-up threshold, prepared growth offset (`1e-6 * rate_scale`), `alpha_ij` (S×S), `b_opt_i` (S), spread (`sd_perf_i`, falling back to `s_i`; S), `a_b_i` (S), `a_d_i` (S), `z_i` (S) |
+
+The lengths are `4 + 5*S*R + 2*S + 2*R` and `5 + S*S + 5*S`, respectively.
+Rates and immigration are prepared in R exactly as for the reference; C does
+not rescale them again. C allocates parameter and CR uptake storage dynamically
+with `R_alloc` inside the solver call. Storage is reclaimed on return or error,
+and there is no fixed richness cap. Callbacks use process-local pointers, so
+solves must be serial within a process; the package's process-based parallel
+workers each have independent storage. No analytic Jacobian is supplied.
+
+The reproducible developer benchmark is `scripts/benchmark_compiled_rhs.R`.
+Run it from the repository root against an optimized installed package, rather
+than the debug DLL produced by `devtools::load_all()`.

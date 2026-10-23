@@ -57,7 +57,7 @@ environment_sample_times <- function(settings, include_burn_in = FALSE) {
       to = expt_end,
       by = sampling_interval
     )
-    if (length(expt_times) == 0L || tail(expt_times, 1) < expt_end) {
+    if (length(expt_times) == 0L || utils::tail(expt_times, 1) < expt_end) {
       expt_times <- c(expt_times, expt_end)
     }
   }
@@ -127,6 +127,7 @@ flatten_spec_settings <- function(spec) {
     initial_consumer_total_abundance = numeric_spec_setting(spec_setting(spec, "simulation", "initial_consumer_total_abundance", 1000), "simulation.initial_consumer_total_abundance"),
     resource_initial_value = numeric_spec_setting(spec_setting(spec, "simulation", "resource_initial_value", 100), "simulation.resource_initial_value"),
     immigration_mode = spec_setting(spec, "simulation", "immigration_mode", "continuous"),
+    ode_rhs = spec_ode_setting(spec, "rhs", "r"),
     ode_method = spec_ode_setting(spec, "method", "lsoda"),
     ode_rtol = numeric_spec_setting(spec_ode_setting(spec, "rtol", 1e-6), "simulation.ode.rtol"),
     ode_atol = numeric_spec_setting(spec_ode_setting(spec, "atol", 1e-8), "simulation.ode.atol"),
@@ -527,6 +528,7 @@ simulate_dynamics_from_spec <- function(experiment_folder,
       initial_consumer_total_abundance = settings$initial_consumer_total_abundance,
       resource_initial_value = settings$resource_initial_value,
       immigration_mode = settings$immigration_mode,
+      ode_rhs = settings$ode_rhs,
       ode_method = settings$ode_method,
       ode_rtol = settings$ode_rtol,
       ode_atol = settings$ode_atol,

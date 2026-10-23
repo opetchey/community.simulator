@@ -419,6 +419,7 @@ validate_ode_spec <- function(ode, model_type) {
   if (!model_type %in% c("lv_continuous", "consumer_resource_continuous")) {
     stop("`simulation.ode` is only used by continuous-time models.", call. = FALSE)
   }
+  if (!is.null(ode$rhs)) require_one_of(ode$rhs, "simulation.ode.rhs", c("r", "compiled"))
   if (!is.null(ode$method)) {
     require_scalar_character(ode$method, "simulation.ode.method")
   }

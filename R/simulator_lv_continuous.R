@@ -23,6 +23,7 @@
 #' @param maxsteps Optional maximum number of internal solver steps before
 #'   reaching the next output time. Passed to `deSolve::ode()` when supplied.
 #' @param blowup_threshold Abundance threshold above which the run stops.
+#' @param rhs RHS implementation: `"r"` (default) or `"compiled"`.
 #' @param negative_tolerance Nonnegative tolerance for numerical negative
 #'   returned abundances. Output below its negative causes failure; tolerated
 #'   negative output is clipped to zero. Negative internal trial states are
@@ -48,7 +49,10 @@ simulator_lv_continuous <- function(input_com_params,
                                     max_step = 1,
                                     maxsteps = NULL,
                                     blowup_threshold = 1e12,
-                                    negative_tolerance = 1e-8) {
+                                    negative_tolerance = 1e-8,
+                                    rhs = "r") {
+
+  rhs <- match.arg(rhs, c("r", "compiled"))
 
   require_nonnegative_number(negative_tolerance, "negative_tolerance")
   negative_tolerance <- as.numeric(negative_tolerance)
@@ -167,10 +171,26 @@ simulator_lv_continuous <- function(input_com_params,
     ode_args$maxsteps <- maxsteps
   }
 
+  if (rhs == "compiled") {
+    parameters <- c(S, 0, if (immigration_mode == "continuous") immigration_rate else 0,
+      blowup_threshold, 1e-6 * (input_com_params$rate_scale %||% 1),
+      as.numeric(al), bopt, spread, ab, ad, z)
+    expected <- 5 + S*S + 5*S
+    if (length(parameters) != expected) stop("Invalid compiled RHS parameter dimensions.")
+    ode_args <- compiled_rhs_args(ode_args, "lv", parameters,
+                                  times, temperatures, temperature_interpolation)
+  }
+
   ode_output <- run_ode_with_captured_output(
     ode_args,
     failure_prefix = "Continuous-time ODE solve failed: "
   )
+  if (rhs == "compiled") {
+    trials <- .Call("cs_trials", PACKAGE = "community.simulator")
+    negative_trial_evaluations <- as.integer(trials[1])
+    minimum_trial_abundance <- trials[2]
+    time_of_minimum_trial <- trials[3]
+  }
   solver_output <- attr(ode_output, "community.simulator.ode_solver_output")
 
   output <- as.data.frame(ode_output)

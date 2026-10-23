@@ -19,7 +19,8 @@ simulator_consumer_resource_continuous(
   max_step = 1,
   maxsteps = NULL,
   blowup_threshold = 1e+12,
-  negative_tolerance = 1e-08
+  negative_tolerance = 1e-08,
+  rhs = "r"
 )
 }
 \arguments{
@@ -53,6 +54,8 @@ reaching the next output time. Passed to \code{deSolve::ode()} when supplied.}
 \item{blowup_threshold}{State-value threshold above which the run stops.}
 
 \item{negative_tolerance}{Negative tolerance for numerical error.}
+
+\item{rhs}{RHS implementation: \code{"r"} (default) or \code{"compiled"}.}
 }
 \value{
 A named list with \code{consumers} and \code{resources} data frames.
