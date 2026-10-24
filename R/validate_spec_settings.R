@@ -27,7 +27,8 @@ experiment_settings_schema <- function() {
     output = fields("save_dynamics", "save_resources", "record_dynamics_wall_time",
       "dynamics_save_every", "resources_save_every", "summary_checkpoint_every",
       "runtime_update_every", "simulation_progress", "environment_progress"),
-    parallel = fields("workers", "environments", "simulations", "community_measures"),
+    parallel = fields("workers", "environments", "simulations", "community_measures",
+      "worker_timeout_minutes", "worker_retries", "chunk_size"),
     measures = fields("extinction_threshold", "soft_viability_scale"),
     treatments = fields("mode", "values")
   )

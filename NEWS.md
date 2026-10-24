@@ -1,3 +1,21 @@
+# community.simulator 0.9.0.9002
+
+- Replaced fork workers in environment generation, dynamics and CPC measures
+  with supervised independent R sessions using callr. Database connections are
+  closed before dispatch; only each chunk's inputs are sent to workers.
+- Added optional `parallel.worker_timeout_minutes` (120), `worker_retries` (2),
+  and `chunk_size` (10). Hung, dead and erroring workers are terminated and
+  retried in fresh sessions, with case IDs and timings in the JSON-line log.
+  All workers are cleaned up on completion, error or interrupt.
+- Parallel results are committed in input order, and case coverage is validated
+  before final output. Explicit seeds are preserved; legacy unseeded dynamics
+  draw initial abundances once in the parent in serial order for retry stability.
+  Unseeded legacy runs saving database output use one supervised case at a time
+  to preserve SQLite-related RNG consumption; explicit abundance seeds retain
+  full concurrency.
+- Fixed integer overflow in large preflight runtime and temperature-row estimates.
+- The compiled ODE RHS and its numerical settings are unchanged.
+
 # community.simulator 0.9.0.9001
 
 - Added an optional compiled C RHS for continuous consumer-resource and LV

@@ -95,6 +95,10 @@ confirm_experiment_run <- function(summary) {
   message("Estimated runtime: ", format_duration(summary$estimated_total_seconds))
   if (summary$parallel_environments || summary$parallel_simulations || summary$parallel_community_measures) {
     message("Parallel workers: ", summary$parallel_workers)
+    message("Parallel backend: supervised independent R sessions (callr)")
+    message("Worker timeout (minutes): ", summary$worker_timeout_minutes)
+    message("Worker retries: ", summary$worker_retries)
+    message("Cases per worker chunk: ", summary$chunk_size)
     message("Parallel environment generation: ", summary$parallel_environments)
     message("Parallel simulations: ", summary$parallel_simulations)
     message("Parallel community measures: ", summary$parallel_community_measures)
@@ -305,7 +309,7 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
     0
   }
 
-  env_series_count <- nrow(environment_table)
+  env_series_count <- as.numeric(nrow(environment_table))
   temperature_rows <- env_series_count * length(environment_sample_times(settings))
 
   estimated_dynamics_db_bytes <- dynamics_rows * 45
@@ -325,10 +329,12 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
   )
 
   rates <- runtime_estimator_rates(settings$dynamics_type)
-  effective_workers <- if (settings$parallel_simulations) settings$parallel_workers else 1L
+  serial_rng <- !"initial_abundance_seed" %in% names(simulation_table) &&
+    is.null(settings$initial_abundance_seed_base) && (settings$save_dynamics || save_resources)
+  effective_workers <- if (settings$parallel_simulations && !serial_rng) settings$parallel_workers else 1L
   estimated_experiment_table_seconds <- max(
     rates$experiment_table_fixed_seconds,
-    nrow(simulation_table) * rates$experiment_table_seconds_per_case
+    as.numeric(nrow(simulation_table)) * rates$experiment_table_seconds_per_case
   )
   effective_environment_workers <- if (settings$parallel_environments) {
     max(1L, min(settings$parallel_workers, env_series_count))
@@ -339,7 +345,7 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
     temperature_rows * 0.00029 / effective_environment_workers
   reference_parallel_workers <- 29
   estimated_simulation_seconds <- (
-    nrow(simulation_table) *
+    as.numeric(nrow(simulation_table)) *
       integration_steps *
       rates$simulation_seconds_per_case_step *
       reference_parallel_workers
@@ -350,7 +356,7 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
     1
   }
   estimated_community_measure_seconds <- (
-    nrow(simulation_table) * rates$community_measure_seconds_per_case
+    as.numeric(nrow(simulation_table)) * rates$community_measure_seconds_per_case
   ) / effective_community_measure_workers
   estimated_io_seconds <- (dynamics_rows + resource_rows) * 0.00001
   estimated_total_seconds <- estimated_experiment_table_seconds +
@@ -380,6 +386,10 @@ estimate_experiment_outputs_from_spec <- function(experiment_folder, spec) {
     parallel_simulations = settings$parallel_simulations,
     parallel_community_measures = settings$parallel_community_measures,
     parallel_workers = settings$parallel_workers,
+    parallel_backend = "callr",
+    worker_timeout_minutes = settings$worker_timeout_minutes,
+    worker_retries = settings$worker_retries,
+    chunk_size = settings$chunk_size,
     estimated_dynamics_db_bytes = estimated_dynamics_db_bytes,
     estimated_resources_db_bytes = estimated_resources_db_bytes,
     estimated_temperatures_db_bytes = estimated_temperatures_db_bytes,

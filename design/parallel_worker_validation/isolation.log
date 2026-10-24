@@ -1,0 +1,4 @@
+    inherited_db inherited_global 
+           FALSE            FALSE 
+[1] TRUE
+Abrupt parent death: both supervised workers terminated.

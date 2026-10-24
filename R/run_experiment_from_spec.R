@@ -149,6 +149,9 @@ flatten_spec_settings <- function(spec) {
     runtime_update_every = integer_spec_setting(spec_setting(spec, "output", "runtime_update_every", 100), "output.runtime_update_every"),
     simulation_progress = isTRUE(spec_setting(spec, "output", "simulation_progress", TRUE)),
     environment_progress = isTRUE(spec_setting(spec, "output", "environment_progress", TRUE)),
+    worker_timeout_minutes = spec_setting(spec, "parallel", "worker_timeout_minutes", 120),
+    worker_retries = spec_setting(spec, "parallel", "worker_retries", 2L),
+    chunk_size = spec_setting(spec, "parallel", "chunk_size", 10L),
     parallel_workers = worker_spec_setting(spec_setting(spec, "parallel", "workers", 1), "parallel.workers"),
     parallel_environments = isTRUE(spec_setting(spec, "parallel", "environments", FALSE)),
     parallel_simulations = isTRUE(spec_setting(spec, "parallel", "simulations", FALSE)),
@@ -202,108 +205,6 @@ make_progress_reporter <- function(label,
     )
     invisible(TRUE)
   }
-}
-
-supports_forked_parallel <- function(enabled, workers) {
-  isTRUE(enabled) && workers > 1L && .Platform$OS.type != "windows"
-}
-
-run_indexed_jobs <- function(indices,
-                             workers,
-                             FUN,
-                             progress_reporter,
-                             failure_label,
-                             on_result = NULL,
-                             store_results = TRUE) {
-  pending_cases <- indices
-  active_jobs <- list()
-  out <- vector("list", length(indices))
-  completed_cases <- 0L
-
-  start_job <- function(case_index) {
-    job <- parallel::mcparallel(
-      FUN(case_index),
-      name = as.character(case_index),
-      silent = TRUE
-    )
-    list(case_index = case_index, job = job)
-  }
-
-  while (length(pending_cases) > 0 || length(active_jobs) > 0) {
-    while (length(pending_cases) > 0 && length(active_jobs) < workers) {
-      next_case <- pending_cases[[1]]
-      pending_cases <- pending_cases[-1]
-      active_jobs[[as.character(next_case)]] <- start_job(next_case)
-    }
-
-    job_list <- lapply(active_jobs, `[[`, "job")
-    collected <- parallel::mccollect(job_list, wait = FALSE)
-
-    if (length(collected) == 0) {
-      Sys.sleep(0.1)
-      next
-    }
-
-    for (pid in names(collected)) {
-      if (pid %in% names(active_jobs)) {
-        active_name <- pid
-      } else {
-        active_match <- vapply(
-          active_jobs,
-          function(active_job) as.character(active_job$job$pid) == pid,
-          logical(1)
-        )
-        if (!any(active_match)) {
-          next
-        }
-        active_name <- names(active_jobs)[active_match][[1]]
-      }
-
-      case_index <- active_jobs[[active_name]]$case_index
-      case_result <- collected[[pid]]
-      if (inherits(case_result, "try-error")) {
-        stop(
-          failure_label,
-          " ",
-          case_index,
-          " failed in a parallel worker: ",
-          conditionMessage(attr(case_result, "condition")),
-          call. = FALSE
-        )
-      }
-      if (is.null(case_result)) {
-        warning(
-          failure_label,
-          " ",
-          case_index,
-          " did not return a result from a parallel worker; rerunning it in the main R process.",
-          call. = FALSE
-        )
-        case_result <- FUN(case_index)
-        if (is.null(case_result)) {
-          stop(
-            failure_label,
-            " ",
-            case_index,
-            " returned NULL after rerunning in the main R process.",
-            call. = FALSE
-          )
-        }
-      }
-
-      if (!is.null(on_result)) {
-        on_result(case_index, case_result)
-      }
-      if (isTRUE(store_results)) {
-        out[[case_index]] <- case_result
-      }
-      completed_cases <- completed_cases + 1L
-      progress_reporter(completed_cases)
-      active_jobs[[active_name]] <- NULL
-    }
-  }
-
-  out
 }
 
 read_environment_table_for_runtime <- function(experiment_folder) {
@@ -363,28 +264,8 @@ create_environments_from_spec <- function(experiment_folder,
 
   environments <- read_environment_table_for_runtime(experiment_folder)
 
-  create_environment <- function(i) {
-    set.seed(environments$temperature_seed[i])
-    temperature_mean <- environments$temperature_mean[i]
-    temperature_sd <- environments$temperature_sd[i]
-    one_over_f_gamma <- environments$one_over_f_gamma[i]
+  create_environment <- function(i) create_prepared_environment(environments, settings, i)
 
-    sample_times <- environment_sample_times(settings)
-    tibble::tibble(
-      phase = "expt",
-      time = sample_times,
-      temperature = generate_one_over_f_temperature(
-        n = length(sample_times),
-        mean = temperature_mean,
-        sd = temperature_sd,
-        gamma = one_over_f_gamma
-      ),
-      env_series_id = environments$env_series_id[i]
-    )
-  }
-
-  conn <- DBI::dbConnect(RSQLite::SQLite(), output_path)
-  on.exit(DBI::dbDisconnect(conn), add = TRUE)
   table_written <- FALSE
 
   report_environment_progress <- make_progress_reporter(
@@ -396,26 +277,33 @@ create_environments_from_spec <- function(experiment_folder,
   environment_indices <- seq_len(nrow(environments))
 
   write_environment_result <- function(i, environment_result) {
-    DBI::dbWriteTable(
-      conn,
-      "temperatures",
-      environment_result,
-      overwrite = !table_written,
-      append = table_written
-    )
+    rng_state <- attr(environment_result, "worker_rng_state")
+    attr(environment_result, "worker_rng_state") <- NULL
+    expected_times <- environment_sample_times(settings)
+    if (!is.data.frame(environment_result) || nrow(environment_result) != length(expected_times) ||
+        !identical(environment_result$time, expected_times) ||
+        anyNA(environment_result$temperature) ||
+        !all(environment_result$env_series_id == environments$env_series_id[i])) {
+      stop("Invalid environment result for ", environments$env_series_id[i], call. = FALSE)
+    }
+    # SQLite writes themselves consume RNG draws; restore before writing so
+    # both generation and the write advance the stream exactly as in serial.
+    if (!is.null(rng_state)) assign(".Random.seed", rng_state, envir = .GlobalEnv)
+    write_stage_table(output_path, "temperatures", environment_result, table_written)
     table_written <<- TRUE
     invisible(NULL)
   }
 
-  if (supports_forked_parallel(settings$parallel_environments, settings$parallel_workers)) {
-    run_indexed_jobs(
-      indices = environment_indices,
-      workers = min(settings$parallel_workers, length(environment_indices)),
-      FUN = create_environment,
-      progress_reporter = report_environment_progress,
-      failure_label = "Environment",
-      on_result = write_environment_result,
-      store_results = FALSE
+  if (supports_parallel(settings$parallel_environments, settings$parallel_workers)) {
+    run_supervised_chunks(
+      indices = environment_indices, workers = settings$parallel_workers,
+      make_payload = function(ii) list(stage = "create_environments",
+        environments = environments[ii, , drop = FALSE], settings = settings),
+      progress_reporter = report_environment_progress, step = "create_environments",
+      on_result = write_environment_result, case_ids = environments$env_series_id,
+      timeout_minutes = settings$worker_timeout_minutes, retries = settings$worker_retries,
+      chunk_size = settings$chunk_size,
+      log_path = file.path(experiment_folder, "experiment_log.txt")
     )
   } else {
     for (i in environment_indices) {
@@ -443,10 +331,7 @@ simulate_dynamics_from_spec <- function(experiment_folder,
   settings <- flatten_spec_settings(spec)
   experiment_folder <- path.expand(experiment_folder)
 
-  conn_temperatures <- DBI::dbConnect(RSQLite::SQLite(), file.path(experiment_folder, "temperatures.db"))
-  on.exit(DBI::dbDisconnect(conn_temperatures), add = TRUE)
-  temperatures_data <- dplyr::tbl(conn_temperatures, "temperatures") |>
-    dplyr::collect()
+  temperatures_data <- read_temperature_data(file.path(experiment_folder, "temperatures.db"))
   expt <- read_simulation_table_for_runtime(experiment_folder)
   community_objects <- read_community_objects_for_runtime(experiment_folder)
 
@@ -472,35 +357,14 @@ simulate_dynamics_from_spec <- function(experiment_folder,
   save_resources <- settings$save_resources &&
     settings$dynamics_type == "consumer_resource_continuous"
 
-  conn_dynamics <- NULL
   dynamics_path <- file.path(experiment_folder, "dynamics.db")
   if (settings$save_dynamics) {
     prepare_output_path(dynamics_path, overwrite = overwrite, verbose = verbose, label = "dynamics database")
-    conn_dynamics <- DBI::dbConnect(RSQLite::SQLite(), dynamics_path)
-    on.exit({
-      if (!is.null(conn_dynamics) && DBI::dbIsValid(conn_dynamics)) {
-        DBI::dbDisconnect(conn_dynamics)
-      }
-    }, add = TRUE)
   }
-
-  conn_resources <- NULL
   resources_path <- file.path(experiment_folder, "resources.db")
   if (save_resources) {
     prepare_output_path(resources_path, overwrite = overwrite, verbose = verbose, label = "resources database")
-    conn_resources <- DBI::dbConnect(RSQLite::SQLite(), resources_path)
-    on.exit({
-      if (!is.null(conn_resources) && DBI::dbIsValid(conn_resources)) {
-        DBI::dbDisconnect(conn_resources)
-      }
-    }, add = TRUE)
   }
-
-  expt_def <- list(
-    burn_in_duration = settings$burn_in_duration,
-    experiment_duration = settings$experiment_duration,
-    temperature_mean = settings$temperature_mean
-  )
 
   dynamics_written <- FALSE
   resources_written <- FALSE
@@ -514,39 +378,17 @@ simulate_dynamics_from_spec <- function(experiment_folder,
   )
 
   simulate_case <- function(i) {
-    rate_scale <- if ("rate_scale" %in% names(expt)) expt$rate_scale[[i]] else settings$rate_scale
-    simulate_one_dynamics_case(
-      i = i,
-      expt = expt,
-      community_objects = community_objects,
-      temperatures_data = temperatures_data,
-      expt_def = expt_def,
-      dynamics_type = settings$dynamics_type,
-      temperature_interpolation = settings$temperature_interpolation,
-      immigration_rate = settings$immigration_rate * rate_scale,
-      consumer_immigration_rate = settings$consumer_immigration_rate * rate_scale,
-      initial_consumer_total_abundance = settings$initial_consumer_total_abundance,
-      resource_initial_value = settings$resource_initial_value,
-      immigration_mode = settings$immigration_mode,
-      ode_rhs = settings$ode_rhs,
-      ode_method = settings$ode_method,
-      ode_rtol = settings$ode_rtol,
-      ode_atol = settings$ode_atol,
-      ode_max_step = settings$ode_max_step,
-      ode_maxsteps = settings$ode_maxsteps,
-      blowup_threshold = settings$blowup_threshold,
-      negative_tolerance = settings$negative_tolerance,
-      dynamics_save_every = settings$dynamics_save_every,
-      resources_save_every = settings$resources_save_every,
-      save_dynamics = settings$save_dynamics,
-      save_resources = save_resources,
-      record_dynamics_wall_time = settings$record_dynamics_wall_time,
-      extinction_threshold = settings$extinction_threshold,
-      initial_abundance_seed_base = settings$initial_abundance_seed_base
-    )
+    simulate_prepared_case(expt, community_objects, temperatures_data, settings, i)
   }
 
   write_simulation_result <- function(i, case_result) {
+    validate_case_rows(case_result$case_summary, expt$case_id[i], "Simulation summary")
+    if (is.null(case_result$population_summary) ||
+        !identical(unique(case_result$population_summary$case_id), expt$case_id[i])) {
+      stop("Missing population summary for case ", expt$case_id[i], call. = FALSE)
+    }
+    if (settings$save_dynamics && is.null(case_result$dynamics)) stop("Missing dynamics for case ", expt$case_id[i])
+    if (save_resources && is.null(case_result$resources)) stop("Missing resources for case ", expt$case_id[i])
     if (!is.null(case_result$solver_diagnostics)) {
       append_experiment_log_entry(
         file.path(experiment_folder, "experiment_log.txt"),
@@ -557,38 +399,47 @@ simulate_dynamics_from_spec <- function(experiment_folder,
     }
     case_summaries[[i]] <<- case_result$case_summary
     population_summaries[[i]] <<- case_result$population_summary
-    if (!is.null(conn_dynamics) && !is.null(case_result$dynamics)) {
-      DBI::dbWriteTable(
-        conn_dynamics,
-        "dynamics",
-        case_result$dynamics,
-        overwrite = !dynamics_written,
-        append = dynamics_written
-      )
+    if (settings$save_dynamics && !is.null(case_result$dynamics)) {
+      write_stage_table(dynamics_path, "dynamics", case_result$dynamics, dynamics_written)
       dynamics_written <<- TRUE
     }
-    if (!is.null(conn_resources) && !is.null(case_result$resources)) {
-      DBI::dbWriteTable(
-        conn_resources,
-        "resources",
-        case_result$resources,
-        overwrite = !resources_written,
-        append = resources_written
-      )
+    if (save_resources && !is.null(case_result$resources)) {
+      write_stage_table(resources_path, "resources", case_result$resources, resources_written)
       resources_written <<- TRUE
     }
   }
 
   case_indices <- seq_len(nrow(expt))
-  if (supports_forked_parallel(settings$parallel_simulations, settings$parallel_workers)) {
-    run_indexed_jobs(
-      indices = case_indices,
-      workers = min(settings$parallel_workers, length(case_indices)),
-      FUN = simulate_case,
-      progress_reporter = report_simulation_progress,
-      failure_label = "Simulation case",
-      on_result = write_simulation_result,
-      store_results = FALSE
+  if (supports_parallel(settings$parallel_simulations, settings$parallel_workers)) {
+    unseeded <- !"initial_abundance_seed" %in% names(expt) && is.null(settings$initial_abundance_seed_base)
+    ordered_rng <- unseeded && (settings$save_dynamics || save_resources)
+    initial_draws <- vector("list", nrow(expt))
+    if (ordered_rng) {
+      append_experiment_log_entry(file.path(experiment_folder, "experiment_log.txt"),
+        "parallel_rng_serialized", list(step = "simulate_dynamics",
+          reason = paste("Unseeded dynamics with database output preserve the serial RNG stream",
+                         "using one supervised case at a time. Set simulation.initial_abundance_seed_base for concurrency.")))
+    }
+    make_simulation_payload <- function(ii) {
+      if (unseeded) for (i in ii) if (is.null(initial_draws[[i]])) {
+        S <- community_objects[[expt$community_id[i]]]$S
+        initial_draws[[i]] <<- (dirmult::rdirichlet(1, rep(1, S)) * settings$initial_consumer_total_abundance)[1, ]
+      }
+      cases <- expt[ii, , drop = FALSE]
+      if (unseeded) cases$prepared_initial_abundances <- initial_draws[ii]
+      list(stage = "simulate_dynamics", expt = cases,
+        communities = community_objects[unique(expt$community_id[ii])],
+        temperatures = temperatures_data[temperatures_data$env_series_id %in% expt$env_series_id[ii], , drop = FALSE],
+        settings = settings)
+    }
+    run_supervised_chunks(
+      indices = case_indices, workers = if (ordered_rng) 1L else settings$parallel_workers,
+      make_payload = make_simulation_payload,
+      progress_reporter = report_simulation_progress, step = "simulate_dynamics",
+      on_result = write_simulation_result, case_ids = expt$case_id,
+      timeout_minutes = settings$worker_timeout_minutes, retries = settings$worker_retries,
+      chunk_size = if (ordered_rng) 1L else settings$chunk_size,
+      log_path = file.path(experiment_folder, "experiment_log.txt")
     )
   } else {
     for (i in case_indices) {
@@ -597,6 +448,7 @@ simulate_dynamics_from_spec <- function(experiment_folder,
     }
   }
 
+  validate_case_rows(dplyr::bind_rows(case_summaries), expt$case_id, "Simulation summaries")
   saveRDS(dplyr::bind_rows(case_summaries), summaries_path)
   saveRDS(dplyr::bind_rows(population_summaries), population_summaries_path)
   announce_output_written(summaries_path, verbose = verbose, label = "simulation summaries file")
@@ -628,8 +480,8 @@ get_community_measures_from_spec <- function(experiment_folder,
   prepare_output_path(output_path, overwrite = overwrite, verbose = verbose, label = "community-measures file")
 
   expt <- readRDS(file.path(experiment_folder, "experiment_table.RDS"))
-  conn_temperatures <- DBI::dbConnect(RSQLite::SQLite(), file.path(experiment_folder, "temperatures.db"))
-  on.exit(DBI::dbDisconnect(conn_temperatures), add = TRUE)
+  conn_temperatures <- DBI::dbConnect(RSQLite::SQLite(), file.path(experiment_folder, "temperatures.db"), flags = RSQLite::SQLITE_RO)
+  on.exit(if (DBI::dbIsValid(conn_temperatures)) DBI::dbDisconnect(conn_temperatures), add = TRUE)
   temperatures <- dplyr::tbl(conn_temperatures, "temperatures")
 
   summaries_path <- file.path(experiment_folder, "simulation_summaries.RDS")
@@ -648,6 +500,10 @@ get_community_measures_from_spec <- function(experiment_folder,
     temperatures,
     expt
   )
+  temperatures <- dplyr::collect(temperatures)
+  DBI::dbDisconnect(conn_temperatures)
+  validate_case_rows(comm_dynamic_measures, expt$case_id, "Simulation summaries", ordered = FALSE)
+  validate_case_rows(performance_optimum_measures, expt$case_id, "Performance-optimum measures", ordered = FALSE)
   if (verbose) {
     message("Calculating CPC measures")
   }
@@ -660,7 +516,10 @@ get_community_measures_from_spec <- function(experiment_folder,
     parallel_community_measures = settings$parallel_community_measures,
     parallel_workers = settings$parallel_workers,
     verbose = settings$simulation_progress,
-    progress_update_every = settings$runtime_update_every
+    progress_update_every = settings$runtime_update_every,
+    worker_timeout_minutes = settings$worker_timeout_minutes,
+    worker_retries = settings$worker_retries, chunk_size = settings$chunk_size,
+    log_path = file.path(experiment_folder, "experiment_log.txt")
   )
 
   if (verbose) {
@@ -677,6 +536,8 @@ get_community_measures_from_spec <- function(experiment_folder,
     dplyr::left_join(performance_optimum_measures, by = "case_id") |>
     dplyr::left_join(comm_cpc, by = "case_id") |>
     standardize_community_measure_names()
+
+  validate_case_rows(comm_measures, expt$case_id, "Community measures")
 
   rm(expt, community_measure_metadata, comm_dynamic_measures, performance_optimum_measures, comm_cpc)
   gc()

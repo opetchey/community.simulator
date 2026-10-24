@@ -85,6 +85,17 @@ test_that("parent logs LV negative trial diagnostics in serial and parallel runs
           matrix(1, nrow = length(ode_args$times), ncol = length(trial),
                  dimnames = list(NULL, names(trial))))
   })
+  local_mocked_bindings(execute_stage_chunk = function(payload) {
+    assignInNamespace("run_ode_with_captured_output", function(ode_args, failure_prefix) {
+      trial <- ode_args$y
+      trial[] <- -10
+      ode_args$func(0.5, trial, NULL)
+      cbind(time = ode_args$times,
+            matrix(1, nrow = length(ode_args$times), ncol = length(trial),
+                   dimnames = list(NULL, names(trial))))
+    }, "community.simulator")
+    getFromNamespace("execute_stage_chunk", "community.simulator")(payload)
+  })
   for (parallel_run in c(FALSE, TRUE)) {
     if (parallel_run && .Platform$OS.type == "windows") next
     spec <- read_experiment_spec(system.file("experiment_templates/lv_continuous.yaml",
@@ -102,6 +113,7 @@ test_that("parent logs LV negative trial diagnostics in serial and parallel runs
     community.simulator:::create_environments_from_spec(folder, spec, verbose = FALSE)
     community.simulator:::simulate_dynamics_from_spec(folder, spec, verbose = FALSE)
     events <- lapply(readLines(file.path(folder, "experiment_log.txt")), jsonlite::fromJSON)
+    events <- Filter(function(x) identical(x$event, "ode_negative_trials"), events)
     expect_length(events, 2)
     expect_setequal(vapply(events, `[[`, character(1), "case_id"), c("case_1", "case_2"))
     for (event in events) {

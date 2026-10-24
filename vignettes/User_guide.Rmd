@@ -973,6 +973,9 @@ the bundled example experiments.
 | `parallel.environments` | All | Logical. If `TRUE`, generate environmental time series in parallel where supported. |
 | `parallel.simulations` | All | Logical. If `TRUE`, simulate cases in parallel where supported. |
 | `parallel.community_measures` | All | Logical. If `TRUE`, calculate community performance curve measures in parallel where supported. |
+| `parallel.worker_timeout_minutes` | All | Positive finite wall-clock minutes per chunk attempt, including startup; default 120. |
+| `parallel.worker_retries` | All | Nonnegative integer retries in fresh workers after timeout, death or error; default 2. |
+| `parallel.chunk_size` | All | Positive integer cases (or environments) per chunk; default 10. |
 | `output.dynamics_save_every` | All | Interval between saved population-dynamics output time points. |
 | `output.resources_save_every` | CR | Interval between saved resource output time points. |
 | `output.save_dynamics` | All | Logical. If `TRUE`, write `dynamics.db`. |
@@ -1092,7 +1095,9 @@ experiment will contain every measure.
 
 ## Parallel Processing and Runtime Reporting
 
-Only available for use in macOS and Linux. Windows users can still run experiments, but parallel processing is not supported.
+All parallel stages use supervised independent R sessions through `callr`,
+without evaluating R code in a forked copy of the caller. The backend is suitable for RStudio and
+plain Rscript, on Linux, macOS and Windows.
 
 Experiment YAML files can include runtime controls for larger runs:
 
@@ -1114,7 +1119,58 @@ allows the sparse progress updates requested in the YAML. Each progress message
 includes completed cases, elapsed time, and estimated remaining time.
 
 When parallel generation or simulation is enabled, database writing is still
-handled by the parent process. Parallel processing is intended for macOS/Linux.
+handled by the parent process. Each database read/write has a short-lived
+connection with guaranteed cleanup; connections close before dispatch. Workers
+receive only their chunk's communities, temperatures and settings, never an open
+database handle or the entire parent session. Results are committed in input
+case order, regardless of completion order, and case coverage is checked before
+saving the final measures file.
+
+The optional supervision settings are:
+
+```yaml
+parallel:
+  workers: available_cores_minus_1
+  environments: true
+  simulations: true
+  community_measures: true
+  worker_timeout_minutes: 120
+  worker_retries: 2
+  chunk_size: 10
+```
+
+The timeout is a wall-clock deadline for one chunk attempt, including R startup,
+computation and result serialization. Choose a deadline longer than the slowest
+expected **whole chunk**, or lower `chunk_size` for expensive simulations. A
+retry uses a fresh R session and identical inputs; `worker_retries: 2` allows
+three total attempts. Retries never run an unbounded task in the parent. Exhausted
+retries stop the stage with the affected case/environment IDs. The parent cleans
+up workers on normal return, error or interrupt, and callr supervision also
+protects against abrupt parent termination.
+
+Only parallel stages use these deadlines; explicitly serial stages remain serial.
+Each dispatched chunk produces a `worker_started` log entry with its PID. Failures
+produce `worker_timeout`, `worker_death` or `worker_error`, followed by
+`worker_retry` when another attempt is available. Entries contain the stage,
+chunk ID, case IDs (environment IDs for generation), attempt and elapsed seconds.
+Only the parent reports progress or writes the log.
+
+Per-case and environmental seeds are preserved. Legacy dynamics without an
+explicit initial-abundance seed draw initial abundances once from the parent's
+RNG in serial case order, then reuse those draws on retry. SQLite writes also
+consume RNG draws for internal names. When unseeded legacy dynamics saves database
+output, cases therefore run one at a time in supervised workers to preserve the
+serial RNG sequence; this is recorded as `parallel_rng_serialized`. Specify
+`simulation.initial_abundance_seed_base` (or use tables with per-case seeds) to
+enable full concurrency and reproducibility across separate workflows. Process
+management preserves the parent's RNG, and parallel environment generation leaves
+the same RNG continuation as serial generation.
+
+Legitimate undefined scientific statistics (for example a CV with zero mean)
+remain unchanged; coverage validation does not replace them with zero. A failed
+stage can leave earlier, fully written database chunks, but cannot save a final
+measures file with missing cases. Rerun with `overwrite = TRUE` after resolving
+the reported failure.
 
 The experiment log records elapsed time for the main workflow steps. It is
 plain text newline-delimited JSON, so it is readable by humans and easy to parse

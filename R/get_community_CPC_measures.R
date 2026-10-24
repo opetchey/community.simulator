@@ -26,17 +26,13 @@ get_community_CPC_measures <- function(temperatures,
                                  parallel_community_measures = FALSE,
                                  parallel_workers = 1,
                                  verbose = TRUE,
-                                 progress_update_every = 100) {
+                                 progress_update_every = 100,
+                                 worker_timeout_minutes = 120,
+                                 worker_retries = 2L,
+                                 chunk_size = 10L,
+                                 log_path = NULL) {
 
 
-
-  # Open connections and read in data
-  #conn_temperatures <- DBI::dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "temperatures.db"))
-  #temperatures <- dplyr::tbl(conn_temperatures, "temperatures")
-  #expt <- readRDS(paste0(experiment_folder, "experiment_table.RDS"))
-  # Remove previous database if it exists
-  #file.remove(paste0(experiment_folder, "imbalance.db"))
-  #conn_imbalance <- DBI::dbConnect(RSQLite::SQLite(), paste0(experiment_folder, "imbalance.db"))
 
   if (!is.numeric(soft_viability_scale) ||
       length(soft_viability_scale) != 1 ||
@@ -52,15 +48,6 @@ get_community_CPC_measures <- function(temperatures,
     parallel_workers <- 1
   }
   parallel_workers <- max(1, min(parallel_workers, nrow(expt)))
-
-  if (parallel_community_measures && parallel_workers > 1 && .Platform$OS.type == "windows") {
-    warning(
-      "`parallel_community_measures = TRUE` uses forked parallel workers, ",
-      "which are not available on Windows. Falling back to serial CPC measures.",
-      call. = FALSE
-    )
-    parallel_community_measures <- FALSE
-  }
 
   temperatures_data <- temperatures |>
     dplyr::collect() |>
@@ -340,83 +327,19 @@ get_community_CPC_measures <- function(temperatures,
       message("Calculating CPC measures in parallel with ", parallel_workers, " workers")
     }
 
-    pending_cases <- case_indices
-    active_jobs <- list()
     community_performance_measures <- vector("list", length(case_indices))
-    completed_cases <- 0L
-
-    start_job <- function(case_index) {
-      job <- parallel::mcparallel(
-        calculate_case_cpc(case_index),
-        name = as.character(case_index),
-        silent = TRUE
-      )
-      list(case_index = case_index, job = job)
-    }
-
-    while (length(pending_cases) > 0 || length(active_jobs) > 0) {
-      while (length(pending_cases) > 0 && length(active_jobs) < parallel_workers) {
-        next_case <- pending_cases[[1]]
-        pending_cases <- pending_cases[-1]
-        active_jobs[[as.character(next_case)]] <- start_job(next_case)
-      }
-
-      job_list <- lapply(active_jobs, `[[`, "job")
-      collected <- parallel::mccollect(job_list, wait = FALSE)
-
-      if (length(collected) == 0) {
-        Sys.sleep(0.1)
-        next
-      }
-
-      for (pid in names(collected)) {
-        if (pid %in% names(active_jobs)) {
-          active_name <- pid
-        } else {
-          active_match <- vapply(
-            active_jobs,
-            function(active_job) as.character(active_job$job$pid) == pid,
-            logical(1)
-          )
-          if (!any(active_match)) {
-            next
-          }
-          active_name <- names(active_jobs)[active_match][[1]]
-        }
-
-        case_index <- active_jobs[[active_name]]$case_index
-        case_result <- collected[[pid]]
-        if (inherits(case_result, "try-error")) {
-          stop(
-            "CPC measure case ", case_index, " failed in a parallel worker: ",
-            conditionMessage(attr(case_result, "condition")),
-            call. = FALSE
-          )
-        }
-        if (is.null(case_result)) {
-          warning(
-            "CPC measure case ",
-            case_index,
-            " did not return a result from a parallel worker; rerunning it in the main R process.",
-            call. = FALSE
-          )
-          case_result <- calculate_case_cpc(case_index)
-          if (is.null(case_result)) {
-            stop(
-              "CPC measure case ",
-              case_index,
-              " returned NULL after rerunning in the main R process.",
-              call. = FALSE
-            )
-          }
-        }
-
-        community_performance_measures[[case_index]] <- case_result
-        completed_cases <- completed_cases + 1L
-        report_cpc_progress(completed_cases)
-        active_jobs[[active_name]] <- NULL
-      }
-    }
+    run_supervised_chunks(case_indices, parallel_workers,
+      make_payload = function(ii) list(stage = "get_community_measures",
+        expt = expt[ii, c("case_id", "env_series_id", "community_object"), drop = FALSE],
+        temperatures = temperatures_data[temperatures_data$env_series_id %in% expt$env_series_id[ii], , drop = FALSE],
+        soft_viability_scale = soft_viability_scale),
+      on_result = function(i, value) {
+        validate_case_rows(value, expt$case_id[i], "CPC measures")
+        community_performance_measures[[i]] <<- value
+      }, progress_reporter = report_cpc_progress,
+      step = "get_community_measures", case_ids = expt$case_id,
+      timeout_minutes = worker_timeout_minutes, retries = worker_retries,
+      chunk_size = chunk_size, log_path = log_path)
   } else {
     community_performance_measures <- lapply(case_indices, function(i) {
       out <- calculate_case_cpc(i)
@@ -425,8 +348,6 @@ get_community_CPC_measures <- function(temperatures,
     })
   }
 
-  #DBI::dbDisconnect(conn_imbalance)
-  #DBI::dbDisconnect(conn_temperatures)
 
   if (any(vapply(community_performance_measures, is.null, logical(1)))) {
     missing_cases <- which(vapply(community_performance_measures, is.null, logical(1)))
@@ -444,6 +365,7 @@ get_community_CPC_measures <- function(temperatures,
     message("Combining CPC measures")
   }
   final_measures <- dplyr::bind_rows(community_performance_measures)
+  validate_case_rows(final_measures, expt$case_id, "CPC measures")
   if (nrow(final_measures) != length(case_indices)) {
     stop(
       "Expected ",

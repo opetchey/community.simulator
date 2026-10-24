@@ -56,6 +56,15 @@ test_that("per-case timing preserves results in serial and parallel for every mo
       setNames(list(delayed_simulator), simulator_name),
       list(.package = "community.simulator", .env = environment())
     ))
+    local_mocked_bindings(execute_stage_chunk = function(payload) {
+      name <- switch(payload$settings$dynamics_type, discrete = "simulator_lv_discrete",
+                     continuous = "simulator_lv_continuous",
+                     consumer_resource_continuous = "simulator_consumer_resource_continuous")
+      original <- getFromNamespace(name, "community.simulator")
+      delayed <- function(...) { Sys.sleep(0.03); original(...) }
+      assignInNamespace(name, delayed, "community.simulator")
+      getFromNamespace("execute_stage_chunk", "community.simulator")(payload)
+    })
     for (parallel in c(FALSE, TRUE)) {
       spec$output$record_dynamics_wall_time <- TRUE
       spec$parallel$simulations <- parallel

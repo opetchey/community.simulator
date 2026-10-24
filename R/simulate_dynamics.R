@@ -245,8 +245,11 @@ simulate_one_dynamics_case <- function(i,
   } else if (!is.null(initial_abundance_seed_base)) {
     set.seed(initial_abundance_seed_for_case(initial_abundance_seed_base, expt, i))
   }
-  initial_abundances <- (dirmult::rdirichlet(1, rep(1, S)) *
-                           initial_consumer_total_abundance)[1, ]
+  initial_abundances <- if ("prepared_initial_abundances" %in% names(expt)) {
+    expt$prepared_initial_abundances[[i]]
+  } else {
+    (dirmult::rdirichlet(1, rep(1, S)) * initial_consumer_total_abundance)[1, ]
+  }
 
   resources_ts <- NULL
   solver_diagnostics <- NULL

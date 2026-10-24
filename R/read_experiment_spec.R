@@ -442,6 +442,15 @@ validate_optional_runtime_sections <- function(spec) {
     if (!is.null(spec$parallel$workers)) {
       validate_parallel_workers(spec$parallel$workers)
     }
+    if (!is.null(spec$parallel$worker_timeout_minutes)) {
+      require_positive_number(spec$parallel$worker_timeout_minutes, "parallel.worker_timeout_minutes")
+    }
+    if (!is.null(spec$parallel$worker_retries)) {
+      require_nonnegative_integer(spec$parallel$worker_retries, "parallel.worker_retries")
+    }
+    if (!is.null(spec$parallel$chunk_size)) {
+      require_positive_integer(spec$parallel$chunk_size, "parallel.chunk_size")
+    }
     for (field in c("environments", "simulations", "community_measures")) {
       if (!is.null(spec$parallel[[field]])) {
         require_scalar_logical(spec$parallel[[field]], paste0("parallel.", field))

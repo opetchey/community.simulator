@@ -1,0 +1,30 @@
+{
+  "runs": [
+    {
+      "repeat_id": 1,
+      "cases": 15000,
+      "workers": 14,
+      "chunk_size": 100,
+      "seconds": 64.259,
+      "identical": true
+    },
+    {
+      "repeat_id": 2,
+      "cases": 15000,
+      "workers": 14,
+      "chunk_size": 100,
+      "seconds": 65.295,
+      "identical": true
+    },
+    {
+      "repeat_id": 3,
+      "cases": 15000,
+      "workers": 14,
+      "chunk_size": 100,
+      "seconds": 70.321,
+      "identical": true
+    }
+  ],
+  "started_workers": 450,
+  "live_workers": 0
+}

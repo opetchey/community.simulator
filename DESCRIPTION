@@ -1,6 +1,6 @@
 Package: community.simulator
 Title: Simulate Temperature-Dependent Community Dynamics and Experiments
-Version: 0.9.0.9001
+Version: 0.9.0.9002
 Authors@R: 
     person("Owen L.", "Petchey", , "owen.petchey@uzh.ch", role = c("aut", "cre"))
 Author: Owen L. Petchey [aut, cre]
@@ -19,12 +19,12 @@ Roxygen: list(markdown = TRUE)
 Depends: 
     R (>= 4.1.0)
 Suggests: 
-    callr,
     devtools,
     kableExtra,
     knitr,
     patchwork,
     pkgdown,
+    ps,
     readxl,
     rmarkdown,
     shiny,
@@ -32,6 +32,7 @@ Suggests:
 VignetteBuilder:
     knitr
 Imports: 
+    callr,
     DBI,
     dbplyr,
     deSolve,
